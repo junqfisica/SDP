@@ -2,6 +2,12 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.6.
 
+## Install angular locally
+
+  `npm install @angular/cli`
+  
+  More of [how to install angular](https://www.npmjs.com/package/@angular/cli)
+
 ## Project dependency
 
 This project uses [Bootstrap](https://getbootstrap.com/) and [ngx-bootstrap](https://valor-software.com/ngx-bootstrap/#/documentation#getting-started)
@@ -11,7 +17,9 @@ This project uses [Bootstrap](https://getbootstrap.com/) and [ngx-bootstrap](htt
 
 `sudo npm install ngx-bootstrap --save`
 
-After installing go to `.angular-cli.json` file and add at styles and scripts the .css and .js files:
+You can skip the next step if you cloned the project. The file `angular.json` should be ok.
+
+After installing go to `angular.json` file and add at styles and scripts the .css and .js files:
 
 	"styles": [
 	  "./node_modules/bootstrap/dist/css/bootstrap.min.css",
