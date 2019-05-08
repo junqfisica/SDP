@@ -10,12 +10,21 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Project dependency
 
-This project uses [Bootstrap](https://getbootstrap.com/) and [ngx-bootstrap](https://valor-software.com/ngx-bootstrap/#/documentation#getting-started)
+This project uses: 
 
-### Installing Bootstrap dependency
+[Bootstrap](https://getbootstrap.com/) 
+
+[ngx-bootstrap](https://valor-software.com/ngx-bootstrap/#/documentation#getting-started)
+
+[ng2-file-upload](https://github.com/valor-software/ng2-file-upload)
+
+
+### Installing dependencies
 `sudo npm install --save bootstrap@4 jquery@3.4.0 font-awesome`
 
 `sudo npm install ngx-bootstrap --save`
+
+`sudo npm i ng2-file-upload --save`
 
 You can skip the next step if you cloned the project. The file `angular.json` should be ok.
 
@@ -29,7 +38,6 @@ After installing go to `angular.json` file and add at styles and scripts the .cs
 	  "./node_modules/jquery/dist/jquery.min.js",
 	  "./node_modules/bootstrap/dist/js/bootstrap.min.js"
 	],
-
 
 ## Development server
 
