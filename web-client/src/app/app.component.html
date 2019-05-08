@@ -1,0 +1,41 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+  <ul class="navbar-nav mr-auto">
+    <li class="nav-item">
+      <a class="nav-link" routerLink="#" routerLinkActive="active">Home <span class="sr-only">(current)</span></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" *ngIf="hasRole('ROLE_USER')" routerLink="#" routerLinkActive="active">User Feature</a>
+    </li>
+  </ul>
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+      <a class="nav-link" *ngIf="!currentUser" routerLink="/login" routerLinkActive="active">
+        <span class="fa fa-sign-in"></span> Login</a>
+      <a class="nav-item btn-group" routerLinkActive="active" *ngIf="currentUser">
+        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" 
+          aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-alignment">
+          <span class="fa fa-user-circle"></span> {{currentUser.username}}
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" *ngIf="hasRole('ROLE_USER')" routerLink="user/account/{{currentUser.username}}">
+            <span class="fa fa-user-circle"></span> Account
+          </a>
+          <a class="dropdown-item" *ngIf="hasRight('RIGHT_USER_CREATE')" routerLink="user/createUser">
+            <span class="fa fa-user-plus"></span> Create user
+          </a>
+          <a class="dropdown-item" *ngIf="hasRight('RIGHT_USER')" routerLink="user/users">
+            <span class="fa fa-users"></span> Users
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" (click)="logout()">
+            <span class="fa fa-sign-out"></span> Logout
+          </a>
+        </div>
+      </a>
+    </li>
+  </ul>
+</nav>
+<div *ngFor="let alert of alerts">
+  <alert [type]="alert.type" [dismissible]=true [dismissOnTimeout]="alert.timeout" (onClosed)="onClosed(alert)">{{ alert.msg }}</alert>
+</div>
+<router-outlet></router-outlet>

@@ -1,0 +1,5 @@
+/* Override bootstrap style when click a dropdown-item */
+.dropdown-item.active, .dropdown-item:active {
+    color: #fff;
+    background-color: slategray;
+}

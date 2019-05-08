@@ -1,0 +1,104 @@
+<div class="page-header">
+  <h3 style="font-weight: bold; text-align: center; padding-bottom: 1%;">Users</h3>
+</div>
+<div class="pull-left">
+  <a routerLink="/user/createUser" class="btn btn-default" *ngIf="hasRole('ROLE_ADMIN')" title="Create a new user">
+    <span class="fa fa-user-plus icon-big icon-link"></span>
+  </a>
+</div>
+<div class="d-flex justify-content-start navbar" id="header">
+  <div class="form-inline">
+    <input [(ngModel)]="searchUsername"
+      [typeahead]="dataSource"
+      (typeaheadLoading)="changeTypeaheadLoading($event)"
+      (typeaheadOnSelect)="typeaheadOnSelect($event)"
+      [typeaheadOptionsLimit]="10"
+      typeaheadWaitMs="500"
+      typeaheadOptionField="username"
+      [typeaheadItemTemplate]="userTypeaheadTemplate"
+      placeholder="Username or Name"
+      class="form-control mr-sm-2">
+    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"
+      (click)="searchUsers('username, name, surname', searchUsername,'username')" [disabled]="typeaheadLoading">
+        <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
+        <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
+    </button>
+  </div>
+</div>
+<table class="table table-striped table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Role</th>
+      <th>Name</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of users">
+      <td>{{user.username}}</td>
+      <td>
+        <i class="fa fa-cogs icon-medium" *ngIf="userHasRole(user, 'ROLE_ADMIN')" title="Admin"></i>
+        <i class="fa fa-user icon-medium" *ngIf="userHasRole(user, 'ROLE_USER') && !userHasRole(user, 'ROLE_ADMIN')" title="User"></i>
+      </td>
+      <td>{{user.name}} {{user.surname}}</td>
+      <td>
+        <div class="pull-right">
+          <a routerLink="/user/edit/{{user.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_USER_EDIT')" title="edit">
+            <span class="fa fa-pencil icon-medium"></span>
+          </a>
+          <button (click)="openDeleteModal(deleteModalTemplate, user)" class="btn btn-xs btn-default" 
+            *ngIf="hasRight('RIGHT_USER_DELETE')" title="delete" [disabled]="isCurrentUser(user)">
+            <span class="fa fa-trash-o icon-medium"></span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ng-template [ngTemplateOutlet]="pagination"></ng-template>
+
+<!-- Modal temples -->
+<ng-template #deleteModalTemplate let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Delete user {{deleteUser?.username}}</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete this user?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="deleteUserFromModal()">Delete</button>
+    <button type="button" class="btn btn-outline-dark" (click)="closeDeleteModal()">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #userTypeaheadTemplate let-user="item">
+  <i>Username: {{user.username}}, Name: {{ user.name }} {{user.surname}}</i>
+</ng-template>
+
+<ng-template #pagination>
+    <div class="d-flex justify-content-end">
+        <div class="p-2">
+            <div class="btn-group" dropdown style="padding-right: 10px;">
+                <button id="button-basic" dropdownToggle type="button" class="btn btn-dark dropdown-toggle"
+                aria-controls="dropdown-basic">
+                {{itemsPerPage}} <span class="caret"></span>
+                </button>
+                <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+                role="menu" aria-labelledby="button-basic">
+                <li role="menuitem"><button class="dropdown-item" (click)="itemsPerPageChanged(10)">10</button></li>
+                <li role="menuitem"><button class="dropdown-item" (click)="itemsPerPageChanged(20)">20</button></li>
+                <li role="menuitem"><button class="dropdown-item" (click)="itemsPerPageChanged(50)">50</button></li>
+                <li role="menuitem"><button class="dropdown-item" (click)="itemsPerPageChanged(100)">100</button></li>
+                </ul>
+            </div>
+            </div>
+        <div class="p-2">
+            <pagination [totalItems]="totalItems" [(ngModel)]="page" [itemsPerPage]="itemsPerPage"
+            (pageChanged)="pageChanged($event)" [maxSize]=5
+            [boundaryLinks]="true" previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;"
+            lastText="&raquo;">
+            </pagination>
+        </div>
+    </div>
+</ng-template>

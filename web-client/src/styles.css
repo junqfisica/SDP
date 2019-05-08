@@ -1,0 +1,32 @@
+/* You can add global styles to this file, and also import other style files */
+.icon-big:before {
+    font-size: 30px
+}
+
+.icon-medium::before {
+    font-size: 20px
+}
+
+.icon-link {
+    color:#bd5734
+}
+
+.button-transparent {
+    background-color: transparent;
+}
+
+/* Set of new colors.*/
+:color {
+    --dark: #343a40;
+}
+
+/* Override ngx-pagination color's style. */
+pagination li.page-item.active a.page-link  {
+    background-color: var(--dark) !important;
+    color: white !important;
+    border-color: var(--dark) !important;
+}
+
+pagination li.page-item a.page-link  {
+    color: var(--dark) !important;
+}

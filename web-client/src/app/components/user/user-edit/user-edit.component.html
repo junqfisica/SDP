@@ -1,0 +1,69 @@
+<div class="container" *ngIf="userForm">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2>Update the user {{user.username}}</h2>
+      <form [formGroup]="userForm"  (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" formControlName="firstName" class="form-control" 
+              [ngClass]="{ 'is-invalid': submitted && f.firstName.errors }" 
+              placeholder="First name" />
+            <div class="invalid-feedback">First Name is required</div>
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" formControlName="lastName" class="form-control" 
+              [ngClass]="{ 'is-invalid': submitted && f.lastName.errors }"
+              placeholder="Last name" />
+            <div class="invalid-feedback">Last Name is required.</div>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" formControlName="username" class="form-control" 
+            [ngClass]="{ 'is-invalid': submitted && f.username.errors }"
+            autocomplete="off"/>
+          <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+            <div *ngIf="f.username.errors.required">Username is required.</div>
+            <div *ngIf="f.username.errors.isTaken">This username already exists.</div>
+          </div>
+        </div>
+        <tabset>
+          <!--Rollen Tab-->
+          <tab heading="Roles" id="roleTab">
+            <div class="form-group" formGroupName="roles">
+                <div class="form-check">
+                  <div *ngFor="let role of roles">
+                    <input type="checkbox" formControlName="{{role.role_id}}" id="{{role.role_id}}" class="form-check-input" 
+                    [ngClass]="{ 'is-invalid': submitted && rolesForm.get(role.role_id).errors }"
+                    [checked]="role.selected" (change)="onToogleRole(role)"/>
+                    <label class="form-check-label" for="{{role.role_id}}">
+                      {{role.label}}
+                    </label>
+                    <div class="invalid-feedback">
+                      <div>You must select at least one role.</div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </tab> 
+          <tab heading="Rights" id="rightTab">
+            <div class="form-group" formGroupName="rights">
+                <div class="form-check">
+                  <div *ngFor="let right of rights">
+                    <input type="checkbox" formControlName="{{right.right_id}}" id="{{right.right_id}}" class="form-check-input" 
+                    [checked]="right.selected" (change)="onToogleRight(right)"/>
+                    <label class="form-check-label" for="{{right.right_id}}">
+                      {{right.label}}
+                    </label>
+                  </div>
+                </div>
+            </div>
+          </tab> 
+        </tabset>
+        <div class="form-group">
+            <button [disabled]="userForm.pending" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
