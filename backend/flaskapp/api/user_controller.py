@@ -157,3 +157,4 @@ def delete_user(user_id):
         app_logger.warning("User {} could't be deleted.".format(user.username))
 
     return response.bool_to_response(deleted)
+

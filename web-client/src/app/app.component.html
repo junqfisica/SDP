@@ -4,7 +4,8 @@
       <a class="nav-link" routerLink="#" routerLinkActive="active">Home <span class="sr-only">(current)</span></a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" *ngIf="hasRole('ROLE_USER')" routerLink="#" routerLinkActive="active">User Feature</a>
+      <a class="nav-link" *ngIf="hasRight('RIGHT_DATA_UPLOAD')" routerLink="data/upload/{{currentUser.username}}" 
+        routerLinkActive="active">Upload Data</a>
     </li>
   </ul>
   <ul class="navbar-nav ml-auto">

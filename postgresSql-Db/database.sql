@@ -29,6 +29,7 @@ insert into SDP.S_RIGHTS values ('RIGHT_USER','View users');
 insert into SDP.S_RIGHTS values ('RIGHT_USER_CREATE','Create users');
 insert into SDP.S_RIGHTS values ('RIGHT_USER_EDIT','Edit users');
 insert into SDP.S_RIGHTS values ('RIGHT_USER_DELETE','Delete users');
+insert into SDP.S_RIGHTS values ('RIGHT_DATA_UPLOAD','Can upload data');
 
 create table SDP.S_ROLES
 (
@@ -55,6 +56,7 @@ insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_USER');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_USER_CREATE');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_USER_EDIT');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_USER_DELETE');
+insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_DATA_UPLOAD');
 
 create table SDP.T_USER (
 	ID varchar(16) not null, 
@@ -111,4 +113,5 @@ insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER_CREATE');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER_DELETE');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER_EDIT');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER');
+insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_DATA_UPLOAD');
 

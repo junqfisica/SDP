@@ -38,6 +38,7 @@ class Right:
     CREATE_USER = "RIGHT_USER_CREATE"
     EDIT_USER = "RIGHT_USER_EDIT"
     DELETE_USER = "RIGHT_USER_DELETE"
+    UPLOAD_DATA = "RIGHT_DATA_UPLOAD"
 
 
 # Import models. Watch for circular dependencies.

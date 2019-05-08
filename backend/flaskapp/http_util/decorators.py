@@ -144,6 +144,30 @@ def post_from_form(*form_parameters: str):
     return app_decorator
 
 
+def post_file():
+    """
+    Get file from post.
+
+    Example::
+
+        @api.route("/upload", methods=["POST"])
+        @post_file()
+        def my_func(file):
+             print(file)
+
+    :return: Inject file from request.files['file'] to the method.
+    """
+    def app_decorator(func):
+        @wraps(func)
+        def wrap_func(*args, **kwargs):
+            file = request.files['file']
+            return func(file, *args, **kwargs)
+
+        return wrap_func
+
+    return app_decorator
+
+
 def secure(permission: str):
     """
     Check if user has a given role/right. If not, raise :class:`PermissionDenied` exception witch

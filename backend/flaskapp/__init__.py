@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+
 from flaskapp.config import Config
 
 db = SQLAlchemy()
@@ -59,12 +60,14 @@ def create_app(config_class=Config):
     # this must be imported only after flask configuration.
     from flaskapp.api import api as api_blueprint
     from flaskapp.api import users as users_blueprint
+    from flaskapp.api import seismic_data as seismic_data_blueprint
     from flaskapp.main.index import main as main_blueprint
     from flaskapp.http_util.exceptions import errors
 
     # register new APIs here.
     app.register_blueprint(api_blueprint, url_prefix='/api')
     app.register_blueprint(users_blueprint, url_prefix='/api/user')
+    app.register_blueprint(seismic_data_blueprint, url_prefix='/api/seismicData')
 
     # redirect to Angular build.
     app.register_blueprint(main_blueprint)

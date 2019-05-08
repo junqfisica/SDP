@@ -13,6 +13,8 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 
+import { FileUploadModule } from 'ng2-file-upload';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { UserService } from './services/user/user.service';
@@ -25,6 +27,7 @@ import { LoginPermission, SameUserPermission, AdminPermission, RightPermission }
 import { UserListComponent } from './components/user/user-list/user-list.component';
 import { UserEditComponent } from './components/user/user-edit/user-edit.component';
 import { AccountComponent } from './components/user/account/account.component';
+import { DataUploadComponent } from './components/seismic-data/data-upload/data-upload.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +36,8 @@ import { AccountComponent } from './components/user/account/account.component';
     CreateUserComponent,
     UserListComponent,
     UserEditComponent,
-    AccountComponent
+    AccountComponent,
+    DataUploadComponent
   ],
   imports: [
     BrowserModule,
@@ -48,7 +52,8 @@ import { AccountComponent } from './components/user/account/account.component';
     BsDropdownModule.forRoot(),
     PaginationModule.forRoot(),
     TypeaheadModule.forRoot(),
-    CollapseModule.forRoot()
+    CollapseModule.forRoot(),
+    FileUploadModule
   ],
   providers: [
     AuthService,
