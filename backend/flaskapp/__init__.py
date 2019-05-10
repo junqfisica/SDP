@@ -60,14 +60,14 @@ def create_app(config_class=Config):
     # this must be imported only after flask configuration.
     from flaskapp.api import api as api_blueprint
     from flaskapp.api import users as users_blueprint
-    from flaskapp.api import seismic_data as seismic_data_blueprint
+    from flaskapp.api import pre_production as seismic_data_blueprint
     from flaskapp.main.index import main as main_blueprint
     from flaskapp.http_util.exceptions import errors
 
     # register new APIs here.
     app.register_blueprint(api_blueprint, url_prefix='/api')
     app.register_blueprint(users_blueprint, url_prefix='/api/user')
-    app.register_blueprint(seismic_data_blueprint, url_prefix='/api/seismicData')
+    app.register_blueprint(seismic_data_blueprint, url_prefix='/api/preProduction')
 
     # redirect to Angular build.
     app.register_blueprint(main_blueprint)

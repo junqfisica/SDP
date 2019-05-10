@@ -6,13 +6,14 @@
   <form class="form-horizontal">
     <div class="row">
       <div class="col-sm-3">
-        <h5>Choose files</h5>
         <label for="uploader-input" ng2FileDrop
-          [ngClass]="{'nv-file-over-class': hasBaseDropZoneOver}" (fileOver)="fileOverBase($event)"
-          [uploader]="uploader" class="card card-body bg-light
-          my-drop-zone">Upload files: click or drag</label>
-        <input type="file" ng2FileSelect [uploader]="uploader"
-          multiple id="uploader-input" style="display:none" />
+          [ngClass]="{'nv-file-over-class': hasBaseDropZoneOver}" (fileOver)="fileOverBase($event)" 
+          [uploader]="uploader" class="card card-body bg-light my-drop-zone"
+          style="height: 100%; text-align: center;">
+          <h5>Choose files</h5>
+          <span>Click or Drag here to add files.</span>
+      </label>
+        <input type="file" ng2FileSelect [uploader]="uploader" multiple id="uploader-input" style="display:none" />
       </div>
       <div class="col-sm-9">
         <h5>Upload Progress</h5>
@@ -80,14 +81,18 @@
               <span class="fa fa-upload"></span> Upload all
             </button>
             <button type="button" class="btn btn-info btn-s" (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
-              <span class="fa fa-close"></span> Cancel upload
+              <span class="fa fa-close"></span> Cancel uploads
             </button>
             <button type="button" class="btn btn-danger btn-s" (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
-              <span class="fa fa-trash-o"></span> Delete all
+              <span class="fa fa-trash-o"></span> Clear all
             </button>
           </div>
         </div>
       </div>
     </div>
   </form>
+  <div style="color: red">
+    Valid formats:
+    <span *ngFor="let ext of supportedFileExt"> *.{{ext}}</span> 
+  </div>
 </div>

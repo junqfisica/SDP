@@ -146,20 +146,21 @@ def post_from_form(*form_parameters: str):
 
 def post_file():
     """
-    Get file from post.
+    Get a streamed file from post form.
 
     Example::
 
         @api.route("/upload", methods=["POST"])
         @post_file()
-        def my_func(file):
-             print(file)
+        def my_func(stream_file: FileStorage):
+             print(stream_file)
 
-    :return: Inject file from request.files['file'] to the method.
+    :return: Injects a stream of type FileStorage from request.files['file'] to the method.
     """
     def app_decorator(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
+            print("File")
             file = request.files['file']
             return func(file, *args, **kwargs)
 
