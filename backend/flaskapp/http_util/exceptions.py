@@ -4,8 +4,6 @@ from flask import jsonify, Blueprint
 
 
 # Exceptions Classes
-
-
 class AppException(Exception):
 
     status_code = http.HTTPStatus.INTERNAL_SERVER_ERROR
@@ -37,6 +35,16 @@ class RoleNotFound(AppException):
     status_code = http.HTTPStatus.FAILED_DEPENDENCY
 
 
+class ForbiddenFileFormat(AppException):
+
+    status_code = http.HTTPStatus.FORBIDDEN
+
+
+class FileAlreadyExists(AppException):
+
+    status_code = http.HTTPStatus.CONFLICT
+
+
 def error_to_response(error: AppException):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
@@ -44,7 +52,6 @@ def error_to_response(error: AppException):
 
 
 # Register exceptions in the app.
-
 errors = Blueprint('errors', __name__)
 
 
@@ -65,4 +72,14 @@ def handle_permission_denied(error: AppException):
 
 @errors.app_errorhandler(RoleNotFound)
 def handle_role_not_found(error: AppException):
+    return error_to_response(error)
+
+
+@errors.app_errorhandler(ForbiddenFileFormat)
+def handle_forbidden_file_format(error: AppException):
+    return error_to_response(error)
+
+
+@errors.app_errorhandler(FileAlreadyExists)
+def handle_file_already_exists(error: AppException):
     return error_to_response(error)

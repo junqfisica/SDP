@@ -160,7 +160,6 @@ def post_file():
     def app_decorator(func):
         @wraps(func)
         def wrap_func(*args, **kwargs):
-            print("File")
             file = request.files['file']
             return func(file, *args, **kwargs)
 
