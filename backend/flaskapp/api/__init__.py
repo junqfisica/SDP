@@ -4,6 +4,7 @@ from flask import Blueprint
 api = Blueprint('api', __name__)
 users = Blueprint('users', __name__)
 pre_production = Blueprint('pre_production', __name__)
+setting = Blueprint('setting', __name__)
 
 # import the controllers.
-from flaskapp.api import user_controller, login_controller, pre_production_controller
+from flaskapp.api import user_controller, login_controller, pre_production_controller, setting_controler

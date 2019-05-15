@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-10">
+      <h2>Edit application parameter {{param.param_id}}</h2>
+      <form class="form-horizontal"  ng-enter="updateApplicationParam()">
+        <div class="form-group">
+          <label>Id</label>
+          <input type="text" id="id" class="form-control" name="id" [(ngModel)]="param.param_id" placeholder="Id"
+            required="true" disabled>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input id="label" type="text" class="form-control" name="label"
+            [ngClass]="{ 'is-invalid': param.label == '' }" 
+            [(ngModel)]="param.label" placeholder="description" required="true">
+          <div class="invalid-feedback">
+            <div>This field is required.</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Value</label>
+          <input type="text" id="value"
+            [ngClass]="{ 'is-invalid': param.param_value == '' }"
+            class="form-control" name="value" [(ngModel)]="param.param_value" placeholder="Value" required="true">
+            <div class="invalid-feedback">
+              <div>This field is required.</div>
+            </div>
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn fa fa-mail-reply" title="back" routerLink="/settings"></button>
+          <button type="button" class="btn btn-info" (click)="updateApplicationParam()">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

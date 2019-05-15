@@ -9,7 +9,7 @@ from flaskapp.file_utils import file_utils
 from flaskapp.http_util import response
 from flaskapp.http_util.decorators import secure, post_file
 from flaskapp.http_util.exceptions import ForbiddenFileFormat, FileAlreadyExists
-from flaskapp.models import Right
+from flaskapp.models import Right, AppParamsModel
 
 ACCEPTED_FILES = ["mseed"]
 
@@ -20,7 +20,8 @@ ACCEPTED_FILES = ["mseed"]
 def upload_data(file: FileStorage):
 
     if file:
-        file_path = os.path.join("/home/junqueira/Pictures/test", file.filename)
+        root_dir = AppParamsModel.get_upload_folder_path()
+        file_path = os.path.join(root_dir, file.filename)
         if os.path.exists(file_path):
             raise FileAlreadyExists("The file {} was already upload to the server".format(file.filename))
         else:

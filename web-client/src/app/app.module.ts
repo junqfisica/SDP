@@ -18,16 +18,19 @@ import { FileUploadModule } from 'ng2-file-upload';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { UserService } from './services/user/user.service';
-import { TokenInterceptor } from './interceptors/token.interceptor';
 import { AuthService } from './services/auth/auth.service';
-import { LoginComponent } from './components/login/login.component';
+import { ApplicationParamService } from './services/setting/application-param.service';
 import { NotificationService } from './services/notification/notification.service';
-import { CreateUserComponent } from './components/user/create-user/create-user.component';
+import { TokenInterceptor } from './interceptors/token.interceptor';
 import { LoginPermission, SameUserPermission, AdminPermission, RightPermission } from './urlPermission/url.permission';
+import { LoginComponent } from './components/login/login.component';
+import { CreateUserComponent } from './components/user/create-user/create-user.component';
 import { UserListComponent } from './components/user/user-list/user-list.component';
 import { UserEditComponent } from './components/user/user-edit/user-edit.component';
 import { AccountComponent } from './components/user/account/account.component';
 import { DataUploadComponent } from './components/seismic-data/data-upload/data-upload.component';
+import { SettingListComponent } from './components/setting/setting-list/setting-list.component';
+import { ApplicationParamEditComponent } from './components/setting/application-param-edit/application-param-edit.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +40,9 @@ import { DataUploadComponent } from './components/seismic-data/data-upload/data-
     UserListComponent,
     UserEditComponent,
     AccountComponent,
-    DataUploadComponent
+    DataUploadComponent,
+    SettingListComponent,
+    ApplicationParamEditComponent
   ],
   imports: [
     BrowserModule,
@@ -59,6 +64,7 @@ import { DataUploadComponent } from './components/seismic-data/data-upload/data-
     AuthService,
     NotificationService,
     UserService,
+    ApplicationParamService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

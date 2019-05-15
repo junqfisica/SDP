@@ -1,0 +1,32 @@
+.fa.fa-check-square {
+    color: green;
+}
+
+.fa.fa-exclamation-triangle.error {
+    color: red;
+}
+
+.relative {
+    position: relative;
+}
+  
+.absolute-center {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+  
+.text-center{
+    text-align: center;
+}
+  
+p {
+    font-size: 1.2rem;
+    margin: 0px;
+}
+
+p.sm {
+    font-size: 0.8rem;
+    margin: 0px;
+}

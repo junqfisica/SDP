@@ -25,6 +25,10 @@ class UserNotFound(AppException):
     status_code = http.HTTPStatus.NOT_FOUND
 
 
+class EntityNotFound(AppException):
+    status_code = http.HTTPStatus.NOT_FOUND
+
+
 class PermissionDenied(AppException):
 
     status_code = http.HTTPStatus.UNAUTHORIZED
@@ -62,6 +66,11 @@ def handle_app_exception(error: AppException):
 
 @errors.app_errorhandler(UserNotFound)
 def handle_user_not_found(error: AppException):
+    return error_to_response(error)
+
+
+@errors.app_errorhandler(EntityNotFound)
+def handle_entity_not_found(error: AppException):
     return error_to_response(error)
 
 

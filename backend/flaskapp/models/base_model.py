@@ -1,9 +1,9 @@
-from sqlalchemy import Column, or_, and_
+from sqlalchemy import Column, or_, and_, inspect
 from sqlalchemy.exc import SQLAlchemyError
 
 from flaskapp import db, app_logger
 from flaskapp.structures.structures import Search, SearchResult
-from flaskapp.http_util.exceptions import AppException
+from flaskapp.http_util.exceptions import AppException, EntityNotFound
 
 
 class BaseModel:
@@ -41,6 +41,22 @@ class BaseModel:
         clean_dict = {c.name: dto[c.name] for c in cls.__table__.columns}
         return cls(**clean_dict)
 
+    def validate(self, entity_id):
+        """
+        Validate this entity. Check if this entity exists in the database. This is useful to check
+        if after convert from dictionary the entity actually exists (valid id) in the database, before update it.
+
+        :param entity_id: The id used to validate this entity.
+
+        :return: The valid entity.
+        """
+
+        safe_entity = self.find_by_id(entity_id)
+        if not safe_entity:
+            raise EntityNotFound("The param_id = {} is not valid.".format(entity_id))
+
+        return safe_entity
+
     def save(self):
         """
         Insert or Update the given entity.
@@ -68,6 +84,21 @@ class BaseModel:
         except SQLAlchemyError as error_message:
             app_logger.error(error_message)
             return False
+
+    def __lshift__(self, other):
+        """
+        Set all the attribute values from other to self.
+
+        Usage::
+
+            entity << other_entity
+
+        :param other: The entity that will pass the attributes values.
+
+        :return:
+        """
+        for c in self.__table__.columns:
+            self.__setattr__(c.name, other.__getattribute__(c.name))
 
     @classmethod
     def __class_validation(cls):

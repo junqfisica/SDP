@@ -24,6 +24,8 @@ class TableNames:
     T_USER_ROLES = "t_user_roles"
     T_USER_RIGHTS = "t_user_rights"
     T_ROLES_RIGHTS = "t_roles_rights"
+    T_APP_PARAMS = "t_application_params"
+    S_NETWORKS = "s_networks"
 
 
 class Role:
@@ -46,3 +48,5 @@ from flaskapp.models.base_model import BaseModel
 from flaskapp.models.token_model import TokenModel
 from flaskapp.models.roles_model import RoleModel, UserRoleModel, RightModel, RolesRightsModel, UserRightModel
 from flaskapp.models.user_model import UserModel
+from flaskapp.models.app_params_model import AppParamsModel
+from flaskapp.models.networks_model import NetworkModel

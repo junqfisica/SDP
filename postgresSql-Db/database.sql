@@ -115,3 +115,24 @@ insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER_EDIT');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_DATA_UPLOAD');
 
+create table SDP.T_APPLICATION_PARAMS
+(
+    PARAM_ID varchar(50) not null,
+    LABEL varchar(100) not null,
+    PARAM_VALUE varchar(200) not null,
+    primary key (PARAM_ID)
+);
+grant all privileges on table SDP.T_APPLICATION_PARAMS to SDP;
+
+insert into SDP.T_APPLICATION_PARAMS values ('uploadFolder','Root directory to upload data', '/media/junqueira/DATA/test_sdp_data_transfer');
+
+create table SDP.S_NETWORKS
+(
+    NETWORK_ID varchar(16) not null,
+    LABEL varchar(500),
+    primary key (NETWORK_ID)
+);
+grant all privileges on table SDP.S_NETWORKS to SDP;
+
+insert into SDP.S_NETWORKS values ('ST','Network stations.');
+
