@@ -8,10 +8,10 @@ class RelationShip:
     USER = "UserModel"
     ROLE = "RoleModel"
     TOKEN = "TokenModel"
-    EQUIPMENTS = "EquipmentsModel"
+    EQUIPMENT = "EquipmentModel"
     STATIONS = "StationModel"
-    EXPERIMENTS = "ExperimentModel"
-    EXPERIMENT_EQUIPMENTS = "ExperimentEquipmentsModel"
+    STATION_SETUP = "StationSetupModel"
+    EXPERIMENT_EQUIPMENTS = "StationSetupEquipmentsModel"
 
 
 # Include the name of tables from your data base. Use this to map table's name.
@@ -30,11 +30,11 @@ class TableNames:
     T_ROLES_RIGHTS = "t_roles_rights"
     T_APP_PARAMS = "t_application_params"
     T_NETWORKS = "t_networks"
-    S_EQUIPMENT_TAGS = "s_equipment_tags"
-    S_EQUIPMENTS = "s_equipments"
+    S_EQUIPMENT_TYPE = "s_equipment_type"
+    S_EQUIPMENT = "s_equipment"
     T_STATIONS = "t_stations"
-    T_EXPERIMENTS = "t_experiments"
-    T_EXPERIMENTS_EQUIPMENTS = "t_experiments_equipments"
+    T_STATION_SETUP = "t_station_setup"
+    T_STATION_SETUP_EQUIPMENTS = "t_station_setup_equipments"
 
 
 class Role:
@@ -50,6 +50,8 @@ class Right:
     EDIT_USER = "RIGHT_USER_EDIT"
     DELETE_USER = "RIGHT_USER_DELETE"
     UPLOAD_DATA = "RIGHT_DATA_UPLOAD"
+    CREATE_FDSN = "RIGHT_FDSN_CREATE"
+    DELETE_FDSN = "RIGHT_FDSN_DELETE"
 
 
 # Import models. Watch for circular dependencies.
@@ -59,6 +61,6 @@ from flaskapp.models.roles_model import RoleModel, UserRoleModel, RightModel, Ro
 from flaskapp.models.user_model import UserModel
 from flaskapp.models.app_params_model import AppParamsModel
 from flaskapp.models.networks_model import NetworkModel
-from flaskapp.models.equipments_model import EquipmentTagsModel, EquipmentsModel
-from flaskapp.models.station_experimet_model import StationModel, ExperimentModel, ExperimentEquipmentsModel
+from flaskapp.models.equipments_model import EquipmentTypeModel, EquipmentModel
+from flaskapp.models.station_setup_model import StationModel, StationSetupModel, StationSetupEquipmentsModel
 

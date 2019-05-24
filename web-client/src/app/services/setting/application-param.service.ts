@@ -6,9 +6,7 @@ import { Observable } from 'rxjs';
 import { ServerUrl } from '../../statics/server-url';
 import { AppParams } from '../../model/model.app-param';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ApplicationParamService {
 
   constructor(private http: HttpClient) { }

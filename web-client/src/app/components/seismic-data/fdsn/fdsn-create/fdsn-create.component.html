@@ -1,0 +1,214 @@
+<div class="container">
+  <h2 style="text-align: center"> Create new FDSN metadata</h2>
+  
+  <!-- Network form-->
+  <div>
+    <button type="button" class="btn btn-lg btn-default" (click)="isNetworkCollapsed = !isNetworkCollapsed"
+      [attr.aria-expanded]="!isNetworkCollapsed" aria-controls="collapseNetwork">
+      <span *ngIf="isNetworkCollapsed" class="fa fa-plus"></span>
+      <span *ngIf="!isNetworkCollapsed" class="fa fa-minus"></span> 
+      Network
+    </button>
+  </div>
+  <div id="collapseNetwork" style="margin-left: 5%" [collapse]="isNetworkCollapsed">
+    <hr>
+    <form [formGroup]="networkForm"  (ngSubmit)="onSubmitNetwork()">
+        <div class="form-group">
+          <label>Code</label>
+          <input type="text" formControlName="networkId" class="form-control" 
+            [ngClass]="{ 'is-invalid': networkControl.networkId.errors }" 
+            placeholder="Network code" />
+            <div *ngIf="networkControl.networkId.errors" class="invalid-feedback">
+              <div *ngIf="networkControl.networkId.errors.required">*required.</div>
+              <div *ngIf="networkControl.networkId.errors.isTaken">This code already exists.</div>
+            </div>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" formControlName="description" class="form-control" 
+            placeholder="Description for this network (Optional)." />
+        </div>
+        <div class="form-group">
+          <button [disabled]="networkForm.pending" class="btn btn-info">Save</button>
+        </div>
+    </form>
+  </div>
+  
+  <!-- Equipment form-->
+  <div>
+    <button type="button" class="btn btn-lg btn-default" (click)="isEquipmentsCollapsed = !isEquipmentsCollapsed"
+      [attr.aria-expanded]="!isEquipmentsCollapsed" aria-controls="collapseEquipments">
+       <span *ngIf="isEquipmentsCollapsed" class="fa fa-plus"></span>
+       <span *ngIf="!isEquipmentsCollapsed" class="fa fa-minus"></span> 
+       Equipments
+    </button>
+  </div>
+  <div id="collapseEquipments" style="margin-left: 5%" [collapse]="isEquipmentsCollapsed">
+    <hr>
+    <form [formGroup]="equipmentForm"  (ngSubmit)="onSubmitEquipment()">
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label>Equipment Type</label>
+          <select class="custom-select mr-sm-2" formControlName="equipmentType" 
+            (change)="onChangeEquipmentType(equipmentControl.equipmentType.value)" 
+            [ngClass]="{ 'is-invalid': equipmentControl.equipmentType.errors }">
+            <option *ngFor="let type of equipmentType" value="{{type.type_id}}">{{type.type_id}}</option>
+          </select>
+          <div class="invalid-feedback">*required.</div>
+        </div>
+      </div>
+      <div class="form-group" *ngIf="!equipmentControl.equipmentType.errors">
+        <div class="custom-control custom-checkbox">
+          <input class="custom-control-input" type="checkbox" formControlName="isRestrict" id="isRestrictCheck" 
+            (click)="onClickEquipmentRestriction(!equipmentControl.isRestrict.value)">
+          <label class="custom-control-label" for="isRestrictCheck"> Use NRL database.</label>
+        </div>
+        <alert *ngIf="!equipmentControl.isRestrict.value" type="warning">
+          <strong>Warning</strong> manufactory and Instrument are not restricted from NRL database.
+        </alert>
+      </div>
+      <div class="form-row" *ngIf="!equipmentControl.equipmentType.errors">
+        <div class="form-group col-md-3">
+          <label>Manufactory</label>
+          <select *ngIf="equipmentControl.isRestrict.value" class="custom-select mr-sm-2" formControlName="equipmentManufactory"
+            (change)="onChangeEquipmentManufactory(equipmentControl.equipmentType.value, equipmentControl.equipmentManufactory.value)" 
+            [ngClass]="{ 'is-invalid': equipmentControl.equipmentManufactory.errors }">
+            <option *ngFor="let name of nrlManufactures" value="{{name}}">{{name}}</option>
+          </select>
+          <input *ngIf="!equipmentControl.isRestrict.value" type="text" formControlName="equipmentManufactory" class="form-control"  
+              placeholder="Manufactory (Optional)"/>
+          <div class="invalid-feedback">*required.</div>
+        </div>
+        <div class="form-group col-md-3" *ngIf="!equipmentControl.equipmentManufactory.errors">
+          <label>Instrument</label>
+          <select *ngIf="equipmentControl.isRestrict.value" class="custom-select mr-sm-2" formControlName="equipmentName" 
+            [ngClass]="{ 'is-invalid': equipmentControl.equipmentName.errors }">
+            <option *ngFor="let name of nrlInstruments" value="{{name}}">{{name}}</option>
+          </select>
+          <input *ngIf="!equipmentControl.isRestrict.value" type="text" formControlName="equipmentName" class="form-control" 
+              [ngClass]="{ 'is-invalid': equipmentControl.equipmentName.errors }" 
+              placeholder="Instrument"/>
+          <div class="invalid-feedback">*required.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" formControlName="description" class="form-control" 
+          placeholder="Description for this instrument (Optional)." />
+      </div>
+      <div class="form-group">
+        <button [disabled]="equipmentControl.pending" class="btn btn-info">Save</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Station form-->
+  <div>
+    <button type="button" class="btn btn-lg btn-default" (click)="isStationCollapsed = !isStationCollapsed"
+      [attr.aria-expanded]="!isStationCollapsed" aria-controls="collapseStation">
+        <span *ngIf="isStationCollapsed" class="fa fa-plus"></span>
+        <span *ngIf="!isStationCollapsed" class="fa fa-minus"></span> 
+        Station
+    </button>
+  </div>
+  <div id="collapseStation" style="margin-left: 5%" [collapse]="isStationCollapsed">
+    <hr>
+    <form [formGroup]="stationForm">
+      <div class="form-group">
+        <div class="custom-control custom-checkbox">
+          <input class="custom-control-input" type="checkbox" formControlName="isPublicData" id="isPublicDataCheck">
+          <label class="custom-control-label" for="isPublicDataCheck"> Public data</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Network code</label>
+          <select class="custom-select mr-sm-2" formControlName="networkId" [ngClass]="{ 'is-invalid': stationControl.networkId.errors }">
+              <option *ngFor="let net of networks" value="{{net.id}}">{{net.id}}</option>
+          </select>
+          <div class="invalid-feedback">*required.</div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Name</label>
+          <input type="text" formControlName="name" class="form-control" 
+              [ngClass]="{ 'is-invalid': stationControl.name.errors }" 
+              placeholder="Name" />
+            <div class="invalid-feedback">*required.</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Latitude (Deg)</label>
+          <input type="number" min="-90" max="90" class="form-control" formControlName="latitude" 
+          [ngClass]="{ 'is-invalid': stationControl.latitude.errors }">
+          <div class="invalid-feedback">*required.</div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Longitude (Deg)</label>
+          <input type="number" min="-180" max="180" formControlName="longitude" class="form-control" 
+              [ngClass]="{ 'is-invalid': stationControl.longitude.errors }">
+            <div class="invalid-feedback">*required.</div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Elevation (m)</label>
+          <input type="number" step="10" formControlName="elevation" class="form-control" 
+              [ngClass]="{ 'is-invalid': stationControl.elevation.errors }">
+            <div class="invalid-feedback">*required.</div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Depth (m)</label>
+          <input type="number" min="0" formControlName="depth" class="form-control" 
+              [ngClass]="{ 'is-invalid': stationControl.depth.errors }">
+            <div class="invalid-feedback">*required.</div>
+        </div>
+      </div>
+      <div class="form-row ">
+        <div class="form-group col-md-6">
+          <div class="form-group">
+            <button [disabled]="(stationControl.longitude.errors || stationControl.latitude.errors)" 
+              class="btn btn-info" (click)="setLocation(stationControl.latitude.value, stationControl.longitude.value)">Get Location</button>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <input type="text" placeholder="Province (Optional)" formControlName="province" class="form-control" >
+            </div>
+            <div class="form-group col-md-6">
+              <input type="text" placeholder="Country (Optional)" formControlName="country" class="form-control">
+            </div>
+            <div class="form-group col-md-6">
+              <label>Site</label>
+              <input type="text" placeholder="Site (Optional)" formControlName="site" class="form-control">
+            </div>
+            <div class="form-group col-md-6">
+              <label>Geology</label>
+              <input type="text" placeholder="Geology (Optional)" formControlName="geology" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row ">
+        <div class="form-group col-md-3">
+          <label>Create date</label>
+          <input type="text" placeholder="DD.MM.YYYY" formControlName="createDate" class="form-control" 
+            bsDatepicker
+            [bsConfig]="bsConfig" 
+            [ngClass]="{ 'is-invalid': stationControl.createDate.errors }">
+          <div *ngIf="stationControl.createDate.errors" class="invalid-feedback">
+            <div *ngIf="stationControl.createDate.errors.required">*required.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-3">
+          <label>Removal date</label>
+          <input type="text" placeholder="DD.MM.YYYY"  bsDatepicker [bsConfig]="bsConfig"
+            max="2500" formControlName="removeDate" class="form-control" [ngClass]="{ 'is-invalid': stationControl.removeDate.errors }">
+          <div *ngIf="stationControl.removeDate.errors" class="invalid-feedback">
+            <div *ngIf="stationControl.removeDate.errors.minDate">This can't be smaller than create date.</div>
+          </div> 
+        </div>
+      </div>
+      <div class="form-group">
+        <button [disabled]="stationControl.pending" class="btn btn-info" (click)="onSubmitStation()">Save</button>
+      </div>
+      </form>
+  </div>
+</div>

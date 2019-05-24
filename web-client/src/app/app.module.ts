@@ -12,6 +12,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 
 import { FileUploadModule } from 'ng2-file-upload';
 
@@ -31,6 +32,8 @@ import { AccountComponent } from './components/user/account/account.component';
 import { DataUploadComponent } from './components/seismic-data/data-upload/data-upload.component';
 import { SettingListComponent } from './components/setting/setting-list/setting-list.component';
 import { ApplicationParamEditComponent } from './components/setting/application-param-edit/application-param-edit.component';
+import { FdsnCreateComponent } from './components/seismic-data/fdsn/fdsn-create/fdsn-create.component';
+import { FdsnService } from './services/fdsn/fdsn.service';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,8 @@ import { ApplicationParamEditComponent } from './components/setting/application-
     AccountComponent,
     DataUploadComponent,
     SettingListComponent,
-    ApplicationParamEditComponent
+    ApplicationParamEditComponent,
+    FdsnCreateComponent
   ],
   imports: [
     BrowserModule,
@@ -58,6 +62,7 @@ import { ApplicationParamEditComponent } from './components/setting/application-
     PaginationModule.forRoot(),
     TypeaheadModule.forRoot(),
     CollapseModule.forRoot(),
+    BsDatepickerModule.forRoot(),
     FileUploadModule
   ],
   providers: [
@@ -65,6 +70,7 @@ import { ApplicationParamEditComponent } from './components/setting/application-
     NotificationService,
     UserService,
     ApplicationParamService,
+    FdsnService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

@@ -12,7 +12,7 @@ class StationModel(db.Model, BaseModel):
     # The table columns.
     id = db.Column(db.String(16), primary_key=True)
     network_id = db.Column(db.String(5), db.ForeignKey(TableNames.T_NETWORKS + ".id"), nullable=False)
-    name = db.Column(db.String(16), nullable=False)
+    name = db.Column(db.String(5), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     elevation = db.Column(db.Float, nullable=False)
@@ -24,42 +24,46 @@ class StationModel(db.Model, BaseModel):
     geology = db.Column(db.String(50), nullable=True)
     province = db.Column(db.String(100), nullable=True)
     country = db.Column(db.String(100), nullable=True)
-    experiments = db.relationship(RelationShip.EXPERIMENTS, backref="station",
-                                  cascade="save-update, merge, delete", lazy=True)
+    setup = db.relationship(RelationShip.STATION_SETUP, backref="station",
+                            cascade="save-update, merge, delete", lazy=True)
 
     def __repr__(self):
         return "StationModel(id={},network_id={},name={}, latitude={}, longitude={})"\
             .format(self.id, self.network_id, self.name, self.latitude, self.longitude)
 
 
-class ExperimentModel(db.Model, BaseModel):
+class StationSetupModel(db.Model, BaseModel):
 
     # The name of the table at the data base.
-    __tablename__ = TableNames.T_EXPERIMENTS
+    __tablename__ = TableNames.T_STATION_SETUP
 
     # The table columns.
     id = db.Column(db.String(16), primary_key=True)
     station_id = db.Column(db.String(16), db.ForeignKey(TableNames.T_STATIONS + ".id"), nullable=False)
+    gain = db.Column(db.String(50), nullable=False)
     sample_rate = db.Column(db.Integer, nullable=False)
+    dl_no = db.Column(db.String(16), nullable=False)
+    sensor_number = db.Column(db.String(16), nullable=False)
     start_time: date = db.Column(db.Date, nullable=False)
     stop_time: date = db.Column(db.Date, nullable=True)
-    equipments = db.relationship(RelationShip.EXPERIMENT_EQUIPMENTS, backref="experiment",
+    equipments = db.relationship(RelationShip.EXPERIMENT_EQUIPMENTS, backref="setups",
                                  cascade="save-update, merge, delete", lazy=True)
 
     def __repr__(self):
-        return "ExperimentModel(id={},station_id={},sample_rate={}, start_time={}, stop_time={})"\
-            .format(self.id, self.station_id, self.sample_rate, self.start_time, self.stop_time)
+        return "StationSetupModel(id={},station_id={},gain={},dl_no={},dl_no={},sample_rate={}, " \
+               "start_time={}, stop_time={})".format(self.id, self.station_id, self.gain, self.sample_rate,
+                                                     self.dl_no, self.sensor_number, self.start_time, self.stop_time)
 
 
-class ExperimentEquipmentsModel(db.Model, BaseModel):
+class StationSetupEquipmentsModel(db.Model, BaseModel):
 
     # The name of the table at the data base.
-    __tablename__ = TableNames.T_EXPERIMENTS_EQUIPMENTS
+    __tablename__ = TableNames.T_STATION_SETUP_EQUIPMENTS
 
     # The table columns.
-    experiment_id = db.Column(db.String(16), db.ForeignKey(TableNames.T_EXPERIMENTS + ".id"), primary_key=True)
-    equipment_id = db.Column(db.String(16), db.ForeignKey(TableNames.S_EQUIPMENTS + ".id"), primary_key=True)
+    station_setup_id = db.Column(db.String(16), db.ForeignKey(TableNames.T_STATION_SETUP + ".id"), primary_key=True)
+    equipment_id = db.Column(db.String(16), db.ForeignKey(TableNames.S_EQUIPMENT + ".id"), primary_key=True)
 
     def __repr__(self):
-        return "ExperimentEquipmentsModel(experiment_id={},equipment_id={})"\
-            .format(self.experiment_id, self.equipment_id)
+        return "StationSetupEquipmentsModel(station_setup_id={},equipment_id={})"\
+            .format(self.station_setup_id, self.equipment_id)

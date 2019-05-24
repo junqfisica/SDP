@@ -13,6 +13,7 @@ def database_config():
 
 class Config:
     SQLALCHEMY_DATABASE_URI = database_config()
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = '1000628bb0b13ce0c676dfde280ba187'
 
 

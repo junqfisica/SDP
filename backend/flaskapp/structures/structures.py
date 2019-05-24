@@ -125,3 +125,42 @@ class SearchResult(AbstractStructure, NamedTuple):
         except Exception as error:
             app_logger.error(traceback.format_exc())
             raise AppException(str(error))
+
+
+class Location(AbstractStructure, NamedTuple):
+    """
+    Class that holds a structure to return a location.
+
+    Fields:
+        latitude: Expect a float.
+
+        longitude: Expect a float.
+
+        province: The state at the location (longitude, latitude).
+
+        country: The country at the location (longitude, latitude).
+    """
+
+    latitude: float
+    longitude: float
+    province: str
+    country: str
+
+    def to_dict(self) -> dict:
+        """
+        Map this object to a dictionary.
+
+        :return: The dictionary representation of this object.
+        """
+        return self._asdict()
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def from_dict(cls, dictionary):
+        try:
+            new_d = validate_dictionary(cls, dictionary)
+            return cls(**new_d)
+
+        except Exception as error:
+            app_logger.error(traceback.format_exc())
+            raise AppException(str(error))

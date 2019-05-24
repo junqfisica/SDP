@@ -49,6 +49,11 @@ class FileAlreadyExists(AppException):
     status_code = http.HTTPStatus.CONFLICT
 
 
+class InvalidInstrumentType(AppException):
+
+    status_code = http.HTTPStatus.NOT_ACCEPTABLE
+
+
 def error_to_response(error: AppException):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
@@ -91,4 +96,9 @@ def handle_forbidden_file_format(error: AppException):
 
 @errors.app_errorhandler(FileAlreadyExists)
 def handle_file_already_exists(error: AppException):
+    return error_to_response(error)
+
+
+@errors.app_errorhandler(InvalidInstrumentType)
+def handle_invalid_instrument_type(error: AppException):
     return error_to_response(error)

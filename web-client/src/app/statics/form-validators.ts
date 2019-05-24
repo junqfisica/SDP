@@ -1,11 +1,12 @@
 import { Validators, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, take, switchMap, map } from 'rxjs/operators';
-
-import { Role } from '../model/model.role';
-import { UserService } from '../services/user/user.service';
 import { Observable } from 'rxjs';
 import { of as observableOf } from 'rxjs';
+
+import { Role } from '../model/model.role';
+import { FdsnService } from '../services/fdsn/fdsn.service';
+import { UserService } from '../services/user/user.service';
 
 
 export class AppValidador extends Validators {
@@ -31,6 +32,22 @@ export class AppValidador extends Validators {
       const valueToMatch = AppValidador.parentControlsValue(control, controlKey)
       if (control.value !== undefined && control.value != valueToMatch) {
         return { 'match': true };
+      }
+      return null;
+    };
+  }
+
+  static minDate(controlKey : string): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: boolean } | null => {
+
+      const parentValue = AppValidador.parentControlsValue(control, controlKey)
+      const minDate = new Date(parentValue)
+      const currentDate = new Date(control.value)
+      if (control.value === null){
+        return null;
+      }
+      if (parentValue !== null || (control.value !== undefined && currentDate < minDate)) {
+        return { 'minDate': true };
       }
       return null;
     };
@@ -72,4 +89,30 @@ export class UserValidador extends Validators {
       }
     }
   }
+  
+}
+
+export class FdsnValidador extends Validators {
+
+  static validateNetworkId(fdsnService: FdsnService, time: number = 500, blacklist: string[] = []) {
+    return (control: AbstractControl): Observable<ValidationErrors|null> => {
+      if (!control.valueChanges){
+        return observableOf(null);
+      } else {
+        if (blacklist.includes(control.value)){
+          return  observableOf(null)
+        }
+        return  control.valueChanges.pipe(
+          debounceTime(time),
+          distinctUntilChanged(),
+          take(1),
+          switchMap(() => fdsnService.isNetworkTaken(control.value.trim().toUpperCase())),
+          map(networkIsTaken => {
+            return networkIsTaken ? {'isTaken': true} : null
+          })
+        )
+      }
+    }
+  }
+  
 }

@@ -1,8 +1,10 @@
 from unittest import TestCase
 
+from obspy.clients.nrl import NRL
+
 from flaskapp import create_app
-from flaskapp.models import AppParamsModel, NetworkModel, EquipmentsModel, EquipmentTagsModel, StationModel, \
-    ExperimentModel, ExperimentEquipmentsModel
+from flaskapp.models import AppParamsModel, NetworkModel, EquipmentModel, EquipmentTypeModel, StationModel, \
+    StationSetupModel, StationSetupEquipmentsModel
 
 
 class TestModels(TestCase):
@@ -23,13 +25,13 @@ class TestModels(TestCase):
         print(network)
         print(network.stations)
 
-    def test_equipments_model(self):
-        equipment: EquipmentsModel = EquipmentsModel.find_by_id("GP01")
+    def test_equipment_model(self):
+        equipment: EquipmentModel = EquipmentModel.find_by(name="DATACUBE")
         self.assertIsNotNone(equipment)
         print(equipment.to_dict())
 
-    def test_equipment_tags_model(self):
-        eq_tags: EquipmentTagsModel = EquipmentTagsModel.find_by_id("Sensor_Number")
+    def test_equipment_type_model(self):
+        eq_tags: EquipmentTypeModel = EquipmentTypeModel.find_by_id("Sensor")
         self.assertIsNotNone(eq_tags)
         print(eq_tags.to_dict())
 
@@ -37,17 +39,29 @@ class TestModels(TestCase):
         station: StationModel = StationModel.find_by(name="04A", creation_date="2016/159")
         self.assertIsNotNone(station)
         print(station.to_dict())
-        print(station.experiments)
+        print(station.setup)
 
-    def test_experiment_model(self):
+    def test_station_setup_model(self):
         station: StationModel = StationModel.find_by(name="04A", creation_date="2016/159")
         self.assertIsNotNone(station)
-        experiment: ExperimentModel = ExperimentModel.find_by(station_id=station.id, start_time="2016/159")
-        self.assertIsNotNone(experiment)
-        print(experiment.to_dict())
-        print(experiment.equipments)
+        setup: StationSetupModel = StationSetupModel.find_by(station_id=station.id, start_time="2016/159")
+        self.assertIsNotNone(setup)
+        print(setup.to_dict())
+        print(setup.equipments)
 
-    def test_experiment_equipments_model(self):
-        ex_eq = ExperimentEquipmentsModel.find_by(experiment_id="test1234", get_first=False)
+    def test_station_setup_equipments_model(self):
+        ex_eq = StationSetupEquipmentsModel.find_by(station_setup_id="test1234", get_first=False)
         self.assertIsNotNone(ex_eq)
         print(ex_eq)
+
+    def test_equipments_manufactory(self):
+        dataloggers = EquipmentModel.get_all_dataloggers_from_nrl()
+        sensors = EquipmentModel.get_all_sensors_from_nrl()
+        self.assertIsNotNone(dataloggers)
+        self.assertIsNotNone(sensors)
+        print(dataloggers)
+        print(sensors)
+
+    def test_test(self):
+        ms = EquipmentModel.get_all_manufactures_nrl("Datalogger")
+        print(ms)
