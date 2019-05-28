@@ -8,6 +8,7 @@ import { Network } from '../../model/model.network';
 import { EquipmentType } from '../../model/model.equipmentTypes';
 import { Equipments } from '../../model/model.equipments';
 import { Location } from '../../model/model.location';
+import { Station } from '../../model/model.station';
 
 @Injectable()
 export class FdsnService {
@@ -20,6 +21,10 @@ export class FdsnService {
 
   createEquipment(eq: Equipments): Observable<boolean> {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createEquipment', eq);
+  }
+
+  createStation(st: Station): Observable<boolean> {
+    return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createStation', st);
   }
 
   isNetworkTaken(id: string): Observable<boolean>{

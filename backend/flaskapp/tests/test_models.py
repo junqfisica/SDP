@@ -1,10 +1,8 @@
 from unittest import TestCase
 
-from obspy.clients.nrl import NRL
-
 from flaskapp import create_app
 from flaskapp.models import AppParamsModel, NetworkModel, EquipmentModel, EquipmentTypeModel, StationModel, \
-    StationSetupModel, StationSetupEquipmentsModel
+    ChannelModel, ChannelEquipmentsModel
 
 
 class TestModels(TestCase):
@@ -36,21 +34,21 @@ class TestModels(TestCase):
         print(eq_tags.to_dict())
 
     def test_station_model(self):
-        station: StationModel = StationModel.find_by(name="04A", creation_date="2016/159")
+        station: StationModel = StationModel.find_by(name="04A", creation_date="2016/06/07")
         self.assertIsNotNone(station)
         print(station.to_dict())
-        print(station.setup)
+        print(station.channels)
 
-    def test_station_setup_model(self):
+    def test_channel_model(self):
         station: StationModel = StationModel.find_by(name="04A", creation_date="2016/159")
         self.assertIsNotNone(station)
-        setup: StationSetupModel = StationSetupModel.find_by(station_id=station.id, start_time="2016/159")
+        setup: ChannelModel = ChannelModel.find_by(station_id=station.id, start_time="2016/159")
         self.assertIsNotNone(setup)
         print(setup.to_dict())
         print(setup.equipments)
 
-    def test_station_setup_equipments_model(self):
-        ex_eq = StationSetupEquipmentsModel.find_by(station_setup_id="test1234", get_first=False)
+    def test_channel_equipments_model(self):
+        ex_eq = ChannelEquipmentsModel.find_by(channel_id="test1234", get_first=False)
         self.assertIsNotNone(ex_eq)
         print(ex_eq)
 
@@ -61,7 +59,3 @@ class TestModels(TestCase):
         self.assertIsNotNone(sensors)
         print(dataloggers)
         print(sensors)
-
-    def test_test(self):
-        ms = EquipmentModel.get_all_manufactures_nrl("Datalogger")
-        print(ms)

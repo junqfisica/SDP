@@ -195,35 +195,40 @@ grant all privileges on table SDP.T_STATIONS to SDP;
 
 insert into SDP.T_STATIONS values ('ghyWoC46','ST','04A','-25.48','-64.39','607','0.6','2016/159','2017/226',False);
 
-create table SDP.T_STATION_SETUP
+create table SDP.T_CHANNELS
 (
     ID varchar(16) not null,
     STATION_ID varchar(16) not null,
+    NAME  varchar(5) not null,
+    LATITUDE numeric not null,
+    LONGITUDE numeric not null,
+    ELEVATION numeric not null,
+    DEPTH numeric not null,
     GAIN varchar(50) not null,
     SAMPLE_RATE integer not null,
     DL_NO varchar(16) not null,
     SENSOR_NUMBER varchar(16) not null,
-    START_TIME date not null,
-    STOP_TIME date not null,
+    START_TIME timestamp not null,
+    STOP_TIME timestamp not null,
     primary key (ID),
     foreign key (STATION_ID) references SDP.T_STATIONS (ID) on delete restrict
     
 );
-grant all privileges on table SDP.T_STATION_SETUP to SDP;
+grant all privileges on table SDP.T_CHANNELS to SDP;
 
-insert into SDP.T_STATION_SETUP values ('test1234','ghyWoC46','1',100,'ARZ','GP12','2016/159','2017/098');
+insert into SDP.T_CHANNELS values ('test1234','ghyWoC46','HHZ','-25.48','-64.39','607','0.6','1',100,'ARZ','GP12','2016/159','2017/098');
 
-create table SDP.T_STATION_SETUP_EQUIPMENTS
+create table SDP.T_CHANNELS_EQUIPMENTS
 (
-    STATION_SETUP_ID varchar(16) not null,
+    CHANNEL_ID varchar(16) not null,
     EQUIPMENT_ID varchar(16) not null,
-    primary key (STATION_SETUP_ID,EQUIPMENT_ID),
-    foreign key (STATION_SETUP_ID) references SDP.T_STATION_SETUP (ID) on delete restrict,
+    primary key (CHANNEL_ID,EQUIPMENT_ID),
+    foreign key (CHANNEL_ID) references SDP.T_CHANNELS (ID) on delete restrict,
     foreign key (EQUIPMENT_ID) references SDP.S_EQUIPMENT (ID) on delete restrict
     
 );
-grant all privileges on table SDP.T_STATION_SETUP_EQUIPMENTS to SDP;
+grant all privileges on table SDP.T_CHANNELS_EQUIPMENTS to SDP;
 
-insert into SDP.T_STATION_SETUP_EQUIPMENTS values ('test1234','hjsuaier');
-insert into SDP.T_STATION_SETUP_EQUIPMENTS values ('test1234','hjfsaior');
+insert into SDP.T_CHANNELS_EQUIPMENTS values ('test1234','hjsuaier');
+insert into SDP.T_CHANNELS_EQUIPMENTS values ('test1234','hjfsaior');
 

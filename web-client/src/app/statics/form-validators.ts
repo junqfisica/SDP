@@ -46,7 +46,7 @@ export class AppValidador extends Validators {
       if (control.value === null){
         return null;
       }
-      if (parentValue !== null || (control.value !== undefined && currentDate < minDate)) {
+      if (parentValue === null || (control.value !== undefined && currentDate < minDate)) {
         return { 'minDate': true };
       }
       return null;

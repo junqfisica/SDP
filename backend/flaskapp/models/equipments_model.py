@@ -1,7 +1,7 @@
 from obspy.clients.nrl import NRL
 
 from flaskapp import db, app_utils
-from flaskapp.http_util.exceptions import InvalidInstrumentType, AppException
+from flaskapp.http_util.exceptions import InvalidInstrumentType, CreateEntityError
 from flaskapp.models import BaseModel, TableNames, RelationShip
 
 
@@ -35,7 +35,7 @@ class EquipmentModel(db.Model, BaseModel):
         equipment: EquipmentModel = cls.from_dict(equipment_dict)
         equipment.id = app_utils.generate_id(16)
         if cls.find_by(name=equipment.name):
-            raise AppException("The instrument {} already exists in the database.".format(equipment.name))
+            raise CreateEntityError("The instrument {} already exists in the database.".format(equipment.name))
         return equipment.save()
 
     # ==== NRL methods =======

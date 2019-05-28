@@ -21,6 +21,8 @@
             <div *ngIf="networkControl.networkId.errors" class="invalid-feedback">
               <div *ngIf="networkControl.networkId.errors.required">*required.</div>
               <div *ngIf="networkControl.networkId.errors.isTaken">This code already exists.</div>
+              <div *ngIf="networkControl.networkId.errors.minlength">It must have 2 characters.</div>
+              <div *ngIf="networkControl.networkId.errors.maxlength">It must have 2 characters.</div>
             </div>
         </div>
         <div class="form-group">
@@ -61,10 +63,18 @@
         <div class="custom-control custom-checkbox">
           <input class="custom-control-input" type="checkbox" formControlName="isRestrict" id="isRestrictCheck" 
             (click)="onClickEquipmentRestriction(!equipmentControl.isRestrict.value)">
-          <label class="custom-control-label" for="isRestrictCheck"> Use NRL database.</label>
+          <label class="custom-control-label" for="isRestrictCheck"> Use IRIS NRL database. </label>
+          <ng-template #popTemplate>Check the box to use <a href="http://ds.iris.edu/NRL/">IRIS NRL</a> database 
+            for Seismic Instruments. 
+          </ng-template>
+          <span class="fa fa-question-circle-o" title="Click for more info."
+            popoverTitle="Nominal Responses Library or NRL"
+            placement="right"  
+            [popover]="popTemplate">
+          </span>
         </div>
         <alert *ngIf="!equipmentControl.isRestrict.value" type="warning">
-          <strong>Warning</strong> manufactory and Instrument are not restricted from NRL database.
+          <strong>Warning</strong> manufactory and instruments are not restricted by IRIS.
         </alert>
       </div>
       <div class="form-row" *ngIf="!equipmentControl.equipmentType.errors">
@@ -133,7 +143,11 @@
           <input type="text" formControlName="name" class="form-control" 
               [ngClass]="{ 'is-invalid': stationControl.name.errors }" 
               placeholder="Name" />
-            <div class="invalid-feedback">*required.</div>
+          <div *ngIf="stationControl.name.errors" class="invalid-feedback">
+            <div *ngIf="stationControl.name.errors.required">*required.</div>
+            <div *ngIf="stationControl.name.errors.minlength">It must have 3-5 characters.</div>
+            <div *ngIf="stationControl.name.errors.maxlength">It must have 3-5 characters.</div>
+          </div>
         </div>
       </div>
       <div class="form-row">
@@ -141,13 +155,21 @@
           <label>Latitude (Deg)</label>
           <input type="number" min="-90" max="90" class="form-control" formControlName="latitude" 
           [ngClass]="{ 'is-invalid': stationControl.latitude.errors }">
-          <div class="invalid-feedback">*required.</div>
+          <div *ngIf="stationControl.latitude.errors" class="invalid-feedback">
+            <div *ngIf="stationControl.latitude.errors.required">*required.</div>
+            <div *ngIf="stationControl.latitude.errors.min">It must be bigger than -90 degrees.</div>
+            <div *ngIf="stationControl.latitude.errors.max">It must be smaller than 90 degrees.</div>
+          </div>
         </div>
         <div class="form-group col-md-2">
           <label>Longitude (Deg)</label>
           <input type="number" min="-180" max="180" formControlName="longitude" class="form-control" 
               [ngClass]="{ 'is-invalid': stationControl.longitude.errors }">
-            <div class="invalid-feedback">*required.</div>
+          <div *ngIf="stationControl.longitude.errors" class="invalid-feedback">
+            <div *ngIf="stationControl.longitude.errors.required">*required.</div>
+            <div *ngIf="stationControl.longitude.errors.min">It must be bigger than -180 degrees.</div>
+            <div *ngIf="stationControl.longitude.errors.max">It must be smaller than 180 degrees.</div>
+          </div>
         </div>
         <div class="form-group col-md-2">
           <label>Elevation (m)</label>
@@ -190,7 +212,7 @@
         <div class="form-group col-md-3">
           <label>Create date</label>
           <input type="text" placeholder="DD.MM.YYYY" formControlName="createDate" class="form-control" 
-            bsDatepicker
+            bsDatepicker (bsValueChange)="onCreateDateChange($event)"
             [bsConfig]="bsConfig" 
             [ngClass]="{ 'is-invalid': stationControl.createDate.errors }">
           <div *ngIf="stationControl.createDate.errors" class="invalid-feedback">
@@ -199,8 +221,10 @@
         </div>
         <div class="form-group col-md-3">
           <label>Removal date</label>
-          <input type="text" placeholder="DD.MM.YYYY"  bsDatepicker [bsConfig]="bsConfig"
-            max="2500" formControlName="removeDate" class="form-control" [ngClass]="{ 'is-invalid': stationControl.removeDate.errors }">
+          <input type="text" placeholder="DD.MM.YYYY"  
+            bsDatepicker [bsConfig]="bsConfig"  [minDate]="stationControl.createDate.value"
+            formControlName="removeDate" class="form-control" 
+            [ngClass]="{ 'is-invalid': stationControl.removeDate.errors }">
           <div *ngIf="stationControl.removeDate.errors" class="invalid-feedback">
             <div *ngIf="stationControl.removeDate.errors.minDate">This can't be smaller than create date.</div>
           </div> 

@@ -18,7 +18,7 @@ export class FdsnCreateComponent implements OnInit {
 
   isNetworkCollapsed = true;
   isEquipmentsCollapsed = true;
-  isStationCollapsed = false;
+  isStationCollapsed = true;
   networkForm: FormGroup;
   equipmentForm: FormGroup;
   stationForm: FormGroup;
@@ -26,7 +26,7 @@ export class FdsnCreateComponent implements OnInit {
   equipmentType: EquipmentType[] = []
   nrlManufactures: string[] = [] 
   nrlInstruments: string[] = []
-  bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' }
+  bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private formBuilder: FormBuilder, private notificationService: NotificationService, private fdsnService: FdsnService) {
     this.fdsnService.getEquipmentTypes().subscribe(
@@ -45,10 +45,15 @@ export class FdsnCreateComponent implements OnInit {
   ngOnInit() {
   }
 
+  getDate(dateStr: string) {
+    return new Date(dateStr);
+  }
+
   buildForms(){
 
     this.networkForm = this.formBuilder.group({
-      networkId: [null, {validators: [Validators.required], asyncValidators: [FdsnValidador.validateNetworkId(this.fdsnService)], updateOn: 'change'}],
+      networkId: [null, {validators: [Validators.required, Validators.minLength(2), Validators.maxLength(2)], 
+        asyncValidators: [FdsnValidador.validateNetworkId(this.fdsnService)], updateOn: 'change'}],
       description: ['', {validators: [], updateOn: 'change'}]
     });
 
@@ -62,10 +67,10 @@ export class FdsnCreateComponent implements OnInit {
 
     this.stationForm = this.formBuilder.group({
       networkId: [null, {validators: [Validators.required]}],
-      name: ['', {validators: [Validators.required], updateOn: 'change'}],
+      name: ['', {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(5)], updateOn: 'change'}],
       isPublicData: [true, {validators: [], updateOn: 'change'}],
-      latitude: ['', {validators: [Validators.required], updateOn: 'change'}],
-      longitude: ['', {validators: [Validators.required], updateOn: 'change'}],
+      latitude: ['', {validators: [Validators.required, Validators.min(-90), Validators.max(90)], updateOn: 'change'}],
+      longitude: ['', {validators: [Validators.required, Validators.min(-180), Validators.max(180)], updateOn: 'change'}],
       elevation: ['', {validators: [Validators.required], updateOn: 'change'}],
       depth: ['', {validators: [Validators.required], updateOn: 'change'}],
       createDate: [null, {validators: [Validators.required], updateOn: 'change'}],
@@ -117,6 +122,12 @@ export class FdsnCreateComponent implements OnInit {
         this.notificationService.showErrorMessage("Error trying to get networs");
       }
     );
+  }
+
+  onCreateDateChange(){
+    setTimeout( () => { 
+      this.stationControl.removeDate.updateValueAndValidity();
+    }, 500 );
   }
 
   onClickEquipmentRestriction(isRestrict: boolean){
@@ -173,15 +184,6 @@ export class FdsnCreateComponent implements OnInit {
     this.equipmentControl.equipmentName.setValue("")
   }
 
-  private formatDOY(year: number, doy: number): string {
-    if (year.toString().length > 0 && doy.toString().length > 0){
-      const doyString = doy.toString().padStart(3, "0");
-      const yearString = year.toString();
-      return yearString + "/" + doyString;
-    }
-    return null;
-  }
-
   stationFormToStation(): Station {
     const st = new Station();
     st.public_data = this.stationControl.isPublicData.value;
@@ -195,14 +197,12 @@ export class FdsnCreateComponent implements OnInit {
     st.country = this.stationControl.country.value;
     st.site = this.stationControl.site.value;
     st.geology = this.stationControl.geology.value;
-    const creationDate = new Date(this.stationControl.createDate.value);
-    st.creation_date = creationDate.getDate() + "/" + (creationDate.getMonth() + 1) + "/" + creationDate.getFullYear();
+    st.creation_date = this.stationControl.createDate.value.toUTCString();
     if (this.stationControl.removeDate.value) {
-      const removeDate = new Date(this.stationControl.removeDate.value);
-      st.removal_date = removeDate.getDate() + "/" + (removeDate.getMonth() + 1) + "/" + removeDate.getFullYear();
+      st.removal_date = this.stationControl.removeDate.value.toUTCString();
     } else {
-      st.removal_date = null;
-    }    
+      st.removal_date = null; 
+    }
     return st;
   }
 
@@ -223,7 +223,7 @@ export class FdsnCreateComponent implements OnInit {
   }
   
   onSubmitNetwork(){
-
+    
     // stop here if form is invalid   
     if (this.networkForm.invalid) {
         return;
@@ -246,8 +246,6 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   onSubmitEquipment() {
-
-    console.log(this.equipmentFormToEquipments());
     
     // stop here if form is invalid   
     if (this.equipmentForm.invalid) {
@@ -271,15 +269,25 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   onSubmitStation(){
-    console.log(this.stationForm);
     console.log(this.stationFormToStation());
+
     // stop here if form is invalid   
     if (this.stationForm.invalid) {
       return;
     }
 
-    console.log("Save station");
-    
+    this.fdsnService.createStation(this.stationFormToStation()).subscribe(
+      saved => {
+        if (saved) {
+          this.notificationService.showSuccessMessage("The new station was created.")
+        } else {
+          this.notificationService.showErrorMessage("Fail to create station.")
+        }
+      },
+      error => {
+        console.log(error);
+        this.notificationService.showErrorMessage(error.error.message);
+      }
+    );
   }
-
 }

@@ -2,7 +2,7 @@ from flaskapp.api import fdsn
 from flaskapp.extensions.geocoder import GeoCoder
 from flaskapp.http_util import response
 from flaskapp.http_util.decorators import secure, post, query_param
-from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel
+from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel
 
 
 @fdsn.route("/createNetwork", methods=["POST"])
@@ -20,6 +20,14 @@ def create_network(network_dict: dict):
 @post()
 def create_equipment(equipment_dict: dict):
     was_created = EquipmentModel.create_equipments(equipment_dict)
+    return response.bool_to_response(was_created)
+
+
+@fdsn.route("/createStation", methods=["POST"])
+@secure(Right.CREATE_FDSN)
+@post()
+def create_station(station_dict: dict):
+    was_created = StationModel.create_station(station_dict)
     return response.bool_to_response(was_created)
 
 

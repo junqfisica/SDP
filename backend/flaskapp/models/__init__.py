@@ -10,8 +10,8 @@ class RelationShip:
     TOKEN = "TokenModel"
     EQUIPMENT = "EquipmentModel"
     STATIONS = "StationModel"
-    STATION_SETUP = "StationSetupModel"
-    EXPERIMENT_EQUIPMENTS = "StationSetupEquipmentsModel"
+    CHANNEL = "ChannelModel"
+    CHANNEL_EQUIPMENTS = "ChannelEquipmentsModel"
 
 
 # Include the name of tables from your data base. Use this to map table's name.
@@ -33,8 +33,8 @@ class TableNames:
     S_EQUIPMENT_TYPE = "s_equipment_type"
     S_EQUIPMENT = "s_equipment"
     T_STATIONS = "t_stations"
-    T_STATION_SETUP = "t_station_setup"
-    T_STATION_SETUP_EQUIPMENTS = "t_station_setup_equipments"
+    T_CHANNELS = "t_channels"
+    T_CHANNELS_EQUIPMENTS = "t_channels_equipments"
 
 
 class Role:
@@ -62,5 +62,5 @@ from flaskapp.models.user_model import UserModel
 from flaskapp.models.app_params_model import AppParamsModel
 from flaskapp.models.networks_model import NetworkModel
 from flaskapp.models.equipments_model import EquipmentTypeModel, EquipmentModel
-from flaskapp.models.station_setup_model import StationModel, StationSetupModel, StationSetupEquipmentsModel
+from flaskapp.models.station_channel_model import StationModel, ChannelModel, ChannelEquipmentsModel
 

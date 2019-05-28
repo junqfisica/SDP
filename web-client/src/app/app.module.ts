@@ -13,6 +13,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { PopoverModule } from 'ngx-bootstrap/popover';
 
 import { FileUploadModule } from 'ng2-file-upload';
 
@@ -34,6 +35,7 @@ import { SettingListComponent } from './components/setting/setting-list/setting-
 import { ApplicationParamEditComponent } from './components/setting/application-param-edit/application-param-edit.component';
 import { FdsnCreateComponent } from './components/seismic-data/fdsn/fdsn-create/fdsn-create.component';
 import { FdsnService } from './services/fdsn/fdsn.service';
+import { StationListComponent } from './components/seismic-data/fdsn/station-list/station-list.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,8 @@ import { FdsnService } from './services/fdsn/fdsn.service';
     DataUploadComponent,
     SettingListComponent,
     ApplicationParamEditComponent,
-    FdsnCreateComponent
+    FdsnCreateComponent,
+    StationListComponent
   ],
   imports: [
     BrowserModule,
@@ -63,6 +66,7 @@ import { FdsnService } from './services/fdsn/fdsn.service';
     TypeaheadModule.forRoot(),
     CollapseModule.forRoot(),
     BsDatepickerModule.forRoot(),
+    PopoverModule.forRoot(),
     FileUploadModule
   ],
   providers: [

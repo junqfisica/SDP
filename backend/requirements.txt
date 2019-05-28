@@ -1,3 +1,4 @@
+python-dateutil
 opencage
 numpy
 obspy
