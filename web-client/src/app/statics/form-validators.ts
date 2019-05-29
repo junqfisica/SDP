@@ -37,17 +37,50 @@ export class AppValidador extends Validators {
     };
   }
 
-  static minDate(controlKey : string): ValidatorFn {
+  static minDate(value : string | Date): ValidatorFn {
     return (control: AbstractControl): { [key: string]: boolean } | null => {
+      
+      let parentValue = null
+      let minDate = null;
+      if (typeof value === "string") {
+        parentValue = AppValidador.parentControlsValue(control, value)
+        minDate = new Date(parentValue)
+      } else if (value instanceof Date) {
+        parentValue = value;
+        minDate = value;
+      }
 
-      const parentValue = AppValidador.parentControlsValue(control, controlKey)
-      const minDate = new Date(parentValue)
       const currentDate = new Date(control.value)
       if (control.value === null){
         return null;
       }
       if (parentValue === null || (control.value !== undefined && currentDate < minDate)) {
         return { 'minDate': true };
+      }
+      return null;
+    };
+  }
+
+  static maxDate(value : string | Date): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: boolean } | null => {
+      
+      let parentValue = null
+      let maxDate = null;
+      if (typeof value === "string") {
+        parentValue = AppValidador.parentControlsValue(control, value)
+        maxDate = new Date(parentValue)
+      } else if (value instanceof Date) {
+        parentValue = value;
+        maxDate = value;
+      }
+
+      const currentDate = new Date(control.value);
+      
+      if (control.value === null){
+        return null;
+      }
+      if (parentValue === null || (control.value !== undefined && currentDate > maxDate)) {
+        return { 'maxDate': true };
       }
       return null;
     };

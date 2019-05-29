@@ -8,6 +8,7 @@ import { FdsnValidador, AppValidador } from '../../../../statics/form-validators
 import { EquipmentType as EquipmentType } from '../../../../model/model.equipmentTypes';
 import { Equipments } from '../../../../model/model.equipments';
 import { Station } from '../../../../model/model.station';
+import { DateUtil } from '../../../../statics/date-util';
 
 @Component({
   selector: 'app-fdsn-create',
@@ -69,8 +70,10 @@ export class FdsnCreateComponent implements OnInit {
       networkId: [null, {validators: [Validators.required]}],
       name: ['', {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(5)], updateOn: 'change'}],
       isPublicData: [true, {validators: [], updateOn: 'change'}],
-      latitude: ['', {validators: [Validators.required, Validators.min(-90), Validators.max(90)], updateOn: 'change'}],
-      longitude: ['', {validators: [Validators.required, Validators.min(-180), Validators.max(180)], updateOn: 'change'}],
+      latitude: ['', {validators: [Validators.required, Validators.min(-90), Validators.max(90), 
+        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
+      longitude: ['', {validators: [Validators.required, Validators.min(-180), Validators.max(180), 
+        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
       elevation: ['', {validators: [Validators.required], updateOn: 'change'}],
       depth: ['', {validators: [Validators.required], updateOn: 'change'}],
       createDate: [null, {validators: [Validators.required], updateOn: 'change'}],
@@ -124,8 +127,8 @@ export class FdsnCreateComponent implements OnInit {
     );
   }
 
-  onCreateDateChange(){
-    setTimeout( () => { 
+  onCreateDateChange($event){
+    setTimeout( () => {
       this.stationControl.removeDate.updateValueAndValidity();
     }, 500 );
   }
@@ -197,9 +200,9 @@ export class FdsnCreateComponent implements OnInit {
     st.country = this.stationControl.country.value;
     st.site = this.stationControl.site.value;
     st.geology = this.stationControl.geology.value;
-    st.creation_date = this.stationControl.createDate.value.toUTCString();
+    st.creation_date = DateUtil.convertDateToUTCStringWithoutShift(this.stationControl.createDate.value);
     if (this.stationControl.removeDate.value) {
-      st.removal_date = this.stationControl.removeDate.value.toUTCString();
+      st.removal_date = DateUtil.convertDateToUTCStringWithoutShift(this.stationControl.removeDate.value);
     } else {
       st.removal_date = null; 
     }
@@ -269,7 +272,8 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   onSubmitStation(){
-    console.log(this.stationFormToStation());
+    // console.log(this.stationFormToStation());
+    // console.log(this.stationControl);
 
     // stop here if form is invalid   
     if (this.stationForm.invalid) {

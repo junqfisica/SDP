@@ -31,7 +31,7 @@
             placeholder="Description for this network (Optional)." />
         </div>
         <div class="form-group">
-          <button [disabled]="networkForm.pending" class="btn btn-info">Save</button>
+          <button  type="button" [disabled]="networkForm.pending" class="btn btn-info">Save</button>
         </div>
     </form>
   </div>
@@ -107,7 +107,7 @@
           placeholder="Description for this instrument (Optional)." />
       </div>
       <div class="form-group">
-        <button [disabled]="equipmentControl.pending" class="btn btn-info">Save</button>
+        <button type="button" [disabled]="equipmentControl.pending" class="btn btn-info">Save</button>
       </div>
     </form>
   </div>
@@ -159,6 +159,7 @@
             <div *ngIf="stationControl.latitude.errors.required">*required.</div>
             <div *ngIf="stationControl.latitude.errors.min">It must be bigger than -90 degrees.</div>
             <div *ngIf="stationControl.latitude.errors.max">It must be smaller than 90 degrees.</div>
+            <div *ngIf="stationControl.latitude.errors.pattern">Must have at least 5 significant digits, i.e: 1.15234.</div>
           </div>
         </div>
         <div class="form-group col-md-2">
@@ -169,6 +170,7 @@
             <div *ngIf="stationControl.longitude.errors.required">*required.</div>
             <div *ngIf="stationControl.longitude.errors.min">It must be bigger than -180 degrees.</div>
             <div *ngIf="stationControl.longitude.errors.max">It must be smaller than 180 degrees.</div>
+            <div *ngIf="stationControl.longitude.errors.pattern">Must have at least 5 significant digits, i.e: 1.15234.</div>
           </div>
         </div>
         <div class="form-group col-md-2">
@@ -212,7 +214,7 @@
         <div class="form-group col-md-3">
           <label>Create date</label>
           <input type="text" placeholder="DD.MM.YYYY" formControlName="createDate" class="form-control" 
-            bsDatepicker (bsValueChange)="onCreateDateChange($event)"
+            bsDatepicker (bsValueChange)="onCreateDateChange($event)" readonly='true'
             [bsConfig]="bsConfig" 
             [ngClass]="{ 'is-invalid': stationControl.createDate.errors }">
           <div *ngIf="stationControl.createDate.errors" class="invalid-feedback">
@@ -223,16 +225,17 @@
           <label>Removal date</label>
           <input type="text" placeholder="DD.MM.YYYY"  
             bsDatepicker [bsConfig]="bsConfig"  [minDate]="stationControl.createDate.value"
-            formControlName="removeDate" class="form-control" 
+            formControlName="removeDate" class="form-control" readonly='true'
             [ngClass]="{ 'is-invalid': stationControl.removeDate.errors }">
           <div *ngIf="stationControl.removeDate.errors" class="invalid-feedback">
-            <div *ngIf="stationControl.removeDate.errors.minDate">This can't be smaller than create date.</div>
+            <div *ngIf="stationControl.removeDate.errors.minDate">It can't be smaller than 
+              {{stationControl.createDate.value | date:'dd.MM.yyyy'}}.</div>
           </div> 
         </div>
       </div>
       <div class="form-group">
-        <button [disabled]="stationControl.pending" class="btn btn-info" (click)="onSubmitStation()">Save</button>
+        <button type="button" [disabled]="stationControl.pending" class="btn btn-info" (click)="onSubmitStation()">Save</button>
       </div>
-      </form>
+    </form>
   </div>
 </div>

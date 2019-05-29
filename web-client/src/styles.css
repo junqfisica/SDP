@@ -22,6 +22,17 @@
     --dark: #343a40;
 }
 
+/* Override popoover header style*/
+.popover-header {
+    background-color: var(--dark);
+    color: white !important;
+}
+
+/* Override popoover body style*/
+.popover-body {
+    background-color: lightgrey;
+}
+
 /* Override ngx-pagination color's style. */
 pagination li.page-item.active a.page-link  {
     background-color: var(--dark) !important;

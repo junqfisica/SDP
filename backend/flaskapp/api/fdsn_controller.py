@@ -74,3 +74,14 @@ def get_nrl_manufacturers(instrument_type: str):
 def get_nrl_instrument(instrument_type: str, manufactory: str):
     instruments = EquipmentModel.get_instruments_nrl(instrument_type, manufactory)
     return response.string_to_response(instruments)
+
+
+@fdsn.route("/getStation", methods=["GET"])
+@secure(Right.CREATE_FDSN)
+@query_param("station_id")
+def get_station(station_id: str):
+    station = StationModel.find_by_id(station_id)
+    if station:
+        return response.model_to_response(station)
+
+    return response.empty_response()

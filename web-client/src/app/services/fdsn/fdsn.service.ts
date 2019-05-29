@@ -27,6 +27,10 @@ export class FdsnService {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createStation', st);
   }
 
+  getStation(id: string): Observable<Station>{
+    return this.http.get<Station>(ServerUrl.rootUrl + '/api/fdsn/getStation?station_id=' + id);
+  }
+
   isNetworkTaken(id: string): Observable<boolean>{
     return this.http.get<boolean>(ServerUrl.rootUrl + '/api/fdsn/networkIsTaken/' + id);
   }
