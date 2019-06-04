@@ -216,6 +216,7 @@ class BaseModel:
         Get all entities from this model.
 
         :param order_by: (Optional) The Column to sort the query.
+
         :return: The list of entities, None otherwise.
         """
         # Validate class before query
@@ -232,15 +233,19 @@ class BaseModel:
         return None
 
     @classmethod
-    def find_by(cls, get_first: bool = True, **kwarg):
+    def find_by(cls, get_first: bool = True, order_by: Column = None, **kwarg):
         """
         Find by an specific column name.
 
         :param get_first: (default=True). If True return one value, otherwise it will try to get
         all entries that match the query.
+
+        :param order_by: (Optional) The Column to sort the query.
+
         :param kwarg: The column name as key and the value to match, e.g username="Jon". If more than one
             filter is given the query will use AND to join it.
             Important: you must pass at least one kwarg to this method, otherwise a ValueError will raise.
+
         :return: The entity if get_first=True and it exists or a list of entity if get_first=False and exists.
             None, otherwise.
         """
@@ -253,7 +258,7 @@ class BaseModel:
         if get_first:
             entity = cls.query.filter_by(**kwarg).first()
         else:
-            entity = cls.query.filter_by(**kwarg).all()
+            entity = cls.query.filter_by(**kwarg).order_by(order_by).all()
 
         if entity:
             return entity

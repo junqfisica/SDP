@@ -9,6 +9,8 @@ import { FdsnService } from '../../../../services/fdsn/fdsn.service';
 import { Station } from '../../../../model/model.station';
 import { AppValidador } from '../../../../statics/form-validators';
 import { DateUtil } from '../../../../statics/date-util';
+import { Equipments } from '../../../../model/model.equipments';
+import { Channel } from '../../../../model/model.channel';
 
 @Component({
   selector: 'app-channel-create',
@@ -22,6 +24,11 @@ export class ChannelCreateComponent implements OnInit {
   isLoaddingPage = true;
   stationCreateDate: Date;
   stationRemovalDate: Date;
+  dataloggers: Observable<Equipments[]>;
+  sensors: Observable<Equipments[]>;
+  gains: Observable<string[]>;
+  sampleRates: Observable<string[]>;
+  restrictEquipments = true;
   bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private route: ActivatedRoute, private router: Router, private formBuilder: FormBuilder, 
@@ -47,6 +54,8 @@ export class ChannelCreateComponent implements OnInit {
           console.log(error);
         }
       );
+      this.dataloggers = this.fdsnService.getDataloggers();
+      this.sensors = this.fdsnService.getSensors();
   }
 
   ngOnInit() {}
@@ -55,17 +64,17 @@ export class ChannelCreateComponent implements OnInit {
     this.stationCreateDate = DateUtil.convertUTCStringToDate(this.station.creation_date);
     this.stationCreateDate.setHours(0);
     this.stationCreateDate.setMinutes(0);
-    this.stationRemovalDate = DateUtil.convertUTCStringToDate(this.station.removal_date);
-    this.stationRemovalDate.setHours(23);
-    this.stationRemovalDate.setMinutes(59);
-    this.stationRemovalDate.setSeconds(59);
-
-    const rt = new Date(this.station.removal_date);
-    rt.setHours(23);
-    rt.setMinutes(59);
+    this.stationCreateDate.setSeconds(0);
+    if (this.station.removal_date !== null) {
+      this.stationRemovalDate = DateUtil.convertUTCStringToDate(this.station.removal_date);
+      this.stationRemovalDate.setHours(23);
+      this.stationRemovalDate.setMinutes(59);
+      this.stationRemovalDate.setSeconds(59);
+    } else {
+      this.stationRemovalDate = null;
+    }
 
     this.channelForm = this.formBuilder.group({
-      stationId: [this.station.id, {validators: [Validators.required]}],
       name: ['', {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(3)], updateOn: 'change'}],
       latitude: [this.station.latitude, {validators: [Validators.required, Validators.min(-90), Validators.max(90), 
         Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
@@ -73,17 +82,26 @@ export class ChannelCreateComponent implements OnInit {
         Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
       elevation: [this.station.elevation, {validators: [Validators.required], updateOn: 'change'}],
       depth: [this.station.depth, {validators: [Validators.required], updateOn: 'change'}],
+      datalogger:['', {validators: [Validators.required], updateOn: 'change'}],
+      sensor:['', {validators: [Validators.required], updateOn: 'change'}],
       gain: ['', {validators: [Validators.required], updateOn: 'change'}],
       sampleRate:['', {validators: [Validators.required], updateOn: 'change'}],
       dlNo: ['', {validators: [Validators.required], updateOn: 'change'}],
       sensorNumber: ['', {validators: [Validators.required], updateOn: 'change'}],
       startTime: [this.stationCreateDate, {validators: [Validators.required, AppValidador.minDate(this.stationCreateDate), 
         AppValidador.maxDate(this.stationRemovalDate)], updateOn: 'change'}],
-      stopTime: [this.stationRemovalDate, {validators: [AppValidador.minDate("startTime"), 
+      stopTime: [this.stationRemovalDate, {validators: [Validators.required, AppValidador.minDate("startTime"), 
         AppValidador.maxDate(this.stationRemovalDate)], updateOn: 'change'}],
       timepickerStop: [this.stationRemovalDate, {validators: [Validators.required], updateOn: 'change'}],
       timepickerStart: [this.stationCreateDate, {validators: [Validators.required], updateOn: 'change'}]
     });
+
+    if (this.stationRemovalDate === null) {
+      this.channelControl.startTime.clearValidators();
+      this.channelControl.startTime.setValidators([Validators.required, AppValidador.minDate(this.stationCreateDate)]);
+      this.channelControl.stopTime.clearValidators();
+      this.channelControl.stopTime.setValidators([Validators.required, AppValidador.minDate("startTime")]);
+    }
     
     // Call everytime the timepicker stoptime is changed.
     const timepickerStopObs: Observable<Date> = this.channelControl.timepickerStop.valueChanges;
@@ -109,6 +127,7 @@ export class ChannelCreateComponent implements OnInit {
       const newDate = new Date(this.channelControl.stopTime.value);
       newDate.setHours(date.getHours());
       newDate.setMinutes(date.getMinutes());
+      newDate.setSeconds(date.getSeconds());
       this.channelControl.stopTime.setValue(newDate);
     }
   }
@@ -118,6 +137,7 @@ export class ChannelCreateComponent implements OnInit {
       const newDate = new Date(this.channelControl.startTime.value);
       newDate.setHours(date.getHours());
       newDate.setMinutes(date.getMinutes());
+      newDate.setSeconds(date.getSeconds());
       this.channelControl.startTime.setValue(newDate);
     }
   }
@@ -132,11 +152,73 @@ export class ChannelCreateComponent implements OnInit {
     }, 500 );
   }
 
-  onSubmitChannel(){
-    const time = DateUtil.convertDateToUTCStringWithoutShift(this.channelControl.stopTime.value)
-    console.log(time);
+  onChangeDatalogger(datalogger: Equipments){
+    this.gains = this.fdsnService.getGains(datalogger.manufactory, datalogger.name);
+    this.channelControl.gain.setValue("");
+    this.gains.subscribe(
+      gains => {
+        if (gains.length == 0) {
+          this.restrictEquipments = false;
+        } else {
+          this.restrictEquipments = true;
+        }
+      }, 
+      error => {
+        console.log(error);
+        this.restrictEquipments = false;
+      }
+    );
     
-    console.log("Save channel");
+  }
+
+  onChangeSensor(sensor: Equipments) {}
+
+  onChangeGain(datalogger: Equipments, gain: string){
+    this.sampleRates = this.fdsnService.getSampleRates(datalogger.manufactory, datalogger.name, gain);
+    this.channelControl.sampleRate.setValue("");
+  }
+
+  onChangeSampleRate(sampleRate: string){}
+
+  channelFormToChannel(): Channel {
+    const channel = new Channel();
+    channel.station_id = this.station.id;
+    channel.name = this.channelControl.name.value.trim().toUpperCase();
+    channel.latitude = this.channelControl.latitude.value;
+    channel.longitude = this.channelControl.longitude.value;
+    channel.elevation = this.channelControl.elevation.value;
+    channel.depth = this.channelControl.depth.value;
+    channel.start_time = DateUtil.convertDateToUTCStringWithoutShift(this.channelControl.startTime.value);
+    channel.stop_time = DateUtil.convertDateToUTCStringWithoutShift(this.channelControl.stopTime.value);
+    channel.equipments = []
+    channel.equipments.push(this.channelControl.datalogger.value);
+    channel.equipments.push(this.channelControl.sensor.value);
+    channel.gain = this.channelControl.gain.value.trim();
+    channel.sample_rate = this.channelControl.sampleRate.value.trim();
+    channel.dl_no = this.channelControl.dlNo.value.trim();
+    channel.sensor_number = this.channelControl.sensorNumber.value.trim();
+    return channel;
+  }
+
+  onSubmitChannel(){
+    
+    // stop here if form is invalid   
+    if (this.channelForm.invalid) {
+      return;
+    }  
+    this.fdsnService.createChannel(this.channelFormToChannel()).subscribe(
+      wasCreated => {
+        if (wasCreated) {
+          this.notificationService.showSuccessMessage("Channel was created.")
+        } else {
+          this.notificationService.showErrorMessage("Fail to create channel.");
+        }
+      }, 
+      error => {
+        console.log(error);
+        this.notificationService.showErrorMessage(error.error.message)
+      }
+    );
     
   }
 }

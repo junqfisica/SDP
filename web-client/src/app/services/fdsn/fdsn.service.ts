@@ -9,6 +9,7 @@ import { EquipmentType } from '../../model/model.equipmentTypes';
 import { Equipments } from '../../model/model.equipments';
 import { Location } from '../../model/model.location';
 import { Station } from '../../model/model.station';
+import { Channel } from '../../model/model.channel';
 
 @Injectable()
 export class FdsnService {
@@ -25,6 +26,10 @@ export class FdsnService {
 
   createStation(st: Station): Observable<boolean> {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createStation', st);
+  }
+
+  createChannel(ch: Channel): Observable<boolean> {
+    return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createChannel', ch);
   }
 
   getStation(id: string): Observable<Station>{
@@ -54,6 +59,23 @@ export class FdsnService {
   getNRLInstrument(instrumentType: string, manufactory: string): Observable<string[]>{
     return this.http.get<string[]>(ServerUrl.rootUrl + '/api/fdsn/getNRLInstrument?instrument_type=' + 
       instrumentType + '&manufactory=' + manufactory);
+  }
+
+  getDataloggers(): Observable<Equipments[]>{
+    return this.http.get<Equipments[]>(ServerUrl.rootUrl + '/api/fdsn/getDataloggers');
+  }
+
+  getSensors(): Observable<Equipments[]>{
+    return this.http.get<Equipments[]>(ServerUrl.rootUrl + '/api/fdsn/getSensors');
+  }
+
+  getGains(manufactory, instrument): Observable<string[]>{
+    return this.http.get<string[]>(ServerUrl.rootUrl + '/api/fdsn/getGains?manufactory=' + manufactory + '&instrument=' + instrument);
+  }
+
+  getSampleRates(manufactory, instrument, gain): Observable<string[]>{
+    return this.http.get<string[]>(ServerUrl.rootUrl + '/api/fdsn/getSampleRates?manufactory=' + 
+      manufactory + '&instrument=' + instrument + '&gain=' + gain);
   }
 
 }

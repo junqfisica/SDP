@@ -129,6 +129,57 @@ class EquipmentModel(db.Model, BaseModel):
 
         return sensor_names
 
+    @staticmethod
+    def get_gain_from_nrl(manufactory, instrument):
+        """
+        Uses Obspy NRL library to get the gain.
+
+        :return: A list of gain.
+        """
+        nrl = NRL()
+        try:
+            gains = nrl.dataloggers[manufactory][instrument]
+            gains = list(gains)
+        except KeyError:
+            gains = []
+
+        return gains
+
+    @staticmethod
+    def get_sample_rate_from_nrl(manufactory, instrument, gain):
+        """
+        Uses Obspy NRL library to get the sample rate from the instrument.
+
+        :return: A list of sample rate.
+        """
+        nrl = NRL()
+        try:
+            sample_rates = nrl.dataloggers[manufactory][instrument][str(gain)]
+            sample_rates = list(sample_rates)
+        except KeyError:
+            sample_rates = []
+
+        return sample_rates
+
+    @staticmethod
+    def get_sensor_extra_information(manufactory, instrument):
+        """
+        Uses Obspy NRL library to get the sensor extra information.
+
+        :return: A list of extra information.
+        """
+        nrl = NRL()
+        try:
+            extra_info = nrl.sensors[manufactory][instrument]
+            extra_info = list(extra_info)
+            for info in extra_info:
+                if info.startswith("http:") or info.startswith("https:"):
+                    return []
+        except KeyError:
+            extra_info = []
+
+        return extra_info
+
 
 class EquipmentTypeModel(db.Model, BaseModel):
 

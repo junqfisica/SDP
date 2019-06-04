@@ -5,7 +5,7 @@ from werkzeug.datastructures import FileStorage
 
 from flaskapp import app_logger
 from flaskapp.api import pre_production
-from flaskapp.file_utils import file_utils
+from flaskapp.utils import file_utils
 from flaskapp.http_util import response
 from flaskapp.http_util.decorators import secure, post_file
 from flaskapp.http_util.exceptions import ForbiddenFileFormat, FileAlreadyExists

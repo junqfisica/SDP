@@ -59,3 +59,7 @@ class TestModels(TestCase):
         self.assertIsNotNone(sensors)
         print(dataloggers)
         print(sensors)
+
+    def test_test(self):
+        info = EquipmentModel.get_sensor_extra_information("Streckeisen", "STS-1")
+        print(info)

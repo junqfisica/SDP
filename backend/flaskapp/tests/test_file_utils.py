@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from flaskapp.file_utils import file_utils
+from flaskapp.utils import file_utils
 
 
 class TestFileUtils(TestCase):
