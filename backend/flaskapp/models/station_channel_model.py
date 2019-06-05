@@ -53,6 +53,20 @@ class StationModel(db.Model, BaseModel):
         overlap = self.creation_date < other_removal_date and other.creation_date < removal_date
         return overlap
 
+    def to_dict(self):
+        """
+        Convert Channel into a dictionary, this way we can convert it to a JSON response.
+
+        :return: A clean dictionary form of this model.
+        """
+        # convert columns to dict
+        dict_representation = super().to_dict()
+
+        # add channels
+        dict_representation["channels"] = [ch.to_dict() for ch in self.channels]
+
+        return dict_representation
+
     def creation_validation(self):
         stations = self.find_by(name=self.name, get_first=False)
         if stations:
@@ -122,6 +136,20 @@ class ChannelModel(db.Model, BaseModel):
                "start_time={}, stop_time={})".format(self.id, self.station_id, self.name, self.gain,
                                                      self.sample_rate, self.dl_no, self.sensor_number,
                                                      self.start_time, self.stop_time)
+
+    def to_dict(self):
+        """
+        Convert Channel into a dictionary, this way we can convert it to a JSON response.
+
+        :return: A clean dictionary form of this model.
+        """
+        # convert columns to dict
+        dict_representation = super().to_dict()
+
+        # add channels
+        dict_representation["equipments"] = [eqs.get_equipment().to_dict() for eqs in self.equipments]
+
+        return dict_representation
 
     def is_time_overlap(self, other):
 
@@ -208,3 +236,6 @@ class ChannelEquipmentsModel(db.Model, BaseModel):
     def __repr__(self):
         return "ChannelEquipmentsModel(channel_id={},equipment_id={})"\
             .format(self.channel_id, self.equipment_id)
+
+    def get_equipment(self):
+        return EquipmentModel.find_by_id(self.equipment_id)

@@ -43,3 +43,7 @@ pagination li.page-item.active a.page-link  {
 pagination li.page-item a.page-link  {
     color: var(--dark) !important;
 }
+
+.center{
+    text-align: center;
+}

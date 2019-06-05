@@ -27,6 +27,7 @@ export class FdsnCreateComponent implements OnInit {
   equipmentType: EquipmentType[] = []
   nrlManufactures: string[] = [] 
   nrlInstruments: string[] = []
+  nrlSensorExtraInfo: string[] = []
   bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private formBuilder: FormBuilder, private notificationService: NotificationService, private fdsnService: FdsnService) {
@@ -140,6 +141,7 @@ export class FdsnCreateComponent implements OnInit {
       this.equipmentControl.equipmentManufactory.clearValidators();
     }
     this.clearEquipmentNameAndManufacture();
+    this.clearEquipDescription();
     this.equipmentControl.equipmentManufactory.updateValueAndValidity();
   }
   
@@ -172,19 +174,49 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   private clearEquipmentNameAndManufacture() {
-    this.equipmentControl.equipmentManufactory.setValue("")
-    this.equipmentControl.equipmentName.setValue("")
+    this.equipmentControl.equipmentManufactory.setValue("");
+    this.equipmentControl.equipmentName.setValue("");
+  }
+
+  private clearEquipDescription(){
+    this.nrlSensorExtraInfo = [];
+    this.equipmentControl.description.setValue("");
+    this.equipmentControl.description.clearValidators();
+    this.equipmentControl.description.updateValueAndValidity();
   }
 
   onChangeEquipmentType(value: string) {
     this.fetchNRLManufactures(value);
     this.clearEquipmentNameAndManufacture();
+    this.clearEquipDescription();
     this.nrlInstruments = [];
   }
 
   onChangeEquipmentManufactory(type: string, manufactore: string) {
     this.fetchNRLInstruments(type, manufactore);
-    this.equipmentControl.equipmentName.setValue("")
+    this.equipmentControl.equipmentName.setValue("");
+    this.clearEquipDescription();
+  }
+
+  onChangeEquipmentName(type: string, manufactore: string, name: string){
+    this.nrlSensorExtraInfo = [];
+    if (type === 'Sensor') {
+      this.equipmentControl.description.setValidators([Validators.required]);
+      this.equipmentControl.description.updateValueAndValidity();
+      this.fdsnService.getSensorExtraInfo(manufactore, name).subscribe(
+        info => {
+          this.nrlSensorExtraInfo = info;
+          if (info.length == 0) {            
+            this.clearEquipDescription();
+          }
+        },
+        error => {
+          console.log(error);
+          this.nrlSensorExtraInfo = [];
+          this.clearEquipDescription();
+        }
+      );
+    }
   }
 
   stationFormToStation(): Station {

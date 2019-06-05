@@ -52,6 +52,7 @@ class Right:
     UPLOAD_DATA = "RIGHT_DATA_UPLOAD"
     CREATE_FDSN = "RIGHT_FDSN_CREATE"
     DELETE_FDSN = "RIGHT_FDSN_DELETE"
+    EDIT_FDSN = "RIGHT_FDSN_EDIT"
 
 
 # Import models. Watch for circular dependencies.

@@ -31,7 +31,7 @@
             placeholder="Description for this network (Optional)." />
         </div>
         <div class="form-group">
-          <button  type="button" [disabled]="networkForm.pending" class="btn btn-info">Save</button>
+          <button  type="button" [disabled]="networkForm.pending" (click)="onSubmitNetwork()" class="btn btn-info">Save</button>
         </div>
     </form>
   </div>
@@ -63,14 +63,14 @@
         <div class="custom-control custom-checkbox">
           <input class="custom-control-input" type="checkbox" formControlName="isRestrict" id="isRestrictCheck" 
             (click)="onClickEquipmentRestriction(!equipmentControl.isRestrict.value)">
-          <label class="custom-control-label" for="isRestrictCheck"> Use IRIS NRL database. </label>
+          <label class="custom-control-label" for="isRestrictCheck"> Use IRIS NRL database</label>
           <ng-template #popTemplate>Check the box to use <a href="http://ds.iris.edu/NRL/">IRIS NRL</a> database 
             for Seismic Instruments. 
           </ng-template>
-          <span class="fa fa-question-circle-o" title="Click for more info."
+          <span class="fa fa-question-circle-o" title="Click for more info." style="margin-left: 0.5%"
             popoverTitle="Nominal Responses Library or NRL"
             placement="right"  
-            [popover]="popTemplate">
+            [popover]="popTemplate">.
           </span>
         </div>
         <alert *ngIf="!equipmentControl.isRestrict.value" type="warning">
@@ -80,34 +80,53 @@
       <div class="form-row" *ngIf="!equipmentControl.equipmentType.errors">
         <div class="form-group col-md-3">
           <label>Manufactory</label>
-          <select *ngIf="equipmentControl.isRestrict.value" class="custom-select mr-sm-2" formControlName="equipmentManufactory"
-            (change)="onChangeEquipmentManufactory(equipmentControl.equipmentType.value, equipmentControl.equipmentManufactory.value)" 
-            [ngClass]="{ 'is-invalid': equipmentControl.equipmentManufactory.errors }">
-            <option *ngFor="let name of nrlManufactures" value="{{name}}">{{name}}</option>
-          </select>
-          <input *ngIf="!equipmentControl.isRestrict.value" type="text" formControlName="equipmentManufactory" class="form-control"  
-              placeholder="Manufactory (Optional)"/>
-          <div class="invalid-feedback">*required.</div>
+          <div class="input-group">
+            <select *ngIf="equipmentControl.isRestrict.value" class="custom-select" formControlName="equipmentManufactory"
+              (change)="onChangeEquipmentManufactory(equipmentControl.equipmentType.value, equipmentControl.equipmentManufactory.value)" 
+              [ngClass]="{ 'is-invalid': equipmentControl.equipmentManufactory.errors }">
+              <option *ngFor="let name of nrlManufactures" value="{{name}}">{{name}}</option>
+            </select>
+            <div *ngIf="nrlManufactures.length == 0 && equipmentControl.isRestrict.value" class="input-group-prepend">
+              <div class="input-group-text" title="loadding"><i class="fa fa-refresh fa-spin"></i></div>
+            </div>
+            <input *ngIf="!equipmentControl.isRestrict.value" type="text" formControlName="equipmentManufactory" class="form-control"  
+                placeholder="Manufactory (Optional)"/>
+            <div class="invalid-feedback">*required.</div>
+          </div>
         </div>
         <div class="form-group col-md-3" *ngIf="!equipmentControl.equipmentManufactory.errors">
           <label>Instrument</label>
-          <select *ngIf="equipmentControl.isRestrict.value" class="custom-select mr-sm-2" formControlName="equipmentName" 
-            [ngClass]="{ 'is-invalid': equipmentControl.equipmentName.errors }">
-            <option *ngFor="let name of nrlInstruments" value="{{name}}">{{name}}</option>
-          </select>
-          <input *ngIf="!equipmentControl.isRestrict.value" type="text" formControlName="equipmentName" class="form-control" 
-              [ngClass]="{ 'is-invalid': equipmentControl.equipmentName.errors }" 
-              placeholder="Instrument"/>
-          <div class="invalid-feedback">*required.</div>
+          <div class="input-group">
+            <select *ngIf="equipmentControl.isRestrict.value" class="custom-select" formControlName="equipmentName"
+              (change)="onChangeEquipmentName(equipmentControl.equipmentType.value, 
+                equipmentControl.equipmentManufactory.value, equipmentControl.equipmentName.value)"  
+              [ngClass]="{ 'is-invalid': equipmentControl.equipmentName.errors }">
+              <option *ngFor="let name of nrlInstruments" value="{{name}}">{{name}}</option>
+            </select>
+            <div *ngIf="nrlInstruments.length == 0 && equipmentControl.isRestrict.value" class="input-group-prepend">
+              <div class="input-group-text" title="loadding"><i class="fa fa-refresh fa-spin"></i></div>
+            </div>
+            <input *ngIf="!equipmentControl.isRestrict.value" type="text" formControlName="equipmentName" class="form-control" 
+                [ngClass]="{ 'is-invalid': equipmentControl.equipmentName.errors }" 
+                placeholder="Instrument"/>
+            <div class="invalid-feedback">*required.</div>
+          </div>
         </div>
       </div>
       <div class="form-group">
         <label>Description</label>
-        <input type="text" formControlName="description" class="form-control" 
+        <input *ngIf="nrlSensorExtraInfo.length == 0" 
+          type="text" formControlName="description" class="form-control" 
           placeholder="Description for this instrument (Optional)." />
+        <select *ngIf="nrlSensorExtraInfo.length > 0" 
+            class="custom-select mr-sm-2" formControlName="description"
+            [ngClass]="{ 'is-invalid': equipmentControl.description.errors }">
+          <option *ngFor="let info of nrlSensorExtraInfo" value="{{info}}">{{info}}</option>
+        </select>
+        <div class="invalid-feedback">*required.</div>
       </div>
       <div class="form-group">
-        <button type="button" [disabled]="equipmentControl.pending" class="btn btn-info">Save</button>
+        <button type="button" [disabled]="equipmentControl.pending" (click)="onSubmitEquipment()" class="btn btn-info">Save</button>
       </div>
     </form>
   </div>

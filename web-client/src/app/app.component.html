@@ -13,6 +13,8 @@
             <span class="fa fa-cloud-upload"></span> Upload Data</a>
           <a class="dropdown-item" *ngIf="hasRight('RIGHT_FDSN_CREATE')" routerLink="fdsn/create">
             <span class="fa fa-plus"></span> Create FDSN metadata</a>
+          <a class="dropdown-item" *ngIf="hasRight('RIGHT_FDSN_EDIT')" routerLink="fdsn/stations">
+            <span class="fa fa-cubes"></span> Stations </a>
         </div>
       </a>
     </li>

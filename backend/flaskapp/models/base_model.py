@@ -126,12 +126,13 @@ class BaseModel:
         return None
 
     @classmethod
-    def search(cls, search: Search):
+    def _create_query(cls, search: Search):
         """
-        Search for entities based on :class:`Search` criteria.
+        Create a query based on search parameters
 
-        :param search: An Search instance.
-        :return: A SearchResult instance
+        :param search: A Search instance.
+
+        :return: The query.
         """
 
         search_columns = []
@@ -163,6 +164,19 @@ class BaseModel:
             query = cls.query.filter(and_(sf for sf in search_filters)).order_by(order_by)
         else:
             query = cls.query.filter(or_(sf for sf in search_filters)).order_by(order_by)
+
+        return query
+
+    @classmethod
+    def search(cls, search: Search):
+        """
+        Search for entities based on :class:`Search` criteria.
+
+        :param search: A Search instance.
+        :return: A SearchResult instance
+        """
+
+        query = cls._create_query(search)
 
         page = query.paginate(per_page=search.PerPage, page=search.Page)
 

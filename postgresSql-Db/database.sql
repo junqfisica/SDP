@@ -32,6 +32,7 @@ insert into SDP.S_RIGHTS values ('RIGHT_USER_DELETE','Delete users');
 insert into SDP.S_RIGHTS values ('RIGHT_DATA_UPLOAD','Upload data');
 insert into SDP.S_RIGHTS values ('RIGHT_FDSN_CREATE','Create FDSN metadata');
 insert into SDP.S_RIGHTS values ('RIGHT_FDSN_DELETE','Delete FDSN metadata');
+insert into SDP.S_RIGHTS values ('RIGHT_FDSN_EDIT','Edit FDSN metadata');
 
 create table SDP.S_ROLES
 (
@@ -61,6 +62,7 @@ insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_USER_DELETE');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_DATA_UPLOAD');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_FDSN_CREATE');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_FDSN_DELETE');
+insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_FDSN_EDIT');
 
 create table SDP.T_USER (
 	ID varchar(16) not null, 
@@ -120,6 +122,7 @@ insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_USER');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_DATA_UPLOAD');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_FDSN_DELETE');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_FDSN_CREATE');
+insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_FDSN_EDIT');
 
 create table SDP.T_APPLICATION_PARAMS
 (
@@ -208,8 +211,8 @@ create table SDP.T_CHANNELS
     SAMPLE_RATE integer not null,
     DL_NO varchar(16) not null,
     SENSOR_NUMBER varchar(16) not null,
-    START_TIME timestamp not null,
-    STOP_TIME timestamp not null,
+    START_TIME timestamptz not null,
+    STOP_TIME timestamptz not null,
     primary key (ID),
     foreign key (STATION_ID) references SDP.T_STATIONS (ID) on delete restrict
     

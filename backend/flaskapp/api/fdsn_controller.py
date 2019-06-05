@@ -1,8 +1,11 @@
+from flaskapp import app_logger
 from flaskapp.api import fdsn
 from flaskapp.extensions.geocoder import GeoCoder
 from flaskapp.http_util import response
-from flaskapp.http_util.decorators import secure, post, query_param
+from flaskapp.http_util.decorators import secure, post, query_param, query
+from flaskapp.http_util.exceptions import EntityNotFound
 from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel, ChannelModel
+from flaskapp.structures.structures import Search, SearchResult
 
 
 @fdsn.route("/createNetwork", methods=["POST"])
@@ -98,6 +101,14 @@ def get_data_sensors():
     return response.model_to_response(sensors)
 
 
+@fdsn.route("/getSensorExtraInfo", methods=["GET"])
+@secure(Right.CREATE_FDSN)
+@query_param("manufactory", "instrument")
+def get_sensor_extra_info(manufactory: str, instrument: str):
+    sr = EquipmentModel.get_sensor_extra_information(manufactory, instrument)
+    return response.string_to_response(sr)
+
+
 @fdsn.route("/getGains", methods=["GET"])
 @secure(Right.CREATE_FDSN)
 @query_param("manufactory", "instrument")
@@ -123,3 +134,51 @@ def get_station(station_id: str):
         return response.model_to_response(station)
 
     return response.empty_response()
+
+
+@fdsn.route("/searchStations", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+@query(Search)
+def search_stations(station_search: Search):
+    search_result: SearchResult = StationModel.search(station_search)
+    return response.model_to_response(search_result)
+
+
+@fdsn.route("/searchChannels", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+@query(Search)
+def search_channels(station_search: Search):
+    search_result: SearchResult = ChannelModel.search(station_search)
+    return response.model_to_response(search_result)
+
+
+@fdsn.route("/deleteStation/<string:station_id>", methods=["DELETE"])
+@secure(Right.DELETE_FDSN)
+def delete_station(station_id):
+    station: StationModel = StationModel.find_by_id(station_id)
+    if not station:
+        raise EntityNotFound("The station id {} doesn't exist".format(station_id))
+
+    deleted = station.delete()
+    if deleted:
+        app_logger.info("Station {} - {} has been deleted".format(station.name, station.creation_date))
+    else:
+        app_logger.warning("Station {} - {} could't be deleted.".format(station.name, station.creation_date))
+
+    return response.bool_to_response(deleted)
+
+
+@fdsn.route("/deleteChannel/<string:channel_id>", methods=["DELETE"])
+@secure(Right.DELETE_FDSN)
+def delete_channel(channel_id):
+    channel: ChannelModel = ChannelModel.find_by_id(channel_id)
+    if not channel:
+        raise EntityNotFound("The channel id {} doesn't exist".format(channel_id))
+
+    deleted = channel.delete()
+    if deleted:
+        app_logger.info("Channel {} - {} has been deleted".format(channel.name, channel.start_time))
+    else:
+        app_logger.warning("Channel {} - {} could't be deleted.".format(channel.name, channel.start_time))
+
+    return response.bool_to_response(deleted)

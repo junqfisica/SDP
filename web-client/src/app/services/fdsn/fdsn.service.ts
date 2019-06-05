@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { Equipments } from '../../model/model.equipments';
 import { Location } from '../../model/model.location';
 import { Station } from '../../model/model.station';
 import { Channel } from '../../model/model.channel';
+import { SearchResult } from '../../model/model.search-result';
 
 @Injectable()
 export class FdsnService {
@@ -69,13 +70,33 @@ export class FdsnService {
     return this.http.get<Equipments[]>(ServerUrl.rootUrl + '/api/fdsn/getSensors');
   }
 
-  getGains(manufactory, instrument): Observable<string[]>{
+  getGains(manufactory: string, instrument: string): Observable<string[]>{
     return this.http.get<string[]>(ServerUrl.rootUrl + '/api/fdsn/getGains?manufactory=' + manufactory + '&instrument=' + instrument);
   }
 
-  getSampleRates(manufactory, instrument, gain): Observable<string[]>{
+  getSensorExtraInfo(manufactory: string, instrument: string): Observable<string[]>{
+    return this.http.get<string[]>(ServerUrl.rootUrl + '/api/fdsn/getSensorExtraInfo?manufactory=' + manufactory + '&instrument=' + instrument);
+  }
+
+  getSampleRates(manufactory: string, instrument: string, gain: string): Observable<string[]>{
     return this.http.get<string[]>(ServerUrl.rootUrl + '/api/fdsn/getSampleRates?manufactory=' + 
       manufactory + '&instrument=' + instrument + '&gain=' + gain);
+  }
+
+  searchStations(params: HttpParams): Observable<SearchResult> {
+    return this.http.get<SearchResult>(ServerUrl.rootUrl + '/api/fdsn/searchStations', { params });
+  }
+
+  searchChannels(params: HttpParams): Observable<SearchResult> {
+    return this.http.get<SearchResult>(ServerUrl.rootUrl + '/api/fdsn/searchChannels', { params });
+  }
+
+  deleteStation(station: Station): Observable<boolean> {
+    return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/fdsn/deleteStation/' + station.id);
+  }
+
+  deleteChannel(channel: Channel): Observable<boolean> {
+    return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/fdsn/deleteChannel/' + channel.id);
   }
 
 }

@@ -1,8 +1,21 @@
-<div class="page-header">
-  <h3 style="font-weight: bold; text-align: center; padding-bottom: 1%;">Stations</h3>
+<div class="container">
+  <div *ngIf="isLoaddingPage" style="text-align: center">
+    <i class="fa fa-spinner fa-spin" style="font-size:300%"></i>
+  </div>
+  <div *ngIf="!isLoaddingPage" style="text-align: center">
+    <h2> Channels at Station {{station.name}}</h2>
+    <div style="margin-bottom: 2%">
+      <span class="fa fa-globe" style="font-size: 130%; color: #515692" 
+        title="Station location"> {{station.latitude}}, {{station.longitude}} </span>
+    </div>
+    <div  class="fa fa-calendar-plus-o" style="margin-right: 5%; font-size: 130%; color: darkgreen" 
+      title="Station created at"> {{station.creation_date | date:'dd.MM.yyyy'}}</div>
+    <div  class="fa fa-calendar-minus-o" style="font-size: 130%; color: darkred" 
+      title="Station removed at"> {{station.removal_date | date:'dd.MM.yyyy'}}</div>
+  </div>
 </div>
 <div class="pull-left">
-  <a routerLink="/fdsn/create" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Stations">
+  <a routerLink="/fdsn/create/channel/{{stationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Channels">
     <span class="fa fa-plus icon-big icon-link"></span>
   </a>
 </div>
@@ -15,11 +28,11 @@
       [typeaheadOptionsLimit]="10"
       typeaheadWaitMs="500"
       typeaheadOptionField="name"
-      [typeaheadItemTemplate]="stationTypeaheadTemplate"
+      [typeaheadItemTemplate]="channelTypeaheadTemplate"
       placeholder="Name"
       class="form-control mr-sm-2">
     <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"
-      (click)="searchStations('name', searchValue,'creation_date')" [disabled]="typeaheadLoading">
+      (click)="searchChannels(searchValue)" [disabled]="typeaheadLoading">
         <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
         <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
     </button>
@@ -28,32 +41,33 @@
 <table class="table table-striped table-hover table-condensed">
   <thead>
     <tr>
-      <th>Network</th>
       <th>Name</th>
-      <th class="center">Create Date</th>
-      <th class="center">Removal Date</th>
-      <th class="center">Channels</th>
+      <th class="center">Location (lat, long)</th>
+      <th class="center">Elevation (m)</th>
+      <th class="center">Depth (m)</th>
+      <th class="center">Gain</th>
+      <th class="center">Sample Rate</th>
+      <th class="center">Start Date & Time (UTC)</th>
+      <th class="center">Stop Date & Time (UTC)</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let station of stations">
-      <td>{{ station.network_id}}</td>
-      <td>{{station.name}}</td>
-      <td class="center">{{ station.creation_date | date:'dd.MM.yyyy'}}</td>
-      <td class="center">{{ station.removal_date | date:'dd.MM.yyyy'}}</td>
-      <td class="center">
-        <a routerLink="/fdsn/channel/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
-          title="channels {{station.channels.length}}">
-          <span class="fa fa-sitemap icon-medium"></span>
-        </a>
-      </td>
+    <tr *ngFor="let ch of channels">
+      <td>{{ch.name}}</td>
+      <td class="center">{{ch.latitude}}, {{ch.longitude}}</td>
+      <td class="center">{{ch.elevation}}</td>
+      <td class="center">{{ch.depth}}</td>
+      <td class="center">{{ch.gain}}</td>
+      <td class="center">{{ch.sample_rate}}</td>
+      <td class="center">{{ dateTimeToUTC(ch.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
+      <td class="center">{{ dateTimeToUTC(ch.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
       <td>
         <div class="pull-right">
           <a routerLink="#" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
             <span class="fa fa-pencil icon-medium"></span>
           </a>
-          <button (click)="openDeleteModal(deleteModalTemplate, station)" class="btn btn-xs btn-default" 
+          <button (click)="openDeleteModal(deleteModalTemplate, ch)" class="btn btn-xs btn-default" 
             *ngIf="hasRight('RIGHT_FDSN_DELETE')" title="delete">
             <span class="fa fa-trash-o icon-medium"></span>
           </button>
@@ -68,12 +82,13 @@
 <!-- Modal temples -->
 <ng-template #deleteModalTemplate let-c="close" let-d="dismiss">
   <div class="modal-header">
-    <h4 class="modal-title">Delete station {{deleteStation?.name}}</h4>
+    <h4 class="modal-title">Delete channel {{deleteChannel?.name}}</h4>
   </div>
   <div class="modal-body">
-    <p>Are you sure you want to delete this station?</p>
-    <p><strong>Create date: {{deleteStation?.creation_date | date:'dd.MM.yyyy'}}</strong></p>
-    <p style="color:red"><strong>All channels belonging to this station will also be deleted!!</strong></p>
+    <p>Are you sure you want to delete this channel?</p>
+    <p><strong>Start date: {{dateTimeToUTC(deleteChannel?.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</strong></p>
+    <p><strong>Stop date: {{dateTimeToUTC(deleteChannel?.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</strong></p>
+    <p style="color:red"><strong>All files belonging to this channel will also be deleted!!</strong></p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-dark" (click)="deleteStationFromModal()">Delete</button>
@@ -81,10 +96,9 @@
   </div>
 </ng-template>
 
-<ng-template #stationTypeaheadTemplate let-station="item">
-  <span><i class="fa fa-bullseye" title="Network">:</i> {{station.network_id}} - 
-    <i class="fa fa-cube" title="Station name">:</i> {{station.name}} - 
-    <i class="fa fa-calendar-plus-o" title="Create at">:</i> {{ station.creation_date | date:'dd.MM.yyyy'}}</span>
+<ng-template #channelTypeaheadTemplate let-channel="item">
+  <span><i class="fa fa-cube" title="Channel name">:</i> {{channel.name}} - 
+    <i class="fa fa-calendar-plus-o" title="Start at">:</i> {{ dateTimeToUTC(channel.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</span>
 </ng-template>
   
 <ng-template #pagination>
@@ -114,3 +128,4 @@
   </div>
 </ng-template>
   
+

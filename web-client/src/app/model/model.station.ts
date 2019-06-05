@@ -1,3 +1,5 @@
+import { Channel } from './model.channel';
+
 export class Station {
     id: string = null;
     network_id: string;
@@ -13,4 +15,5 @@ export class Station {
     geology: string;
     province: string;
     country: string;
+    channels: Channel[];
 }
