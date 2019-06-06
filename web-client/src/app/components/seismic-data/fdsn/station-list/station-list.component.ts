@@ -40,7 +40,7 @@ export class StationListComponent extends ComponentUtils implements OnInit {
       // Runs on every search
       observer.next(this.searchValue);
     }).pipe(
-      mergeMap((term: string) => this.fdsnService.searchStations(this.buildQueryParams("name", term.toUpperCase()))
+      mergeMap((term: string) => this.fdsnService.searchStations(this.buildQueryParams("network_id, name", term.toUpperCase()))
       .pipe(
         // Map search result observable to result list.
         map((data) => {

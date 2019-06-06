@@ -1,0 +1,19 @@
+table.table-dark.hover:hover {
+    background-color: #343a40!important;
+    color: white !important;
+}
+
+table.table-dark.hover>thead>tr:hover {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+table.table-dark.hover>tbody>tr:hover {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    color: white !important;
+}
+
+table.table-dark>thead>tr {
+    background-color: rgba(0, 0, 0, 1) !important;
+    color: white !important;
+}

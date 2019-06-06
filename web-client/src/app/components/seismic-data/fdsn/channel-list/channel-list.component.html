@@ -14,12 +14,13 @@
       title="Station removed at"> {{station.removal_date | date:'dd.MM.yyyy'}}</div>
   </div>
 </div>
-<div class="pull-left">
-  <a routerLink="/fdsn/create/channel/{{stationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Channels">
-    <span class="fa fa-plus icon-big icon-link"></span>
-  </a>
-</div>
+
 <div class="d-flex justify-content-start navbar" id="header">
+  <div>
+    <a routerLink="/fdsn/create/channel/{{stationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Channels">
+      <span class="fa fa-plus icon-big icon-link"></span>
+    </a>
+  </div>
   <div class="form-inline">
     <input [(ngModel)]="searchValue"
       [typeahead]="dataSource"
@@ -31,51 +32,89 @@
       [typeaheadItemTemplate]="channelTypeaheadTemplate"
       placeholder="Name"
       class="form-control mr-sm-2">
-    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"
-      (click)="searchChannels(searchValue)" [disabled]="typeaheadLoading">
-        <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
-        <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
-    </button>
   </div>
+  <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"
+    (click)="searchChannels(searchValue)" [disabled]="typeaheadLoading">
+      <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
+      <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
+  </button>
 </div>
-<table class="table table-striped table-hover table-condensed">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th class="center">Location (lat, long)</th>
-      <th class="center">Elevation (m)</th>
-      <th class="center">Depth (m)</th>
-      <th class="center">Gain</th>
-      <th class="center">Sample Rate</th>
-      <th class="center">Start Date & Time (UTC)</th>
-      <th class="center">Stop Date & Time (UTC)</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let ch of channels">
-      <td>{{ch.name}}</td>
-      <td class="center">{{ch.latitude}}, {{ch.longitude}}</td>
-      <td class="center">{{ch.elevation}}</td>
-      <td class="center">{{ch.depth}}</td>
-      <td class="center">{{ch.gain}}</td>
-      <td class="center">{{ch.sample_rate}}</td>
-      <td class="center">{{ dateTimeToUTC(ch.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
-      <td class="center">{{ dateTimeToUTC(ch.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
-      <td>
-        <div class="pull-right">
-          <a routerLink="#" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
-            <span class="fa fa-pencil icon-medium"></span>
-          </a>
-          <button (click)="openDeleteModal(deleteModalTemplate, ch)" class="btn btn-xs btn-default" 
-            *ngIf="hasRight('RIGHT_FDSN_DELETE')" title="delete">
-            <span class="fa fa-trash-o icon-medium"></span>
+
+<div class="table-responsive">
+  <table class="table table-striped table-hover table-condensed" id="channelTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th class="center">Location (lat, long)</th>
+        <th class="center">Elevation (m)</th>
+        <th class="center">Depth (m)</th>
+        <th class="center">Gain</th>
+        <th class="center">Sample Rate</th>
+        <th class="center">Start Date & Time (UTC)</th>
+        <th class="center">Stop Date & Time (UTC)</th>
+        <th class="center">Equipment Info</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ch of channels">
+        <td>{{ch.name}}</td>
+        <td class="center">{{ch.latitude}}, {{ch.longitude}}</td>
+        <td class="center">{{ch.elevation}}</td>
+        <td class="center">{{ch.depth}}</td>
+        <td class="center">{{ch.gain}}</td>
+        <td class="center">{{ch.sample_rate}}</td>
+        <td class="center">{{ dateTimeToUTC(ch.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
+        <td class="center">{{ dateTimeToUTC(ch.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
+        <td class="center">
+          <button type="button" class="btn btn-xs btn-default" title="click" placement="left"
+            [outsideClick]="true"
+            [popoverContext]="ch"
+            adaptivePosition="true"
+            containerClass="customClass"
+            popoverTitle="Equipment Setup"
+            [popover]="popEqInfoTemplate"> 
+            <span class="fa fa-microchip icon-medium"></span>
           </button>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        </td>
+        <td>
+          <div class="pull-right">
+            <a routerLink="#" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
+              <span class="fa fa-pencil icon-medium"></span>
+            </a>
+            <button (click)="openDeleteModal(deleteModalTemplate, ch)" class="btn btn-xs btn-default" 
+              *ngIf="hasRight('RIGHT_FDSN_DELETE')" title="delete">
+              <span class="fa fa-trash-o icon-medium"></span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<ng-template #popEqInfoTemplate let-equipments="equipments">
+  <div class="table-responsive">
+    <table class="table table-dark table-bordered hover" id="infoTable" style="margin-bottom: 0%;">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Instrument</th>
+          <th>Manufactory</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let eq of equipments">
+          <td>{{eq.type}}</td>
+          <td>{{eq.name}}</td>
+          <td>{{eq.manufactory}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
 
 <ng-template [ngTemplateOutlet]="pagination"></ng-template>
   

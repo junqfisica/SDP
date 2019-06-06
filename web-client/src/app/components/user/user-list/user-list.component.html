@@ -1,12 +1,13 @@
 <div class="page-header">
   <h3 style="font-weight: bold; text-align: center; padding-bottom: 1%;">Users</h3>
 </div>
-<div class="pull-left">
-  <a routerLink="/user/createUser" class="btn btn-default" *ngIf="hasRole('ROLE_ADMIN')" title="Create a new user">
-    <span class="fa fa-user-plus icon-big icon-link"></span>
-  </a>
-</div>
+
 <div class="d-flex justify-content-start navbar" id="header">
+  <div>
+    <a routerLink="/user/createUser" class="btn btn-default" *ngIf="hasRole('ROLE_ADMIN')" title="Create a new user">
+      <span class="fa fa-user-plus icon-big icon-link"></span>
+    </a>
+  </div>
   <div class="form-inline">
     <input [(ngModel)]="searchUsername"
       [typeahead]="dataSource"
@@ -18,44 +19,47 @@
       [typeaheadItemTemplate]="userTypeaheadTemplate"
       placeholder="Username or Name"
       class="form-control mr-sm-2">
-    <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"
-      (click)="searchUsers('username, name, surname', searchUsername,'username')" [disabled]="typeaheadLoading">
-        <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
-        <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
-    </button>
   </div>
+  <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"
+    (click)="searchUsers('username, name, surname', searchUsername,'username')" [disabled]="typeaheadLoading">
+      <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
+      <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
+  </button>
 </div>
-<table class="table table-striped table-hover table-condensed">
-  <thead>
-    <tr>
-      <th>Username</th>
-      <th>Role</th>
-      <th>Name</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let user of users">
-      <td>{{user.username}}</td>
-      <td>
-        <i class="fa fa-cogs icon-medium" *ngIf="userHasRole(user, 'ROLE_ADMIN')" title="Admin"></i>
-        <i class="fa fa-user icon-medium" *ngIf="userHasRole(user, 'ROLE_USER') && !userHasRole(user, 'ROLE_ADMIN')" title="User"></i>
-      </td>
-      <td>{{user.name}} {{user.surname}}</td>
-      <td>
-        <div class="pull-right">
-          <a routerLink="/user/edit/{{user.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_USER_EDIT')" title="edit">
-            <span class="fa fa-pencil icon-medium"></span>
-          </a>
-          <button (click)="openDeleteModal(deleteModalTemplate, user)" class="btn btn-xs btn-default" 
-            *ngIf="hasRight('RIGHT_USER_DELETE')" title="delete" [disabled]="isCurrentUser(user)">
-            <span class="fa fa-trash-o icon-medium"></span>
-          </button>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+<div class="table-responsive">
+  <table class="table table-striped table-hover table-condensed">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Name</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{user.username}}</td>
+        <td>
+          <i class="fa fa-cogs icon-medium" *ngIf="userHasRole(user, 'ROLE_ADMIN')" title="Admin"></i>
+          <i class="fa fa-user icon-medium" *ngIf="userHasRole(user, 'ROLE_USER') && !userHasRole(user, 'ROLE_ADMIN')" title="User"></i>
+        </td>
+        <td>{{user.name}} {{user.surname}}</td>
+        <td>
+          <div class="pull-right">
+            <a routerLink="/user/edit/{{user.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_USER_EDIT')" title="edit">
+              <span class="fa fa-pencil icon-medium"></span>
+            </a>
+            <button (click)="openDeleteModal(deleteModalTemplate, user)" class="btn btn-xs btn-default" 
+              *ngIf="hasRight('RIGHT_USER_DELETE')" title="delete" [disabled]="isCurrentUser(user)">
+              <span class="fa fa-trash-o icon-medium"></span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <ng-template [ngTemplateOutlet]="pagination"></ng-template>
 
 <!-- Modal temples -->

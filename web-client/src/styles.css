@@ -33,6 +33,11 @@
     background-color: lightgrey;
 }
 
+/* Override popoover style*/
+.popover {
+    max-width: 100%;
+}
+
 /* Override ngx-pagination color's style. */
 pagination li.page-item.active a.page-link  {
     background-color: var(--dark) !important;
