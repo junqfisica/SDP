@@ -177,8 +177,10 @@ def delete_channel(channel_id):
 
     deleted = channel.delete()
     if deleted:
-        app_logger.info("Channel {} - {} has been deleted".format(channel.name, channel.start_time))
+        app_logger.info("Station/Channel {}-{} - {} has been deleted".
+                        format(channel.get_station().name, channel.name, channel.start_time))
     else:
-        app_logger.warning("Channel {} - {} could't be deleted.".format(channel.name, channel.start_time))
+        app_logger.warning("Station/Channel {}-{} - {} could't be deleted.".
+                           format(channel.get_station().name, channel.name, channel.start_time))
 
     return response.bool_to_response(deleted)

@@ -50,6 +50,11 @@ class StationModel(db.Model, BaseModel):
             # add 10 years to current date. # Virtually it means that the removal date is open.
             other_removal_date = datetime.now().date() + timedelta(days=10 * 365)
 
+        # Avoid cases where both dates are equal within the same day.
+        is_equal = self.creation_date == other.creation_date and self.removal_date == other_removal_date
+        if is_equal:
+            return is_equal
+
         overlap = self.creation_date < other_removal_date and other.creation_date < removal_date
         return overlap
 
@@ -137,6 +142,14 @@ class ChannelModel(db.Model, BaseModel):
                                                      self.sample_rate, self.dl_no, self.sensor_number,
                                                      self.start_time, self.stop_time)
 
+    @property
+    def start_time_utc(self):
+        return DateUtils.convert_datetime_to_utc(self.start_time)
+
+    @property
+    def stop_time_utc(self):
+        return DateUtils.convert_datetime_to_utc(self.stop_time)
+
     def to_dict(self):
         """
         Convert Channel into a dictionary, this way we can convert it to a JSON response.
@@ -157,8 +170,19 @@ class ChannelModel(db.Model, BaseModel):
         if self.id == other.id:
             return False
 
+        if self.start_time == self.stop_time:
+            raise CreateEntityError("Channel can't have the same start and stop time")
+
         overlap = self.start_time < other.stop_time and other.start_time < self.stop_time
         return overlap
+
+    def get_station(self) -> StationModel:
+        """
+        Get the station in which this channel belongs.
+
+        :return: The station from this channel.
+        """
+        return StationModel.find_by_id(self.station_id)
 
     @classmethod
     def from_dict(cls, channel_dict: dict):
@@ -173,12 +197,12 @@ class ChannelModel(db.Model, BaseModel):
         return channel
 
     def creation_validation(self):
-        channels = self.find_by(name=self.name, get_first=False)
+        channels = self.find_by(station_id=self.station_id, name=self.name, get_first=False)
         if channels:
             for channel in channels:
                 if self.is_time_overlap(channel):
-                    rd = DateUtils.convert_datetime_to_utc(channel.stop_time).strftime("%d-%m-%Y, %H:%M:%S")
-                    st = DateUtils.convert_datetime_to_utc(channel.start_time).strftime("%d-%m-%Y, %H:%M:%S")
+                    rd = channel.stop_time_utc.strftime("%d-%m-%Y, %H:%M:%S")
+                    st = channel.start_time_utc.strftime("%d-%m-%Y, %H:%M:%S")
                     msg = "Time overlap with channel {} started at {} and stopped at {}". \
                         format(channel.name, st, rd)
                     raise CreateEntityError(msg)

@@ -86,8 +86,8 @@
   </div>
   <div class="modal-body">
     <p>Are you sure you want to delete this channel?</p>
-    <p><strong>Start date: {{dateTimeToUTC(deleteChannel?.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</strong></p>
-    <p><strong>Stop date: {{dateTimeToUTC(deleteChannel?.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</strong></p>
+    <p><strong>Start date: {{deleteChannel?.start_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}</strong></p>
+    <p><strong>Stop date: {{deleteChannel?.stop_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}</strong></p>
     <p style="color:red"><strong>All files belonging to this channel will also be deleted!!</strong></p>
   </div>
   <div class="modal-footer">
@@ -98,7 +98,7 @@
 
 <ng-template #channelTypeaheadTemplate let-channel="item">
   <span><i class="fa fa-cube" title="Channel name">:</i> {{channel.name}} - 
-    <i class="fa fa-calendar-plus-o" title="Start at">:</i> {{ dateTimeToUTC(channel.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</span>
+    <i class="fa fa-calendar-plus-o" title="Start at">:</i> {{ channel.start_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}</span>
 </ng-template>
   
 <ng-template #pagination>

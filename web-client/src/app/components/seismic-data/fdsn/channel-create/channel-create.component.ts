@@ -90,7 +90,7 @@ export class ChannelCreateComponent implements OnInit {
       sensorNumber: ['', {validators: [Validators.required], updateOn: 'change'}],
       startTime: [this.stationCreateDate, {validators: [Validators.required, AppValidador.minDate(this.stationCreateDate), 
         AppValidador.maxDate(this.stationRemovalDate)], updateOn: 'change'}],
-      stopTime: [this.stationRemovalDate, {validators: [Validators.required, AppValidador.minDate("startTime"), 
+      stopTime: [this.stationRemovalDate, {validators: [Validators.required, AppValidador.minDate("startTime", true), 
         AppValidador.maxDate(this.stationRemovalDate)], updateOn: 'change'}],
       timepickerStop: [this.stationRemovalDate, {validators: [Validators.required], updateOn: 'change'}],
       timepickerStart: [this.stationCreateDate, {validators: [Validators.required], updateOn: 'change'}]

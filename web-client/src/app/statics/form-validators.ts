@@ -37,7 +37,7 @@ export class AppValidador extends Validators {
     };
   }
 
-  static minDate(value : string | Date): ValidatorFn {
+  static minDate(value : string | Date, isInclusive = false): ValidatorFn {
     return (control: AbstractControl): { [key: string]: boolean } | null => {
       
       let parentValue = null
@@ -54,14 +54,15 @@ export class AppValidador extends Validators {
       if (control.value === null){
         return null;
       }
-      if (parentValue === null || (control.value !== undefined && currentDate < minDate)) {
+      const isMin = isInclusive ? currentDate <= minDate : currentDate < minDate;
+      if (parentValue === null || (control.value !== undefined && isMin)) {
         return { 'minDate': true };
       }
       return null;
     };
   }
 
-  static maxDate(value : string | Date): ValidatorFn {
+  static maxDate(value : string | Date, isInclusive = false): ValidatorFn {
     return (control: AbstractControl): { [key: string]: boolean } | null => {
       
       let parentValue = null
@@ -79,7 +80,8 @@ export class AppValidador extends Validators {
       if (control.value === null){
         return null;
       }
-      if (parentValue === null || (control.value !== undefined && currentDate > maxDate)) {
+      const isMax = isInclusive ? currentDate >= maxDate : currentDate > maxDate;
+      if (parentValue === null || (control.value !== undefined && isMax)) {
         return { 'maxDate': true };
       }
       return null;
