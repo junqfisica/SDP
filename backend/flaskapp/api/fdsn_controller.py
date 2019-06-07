@@ -152,6 +152,19 @@ def search_channels(station_search: Search):
     return response.model_to_response(search_result)
 
 
+@fdsn.route("/updateStation", methods=["POST"])
+@secure(Right.EDIT_FDSN)
+@post()
+def update_station(station: dict):
+
+    updated_station = StationModel.update(station)
+
+    if not updated_station:
+        raise EntityNotFound("This station doesn't exist.")
+
+    return response.bool_to_response(updated_station.save())
+
+
 @fdsn.route("/deleteStation/<string:station_id>", methods=["DELETE"])
 @secure(Right.DELETE_FDSN)
 def delete_station(station_id):

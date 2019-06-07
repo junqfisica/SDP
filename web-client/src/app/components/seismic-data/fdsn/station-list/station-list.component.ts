@@ -54,11 +54,11 @@ export class StationListComponent extends ComponentUtils implements OnInit {
   }
 
   buildQueryParams(searchBy="name", value="", orderBy=""): HttpParams {
-    const searchParms = new Search(searchBy, value).searchParms
-    searchParms.orderBy = orderBy
-    searchParms.orderDesc = false
-    searchParms.page = this.page
-    searchParms.perPage = this.itemsPerPage
+    const searchParms = new Search(searchBy, value).searchParms;
+    searchParms.orderBy = orderBy;
+    searchParms.orderDesc = false;
+    searchParms.page = this.page;
+    searchParms.perPage = this.itemsPerPage;
 
     return new HttpParams({ fromObject: searchParms });
   }

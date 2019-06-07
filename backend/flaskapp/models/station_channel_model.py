@@ -72,8 +72,8 @@ class StationModel(db.Model, BaseModel):
 
         return dict_representation
 
-    def creation_validation(self):
-        stations = self.find_by(name=self.name, get_first=False)
+    def creation_validation(self, ignore_name_loc_check=False):
+        stations = StationModel.find_by(name=self.name, get_first=False)
         if stations:
             for station in stations:
                 if self.is_time_overlap(station):
@@ -82,13 +82,14 @@ class StationModel(db.Model, BaseModel):
                         format(station.name, station.creation_date.strftime("%d-%m-%Y"), rd)
                     raise CreateEntityError(msg)
 
-        stations = self.find_by(latitude=self.latitude, longitude=self.longitude, get_first=False)
-        if stations:
-            for station in stations:
-                if self.name != station.name:
-                    msg = "The location {}, {} is used by the station {}".\
-                        format(self.latitude, self.longitude, station.name)
-                    raise CreateEntityError(msg)
+        if not ignore_name_loc_check:
+            st_unique_loc = StationModel.find_by(latitude=self.latitude, longitude=self.longitude, get_first=False)
+            if st_unique_loc:
+                for station in st_unique_loc:
+                    if self.name != station.name:
+                        msg = "The location {}, {} is been used by the station {}".\
+                            format(self.latitude, self.longitude, station.name)
+                        raise CreateEntityError(msg)
 
     @classmethod
     def from_dict(cls, station_dict: dict):
@@ -112,6 +113,30 @@ class StationModel(db.Model, BaseModel):
         st.creation_validation()
 
         return st.save()
+
+    @classmethod
+    def update(cls, station_dict: dict):
+        """
+        Update the current station.
+
+        Import: You must use save() to storage it in the database.
+
+        :param station_dict: A dictionary representation of the station.
+
+        :return: The updated station or None if user if not valid.
+        """
+        station: StationModel = cls.from_dict(station_dict)
+        valid_station: StationModel = StationModel.find_by_id(station.id)
+        if not valid_station:
+            return None
+
+        # validate creation to check if there is time overlap.
+        station.creation_validation(ignore_name_loc_check=True)
+
+        # Copy all attributes from station to valid_station.
+        valid_station << station
+
+        return valid_station
 
 
 class ChannelModel(db.Model, BaseModel):

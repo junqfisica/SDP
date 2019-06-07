@@ -39,6 +39,7 @@ import { FdsnService } from './services/fdsn/fdsn.service';
 import { StationListComponent } from './components/seismic-data/fdsn/station-list/station-list.component';
 import { ChannelCreateComponent } from './components/seismic-data/fdsn/channel-create/channel-create.component';
 import { ChannelListComponent } from './components/seismic-data/fdsn/channel-list/channel-list.component';
+import { StationEditComponent } from './components/seismic-data/fdsn/station-edit/station-edit.component';
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { ChannelListComponent } from './components/seismic-data/fdsn/channel-lis
     FdsnCreateComponent,
     StationListComponent,
     ChannelCreateComponent,
-    ChannelListComponent
+    ChannelListComponent,
+    StationEditComponent
   ],
   imports: [
     BrowserModule,

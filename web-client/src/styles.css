@@ -2,15 +2,23 @@
 
 /* You can add global styles to this file, and also import other style files */
 .icon-big:before {
-    font-size: 30px
+    font-size: 30px;
 }
 
 .icon-medium::before {
-    font-size: 20px
+    font-size: 20px;
 }
 
 .icon-link {
-    color:#bd5734
+    color:#bd5734;
+}
+
+.icon-red {
+    color:red;
+}
+
+.icon-green {
+    color: darkgreen;
 }
 
 .button-transparent {
@@ -51,4 +59,24 @@ pagination li.page-item a.page-link  {
 
 .center{
     text-align: center;
+}
+
+table.table-dark.hover:hover {
+    background-color: #343a40!important;
+    color: white !important;
+}
+
+table.table-dark.hover>thead>tr:hover {
+    background-color: #343a40 !important;
+    color: white !important;
+}
+
+table.table-dark.hover>tbody>tr:hover {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    color: white !important;
+}
+
+table.table-dark>thead>tr {
+    background-color: rgba(0, 0, 0, 1) !important;
+    color: white !important;
 }

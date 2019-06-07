@@ -1,0 +1,139 @@
+<div *ngIf="isLoaddingPage" style="text-align: center">
+  <i class="fa fa-spinner fa-spin" style="font-size:300%"></i>
+</div>
+<div *ngIf="!isLoaddingPage" class="container" style="margin-top: 1%">
+  <div class="page-header">
+    <h3 style="font-weight: bold; text-align: center; padding-bottom: 1%;">Edit Station</h3>
+  </div>
+  <form [formGroup]="stationForm">
+    <div class="form-group">
+      <div class="custom-control custom-checkbox">
+        <input class="custom-control-input" type="checkbox" formControlName="isPublicData" id="isPublicDataCheck">
+        <label class="custom-control-label" for="isPublicDataCheck"> Public data</label>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-2">
+        <label>Network code</label>
+        <select class="custom-select mr-sm-2" formControlName="networkId" [ngClass]="{ 'is-invalid': stationControl.networkId.errors }">
+            <option *ngFor="let net of networks" value="{{net.id}}">{{net.id}}</option>
+        </select>
+        <div class="invalid-feedback">*required.</div>
+      </div>
+      <div class="form-group col-md-2">
+        <label>Name</label>
+        <input type="text" formControlName="name" class="form-control" 
+            [ngClass]="{ 'is-invalid': stationControl.name.errors }" 
+            placeholder="Name" />
+        <div *ngIf="stationControl.name.errors" class="invalid-feedback">
+          <div *ngIf="stationControl.name.errors.required">*required.</div>
+          <div *ngIf="stationControl.name.errors.minlength">It must have 3-5 characters.</div>
+          <div *ngIf="stationControl.name.errors.maxlength">It must have 3-5 characters.</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-2">
+        <label>Latitude (Deg)</label>
+        <input type="number" min="-90" max="90" class="form-control" formControlName="latitude" 
+        [ngClass]="{ 'is-invalid': stationControl.latitude.errors }">
+        <div *ngIf="stationControl.latitude.errors" class="invalid-feedback">
+          <div *ngIf="stationControl.latitude.errors.required">*required.</div>
+          <div *ngIf="stationControl.latitude.errors.min">It must be bigger than -90 degrees.</div>
+          <div *ngIf="stationControl.latitude.errors.max">It must be smaller than 90 degrees.</div>
+          <div *ngIf="stationControl.latitude.errors.pattern">Must have at least 5 significant digits, i.e: 1.15234.</div>
+        </div>
+      </div>
+      <div class="form-group col-md-2">
+        <label>Longitude (Deg)</label>
+        <input type="number" min="-180" max="180" formControlName="longitude" class="form-control" 
+            [ngClass]="{ 'is-invalid': stationControl.longitude.errors }">
+        <div *ngIf="stationControl.longitude.errors" class="invalid-feedback">
+          <div *ngIf="stationControl.longitude.errors.required">*required.</div>
+          <div *ngIf="stationControl.longitude.errors.min">It must be bigger than -180 degrees.</div>
+          <div *ngIf="stationControl.longitude.errors.max">It must be smaller than 180 degrees.</div>
+          <div *ngIf="stationControl.longitude.errors.pattern">Must have at least 5 significant digits, i.e: 1.15234.</div>
+        </div>
+      </div>
+      <div class="form-group col-md-2">
+        <label>Elevation (m)</label>
+        <input type="number" step="10" formControlName="elevation" class="form-control" 
+            [ngClass]="{ 'is-invalid': stationControl.elevation.errors }">
+          <div class="invalid-feedback">*required.</div>
+      </div>
+      <div class="form-group col-md-2">
+        <label>Depth (m)</label>
+        <input type="number" min="0" formControlName="depth" class="form-control" 
+            [ngClass]="{ 'is-invalid': stationControl.depth.errors }">
+          <div class="invalid-feedback">*required.</div>
+      </div>
+    </div>
+    <div class="form-row ">
+      <div class="form-group col-md-6">
+        <div class="form-group">
+          <button [disabled]="(stationControl.longitude.errors || stationControl.latitude.errors)" 
+            class="btn btn-info" (click)="setLocation(stationControl.latitude.value, stationControl.longitude.value)">Get Location</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <input type="text" placeholder="Province (Optional)" formControlName="province" class="form-control" >
+          </div>
+          <div class="form-group col-md-6">
+            <input type="text" placeholder="Country (Optional)" formControlName="country" class="form-control">
+          </div>
+          <div class="form-group col-md-6">
+            <label>Site</label>
+            <input type="text" placeholder="Site (Optional)" formControlName="site" class="form-control">
+          </div>
+          <div class="form-group col-md-6">
+            <label>Geology</label>
+            <input type="text" placeholder="Geology (Optional)" formControlName="geology" class="form-control">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row ">
+      <div class="form-group col-md-3">
+        <label>Create date</label>
+        <input type="text" placeholder="DD.MM.YYYY" formControlName="createDate" class="form-control" 
+          bsDatepicker (bsValueChange)="onCreateDateChange($event)" readonly='true'
+          [bsConfig]="bsConfig" [maxDate]="maxCreateDate"
+          [ngClass]="{ 'is-invalid': stationControl.createDate.errors }">
+        <div *ngIf="stationControl.createDate.errors" class="invalid-feedback">
+          <div *ngIf="stationControl.createDate.errors.required">*required.</div>
+          <div *ngIf="stationControl.createDate.errors.maxDate">It can't be bigger than first channel start time at
+              {{maxCreateDate | date:'dd.MM.yyyy'}}.</div>
+        </div>
+      </div>
+      <div class="form-group col-md-3">
+        <label>Removal date</label>
+        <input type="text" placeholder="DD.MM.YYYY"  
+          bsDatepicker [bsConfig]="bsConfig"  [minDate]="stationControl.createDate.value"
+          formControlName="removeDate" class="form-control" readonly='true'
+          [ngClass]="{ 'is-invalid': stationControl.removeDate.errors }">
+        <div *ngIf="stationControl.removeDate.errors" class="invalid-feedback">
+          <div *ngIf="stationControl.removeDate.errors.minDate && minRemovelDate">It can't be smaller than the latest channel stop time at
+            {{minRemovelDate | date:'dd.MM.yyyy'}}.</div>
+          <div *ngIf="stationControl.removeDate.errors.minDate && !minRemovelDate">It can't be smaller than 
+            {{stationControl.createDate.value | date:'dd.MM.yyyy'}}.</div>
+        </div> 
+      </div>
+    </div>
+    <div class="form-group">
+      <button type="button" [disabled]="stationControl.pending" class="btn btn-info" (click)="openUpdateModal(updateModalTemplate)">Update</button>
+    </div>
+  </form>
+</div>
+
+<ng-template #updateModalTemplate let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Update station {{station.name}}</h4>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to update this station?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="onSubmitStation()">Update</button>
+    <button type="button" class="btn btn-outline-dark" (click)="closeUpdateModal()">Cancel</button>
+  </div>
+</ng-template>

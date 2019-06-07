@@ -31,27 +31,45 @@
       <tr>
         <th>Network</th>
         <th>Name</th>
+        <th class="center">Location (lat, long)</th>
+        <th class="center">Elevation (m)</th>
+        <th class="center">Depth (m)</th>
         <th class="center">Create Date</th>
         <th class="center">Removal Date</th>
         <th class="center">Channels</th>
+        <th class="center">Public Data</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let station of stations">
-        <td>{{ station.network_id}}</td>
+        <td>{{station.network_id}}</td>
         <td>{{station.name}}</td>
-        <td class="center">{{ station.creation_date | date:'dd.MM.yyyy'}}</td>
-        <td class="center">{{ station.removal_date | date:'dd.MM.yyyy'}}</td>
+        <td class="center">{{station.latitude}}, {{station.longitude}}</td>
+        <td class="center">{{station.elevation}}</td>
+        <td class="center">{{station.depth}}</td>
+        <td class="center">{{station.creation_date | date:'dd.MM.yyyy'}}</td>
+        <td class="center">{{station.removal_date | date:'dd.MM.yyyy'}}</td>
         <td class="center">
           <a routerLink="/fdsn/channel/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
             title="channels {{station.channels.length}}">
             <span class="fa fa-sitemap icon-medium"></span>
           </a>
         </td>
+        <td class="center">
+          <button type="button" class="btn btn-xs btn-default" placement="left" container="body"
+            [outsideClick]="true"
+            [popoverContext]="station"
+            adaptivePosition="true"
+            popoverTitle="Location info"
+            [popover]="popLocationTemplate">
+            <span *ngIf="station.public_data" class="fa fa-globe icon-medium icon-green" title="Public"></span>
+            <span *ngIf="!station.public_data" class="fa fa-globe icon-medium icon-red" title="Restrict"></span>
+          </button>
+        </td>
         <td>
           <div class="pull-right">
-            <a routerLink="#" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
+            <a routerLink="edit/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
               <span class="fa fa-pencil icon-medium"></span>
             </a>
             <button (click)="openDeleteModal(deleteModalTemplate, station)" class="btn btn-xs btn-default" 
@@ -64,6 +82,33 @@
     </tbody>
   </table>
 </div>
+
+<ng-template #popLocationTemplate 
+  let-country="country"
+  let-province="province"
+  let-site="site"
+  let-geology="geology">
+  <div class="table-responsive">
+    <table class="table table-dark table-bordered hover" id="infoTable" style="margin-bottom: 0%;">
+      <thead>
+        <tr>
+          <th>Country</th>
+          <th>Province</th>
+          <th>Site</th>
+          <th>Geology</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{country}}</td>
+          <td>{{province}}</td>
+          <td>{{site}}</td>
+          <td>{{geology}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
 
 <ng-template [ngTemplateOutlet]="pagination"></ng-template>
   

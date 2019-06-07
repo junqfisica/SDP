@@ -29,6 +29,10 @@ export class FdsnService {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createStation', st);
   }
 
+  updateStation(st: Station): Observable<boolean> {
+    return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/updateStation', st);
+  }
+
   createChannel(ch: Channel): Observable<boolean> {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createChannel', ch);
   }

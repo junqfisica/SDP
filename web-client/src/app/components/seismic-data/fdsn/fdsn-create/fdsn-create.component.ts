@@ -87,6 +87,10 @@ export class FdsnCreateComponent implements OnInit {
 
   }
 
+  clearRemovalDate(){
+    this.stationControl.removeDate.setValue(null);
+  }
+
   fetchNRLManufactures(instrumentType: string){
     this.fdsnService.getNRLManufacturers(instrumentType).subscribe(
       manufactores => {

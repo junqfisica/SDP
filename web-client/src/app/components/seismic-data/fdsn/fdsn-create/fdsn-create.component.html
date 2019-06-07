@@ -229,7 +229,7 @@
           </div>
         </div>
       </div>
-      <div class="form-row ">
+      <div class="form-row">
         <div class="form-group col-md-3">
           <label>Create date</label>
           <input type="text" placeholder="DD.MM.YYYY" formControlName="createDate" class="form-control" 
@@ -249,7 +249,13 @@
           <div *ngIf="stationControl.removeDate.errors" class="invalid-feedback">
             <div *ngIf="stationControl.removeDate.errors.minDate">It can't be smaller than 
               {{stationControl.createDate.value | date:'dd.MM.yyyy'}}.</div>
-          </div> 
+          </div>
+        </div>
+        <div class="form-group col-auto">
+          <label><i class="fa fa-calendar-times-o" title="clear removal date."></i></label>
+          <div>
+            <button type="button" class="btn btn-info" (click)="clearRemovalDate()">Clear date</button>
+          </div>
         </div>
       </div>
       <div class="form-group">
