@@ -18,6 +18,8 @@ This project uses:
 
 [ng2-file-upload](https://github.com/valor-software/ng2-file-upload)
 
+[ng2-google-chart](https://www.devrandom.it/software/ng2-google-charts/)
+
 
 ### Installing dependencies
 `sudo npm install --save bootstrap@4 jquery@3.4.0 font-awesome`
@@ -25,6 +27,8 @@ This project uses:
 `sudo npm install ngx-bootstrap --save`
 
 `sudo npm i ng2-file-upload --save`
+
+`sudo npm i npm i --save ng2-google-charts`
 
 You can skip the next step if you cloned the project. The file `angular.json` should be ok.
 

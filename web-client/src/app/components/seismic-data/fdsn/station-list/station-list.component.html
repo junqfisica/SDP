@@ -1,6 +1,9 @@
 <div class="page-header">
   <h3 style="font-weight: bold; text-align: center; padding-bottom: 1%;">Stations</h3>
 </div>
+<div class="container table-responsive">
+  <google-chart #chart [data]="timelineChartData" (chartSelect)="onSelectChart($event)" *ngIf="isDataLoaded"></google-chart>
+</div>
 <div class="d-flex justify-content-start navbar" id="header">
   <div>
     <a routerLink="/fdsn/create" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Stations">

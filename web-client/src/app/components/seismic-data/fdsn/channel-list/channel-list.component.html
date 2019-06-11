@@ -14,7 +14,9 @@
       title="Station removed at"> {{station.removal_date | date:'dd.MM.yyyy'}}</div>
   </div>
 </div>
-
+<div class="container table-responsive" style="margin-top: 2%; height: 10">
+  <google-chart #chart [data]="timelineChartData" *ngIf="isDataLoaded"></google-chart>
+</div>
 <div class="d-flex justify-content-start navbar" id="header">
   <div>
     <a routerLink="/fdsn/create/channel/{{stationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Channels">

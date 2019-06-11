@@ -17,6 +17,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 
 import { FileUploadModule } from 'ng2-file-upload';
+import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -75,7 +76,8 @@ import { StationEditComponent } from './components/seismic-data/fdsn/station-edi
     BsDatepickerModule.forRoot(),
     PopoverModule.forRoot(),
     TimepickerModule.forRoot(),
-    FileUploadModule
+    FileUploadModule,
+    Ng2GoogleChartsModule
   ],
   providers: [
     AuthService,

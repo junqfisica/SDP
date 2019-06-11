@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 
@@ -8,6 +8,8 @@ import { mergeMap, map } from 'rxjs/operators';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/';
+
+import { GoogleChartComponent } from 'ng2-google-charts';
 
 import { FdsnService } from '../../../../services/fdsn/fdsn.service';
 import { NotificationService } from '../../../../services/notification/notification.service';
@@ -24,6 +26,11 @@ import { Station } from '../../../../model/model.station';
 })
 export class ChannelListComponent extends ComponentUtils implements OnInit {
 
+  @ViewChild('chart') set content(content: GoogleChartComponent) {
+    // Called everytime the isDataLoaded change status.
+    this.reDrawGoogleChart(content);
+  }
+
   station: Station;
   stationId: string;
   deleteModalRef: BsModalRef | null;
@@ -35,6 +42,20 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
   dataSource: Observable<Channel>;
   searchValue: string;
   typeaheadLoading: boolean;
+  timelineChartData: any =  {
+    chartType: 'Timeline',
+    options: {
+      timeline: { 
+        showRowLabels: true,
+        showBarLabels: true  
+      },
+      avoidOverlappingGridLines: false
+    },
+    dataTable: [
+      ['Name','Label', 'From', 'To']
+    ]
+  };
+  isDataLoaded = false;
   isLoaddingPage = true;
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
@@ -47,6 +68,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
             station => {
               this.station = station;
               this.isLoaddingPage = false;
+              this.searchChannels();
             },
             error =>{
               console.log(error);
@@ -55,7 +77,6 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
             }
           );
           this.stationId = params.stationId;
-          this.searchChannels();
         }
       },
       error => {
@@ -159,12 +180,35 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
     this.searchChannels(e.item.id, "start_time", "id");
   }
 
+  private loadTimeLineData() {
+    this.isDataLoaded = false;
+    this.timelineChartData.dataTable = [];
+    this.timelineChartData.dataTable.push(['Name','Label', 'From', 'To']);
+    for (const ch of this.channels) {
+      this.timelineChartData.dataTable.push(
+        [this.station.name + "-" + ch.name, ch.name, DateUtil.convertUTCStringToDate(ch.start_time),  DateUtil.convertUTCStringToDate(ch.stop_time)]
+      );
+    };
+    if (this.timelineChartData.dataTable.length > 1){
+      this.isDataLoaded = true;
+    }
+  }
+
+  private reDrawGoogleChart(googleChart: GoogleChartComponent){
+    if (googleChart) {
+      if (googleChart.wrapper) {
+        googleChart.draw();
+      };
+    };
+  }
+
   searchChannels(value="", orderBy="start_time", searchBy = "station_id, name"){
     
     this.fdsnService.searchChannels(this.buildQueryParams(value, orderBy, searchBy)).subscribe(
       data => {        
-        this.totalItems = data.total
-        this.channels = data.result                
+        this.totalItems = data.total;
+        this.channels = data.result;
+        this.loadTimeLineData();                
       },
       error => {
         console.log(error);
