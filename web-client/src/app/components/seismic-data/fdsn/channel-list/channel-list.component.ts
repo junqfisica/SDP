@@ -10,6 +10,7 @@ import { PageChangedEvent } from 'ngx-bootstrap/pagination';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/';
 
 import { GoogleChartComponent } from 'ng2-google-charts';
+import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 
 import { FdsnService } from '../../../../services/fdsn/fdsn.service';
 import { NotificationService } from '../../../../services/notification/notification.service';
@@ -18,17 +19,19 @@ import { ComponentUtils } from '../../../../components/component.utils';
 import { Channel } from '../../../../model/model.channel';
 import { DateUtil } from '../../../../statics/date-util';
 import { Station } from '../../../../model/model.station';
+import { DataTable } from '../../../../auxiliary-classes/data-table';
+import { IGoogleChart } from '../../../../interfaces/google-chart-interface';
 
 @Component({
   selector: 'app-channel-list',
   templateUrl: './channel-list.component.html',
   styleUrls: ['./channel-list.component.css']
 })
-export class ChannelListComponent extends ComponentUtils implements OnInit {
+export class ChannelListComponent extends ComponentUtils implements OnInit, IGoogleChart {
 
   @ViewChild('chart') set content(content: GoogleChartComponent) {
     // Called everytime the isDataLoaded change status.
-    this.reDrawGoogleChart(content);
+    DataTable.reDrawGoogleChart(content);
   }
 
   station: Station;
@@ -42,18 +45,19 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
   dataSource: Observable<Channel>;
   searchValue: string;
   typeaheadLoading: boolean;
-  timelineChartData: any =  {
+  timelineChart: GoogleChartInterface =  {
     chartType: 'Timeline',
     options: {
       timeline: { 
         showRowLabels: true,
-        showBarLabels: true  
+        showBarLabels: true
       },
       avoidOverlappingGridLines: false
     },
-    dataTable: [
-      ['Name','Label', 'From', 'To']
-    ]
+    dataTable: {
+      cols:[],
+      rows: []
+    }
   };
   isDataLoaded = false;
   isLoaddingPage = true;
@@ -180,26 +184,26 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
     this.searchChannels(e.item.id, "start_time", "id");
   }
 
-  private loadTimeLineData() {
+  loadChartData() {
     this.isDataLoaded = false;
-    this.timelineChartData.dataTable = [];
-    this.timelineChartData.dataTable.push(['Name','Label', 'From', 'To']);
+    const data = new DataTable();
+    // add columns
+    data.addColumn("Name","string");
+    data.addColumn("Label","string");
+    data.addColumn("From","date");
+    data.addColumn("To","date");
+
     for (const ch of this.channels) {
-      this.timelineChartData.dataTable.push(
-        [this.station.name + "-" + ch.name, ch.name, DateUtil.convertUTCStringToDate(ch.start_time),  DateUtil.convertUTCStringToDate(ch.stop_time)]
-      );
+      data.addRow(
+        [this.station.name + "-" + ch.name, ch.name, DateUtil.convertUTCStringToDate(ch.start_time),  DateUtil.convertUTCStringToDate(ch.stop_time)]);
     };
-    if (this.timelineChartData.dataTable.length > 1){
+
+    this.timelineChart.dataTable = data;
+    
+    // Only re-draw if there is data.
+    if (this.timelineChart.dataTable.rows.length > 0){
       this.isDataLoaded = true;
     }
-  }
-
-  private reDrawGoogleChart(googleChart: GoogleChartComponent){
-    if (googleChart) {
-      if (googleChart.wrapper) {
-        googleChart.draw();
-      };
-    };
   }
 
   searchChannels(value="", orderBy="start_time", searchBy = "station_id, name"){
@@ -208,7 +212,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
       data => {        
         this.totalItems = data.total;
         this.channels = data.result;
-        this.loadTimeLineData();                
+        this.loadChartData();                
       },
       error => {
         console.log(error);

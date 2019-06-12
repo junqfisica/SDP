@@ -17,6 +17,8 @@ import { FdsnService } from '../../../../services/fdsn/fdsn.service';
 import { NotificationService } from '../../../../services/notification/notification.service';
 import { Search } from '../../../../model/model.search';
 import { ComponentUtils } from '../../../../components/component.utils';
+import { DataTable } from '../../../../auxiliary-classes/data-table';
+import { IGoogleChart } from '../../../../interfaces/google-chart-interface';
 
 
 @Component({
@@ -24,13 +26,13 @@ selector: 'app-station-list',
   templateUrl: './station-list.component.html',
   styleUrls: ['./station-list.component.css']
 })
-export class StationListComponent extends ComponentUtils implements OnInit {
+export class StationListComponent extends ComponentUtils implements OnInit, IGoogleChart {
   
   private _chart: GoogleChartComponent;
   @ViewChild('chart') set content(content: GoogleChartComponent) {
     // Called everytime the isDataLoaded change status.
     this._chart = content;
-    this.reDrawGoogleChart(content);
+    DataTable.reDrawGoogleChart(content);
   }
   
   isDataLoaded = false;
@@ -43,19 +45,19 @@ export class StationListComponent extends ComponentUtils implements OnInit {
   dataSource: Observable<Station>;
   searchValue: string;
   typeaheadLoading: boolean;
-  timelineChartData: GoogleChartInterface =  {
+  timelineChart: GoogleChartInterface =  {
     chartType: 'Timeline',
     options: {
       timeline: { 
         showRowLabels: true,
         showBarLabels: true
-          
       },
       avoidOverlappingGridLines: false
     },
-    dataTable: [
-      ['Name','Label', 'From', 'To']
-    ]
+    dataTable: {
+      cols:[],
+      rows: []
+    }
   };
 
   constructor(private fdsnService: FdsnService, private notificationService: NotificationService, private modalService: BsModalService, 
@@ -75,6 +77,7 @@ export class StationListComponent extends ComponentUtils implements OnInit {
         }))
       )
     );
+
   }
 
   ngOnInit() {
@@ -149,28 +152,26 @@ export class StationListComponent extends ComponentUtils implements OnInit {
     this.searchStations("id", e.item.id, "name");
   }
 
-  private loadTimeLineData() {
+  loadChartData() {
     
     this.isDataLoaded = false;
-    this.timelineChartData.dataTable = [];
-    this.timelineChartData.dataTable.push(['Name','Label', 'From', 'To']);
+    const data = new DataTable();
+    // add columns
+    data.addColumn("Name","string");
+    data.addColumn("Label","string");
+    data.addColumn("From","date");
+    data.addColumn("To","date");
+
     for (const st of this.stations) {
-      this.timelineChartData.dataTable.push(
-        [st.network_id + "-" + st.name, st.name, new Date(st.creation_date),  new Date(st.removal_date)]
-      );
+      data.addRow([st.network_id + "-" + st.name, st.name, new Date(st.creation_date),  new Date(st.removal_date)]);
     };
+
+    this.timelineChart.dataTable = data;
+    
     // Only re-draw if there is data.
-    if (this.timelineChartData.dataTable.length > 1){
+    if (this.timelineChart.dataTable.rows.length > 0){
       this.isDataLoaded = true;
     }
-  }
-
-  private reDrawGoogleChart(googleChart: GoogleChartComponent){
-    if (googleChart) {
-      if (googleChart.wrapper) {
-        googleChart.draw();
-      };
-    };
   }
 
   onSelectChart(event: ChartSelectEvent){
@@ -188,7 +189,7 @@ export class StationListComponent extends ComponentUtils implements OnInit {
       data => {        
         this.totalItems = data.total;
         this.stations = data.result;
-        this.loadTimeLineData();              
+        this.loadChartData();              
       },
       error => {
         console.log(error);
