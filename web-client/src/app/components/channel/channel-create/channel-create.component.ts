@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Observable } from 'rxjs';
 
-import { NotificationService } from '../../../../services/notification/notification.service';
-import { FdsnService } from '../../../../services/fdsn/fdsn.service';
-import { Station } from '../../../../model/model.station';
-import { AppValidador } from '../../../../statics/form-validators';
-import { DateUtil } from '../../../../statics/date-util';
-import { Equipments } from '../../../../model/model.equipments';
-import { Channel } from '../../../../model/model.channel';
+import { NotificationService } from '../../../services/notification/notification.service';
+import { FdsnService } from '../../../services/fdsn/fdsn.service';
+import { Station } from '../../../model/model.station';
+import { AppValidador } from '../../../statics/form-validators';
+import { DateUtil } from '../../../statics/date-util';
+import { Equipments } from '../../../model/model.equipments';
+import { Channel } from '../../../model/model.channel';
 
 @Component({
   selector: 'app-channel-create',

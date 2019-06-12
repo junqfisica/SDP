@@ -12,15 +12,15 @@ import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/';
 import { GoogleChartComponent } from 'ng2-google-charts';
 import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 
-import { FdsnService } from '../../../../services/fdsn/fdsn.service';
-import { NotificationService } from '../../../../services/notification/notification.service';
-import { Search } from '../../../../model/model.search';
-import { ComponentUtils } from '../../../../components/component.utils';
-import { Channel } from '../../../../model/model.channel';
-import { DateUtil } from '../../../../statics/date-util';
-import { Station } from '../../../../model/model.station';
-import { DataTable } from '../../../../auxiliary-classes/data-table';
-import { IGoogleChart } from '../../../../interfaces/google-chart-interface';
+import { FdsnService } from '../../../services/fdsn/fdsn.service';
+import { NotificationService } from '../../../services/notification/notification.service';
+import { Search } from '../../../model/model.search';
+import { ComponentUtils } from '../../component.utils';
+import { Channel } from '../../../model/model.channel';
+import { DateUtil } from '../../../statics/date-util';
+import { Station } from '../../../model/model.station';
+import { DataTable } from '../../../auxiliary-classes/data-table';
+import { IGoogleChart } from '../../../interfaces/google-chart-interface';
 
 @Component({
   selector: 'app-channel-list',

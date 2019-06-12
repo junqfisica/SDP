@@ -37,10 +37,11 @@ import { SettingListComponent } from './components/setting/setting-list/setting-
 import { ApplicationParamEditComponent } from './components/setting/application-param-edit/application-param-edit.component';
 import { FdsnCreateComponent } from './components/seismic-data/fdsn/fdsn-create/fdsn-create.component';
 import { FdsnService } from './services/fdsn/fdsn.service';
-import { StationListComponent } from './components/seismic-data/fdsn/station-list/station-list.component';
-import { ChannelCreateComponent } from './components/seismic-data/fdsn/channel-create/channel-create.component';
-import { ChannelListComponent } from './components/seismic-data/fdsn/channel-list/channel-list.component';
-import { StationEditComponent } from './components/seismic-data/fdsn/station-edit/station-edit.component';
+import { StationListComponent } from './components/station/station-list/station-list.component';
+import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
+import { ChannelListComponent } from './components/channel/channel-list/channel-list.component';
+import { StationEditComponent } from './components/station/station-edit/station-edit.component';
+import { ChannelEditComponent } from './components/channel/channel-edit/channel-edit.component';
 
 @NgModule({
   declarations: [
@@ -57,7 +58,8 @@ import { StationEditComponent } from './components/seismic-data/fdsn/station-edi
     StationListComponent,
     ChannelCreateComponent,
     ChannelListComponent,
-    StationEditComponent
+    StationEditComponent,
+    ChannelEditComponent
   ],
   imports: [
     BrowserModule,

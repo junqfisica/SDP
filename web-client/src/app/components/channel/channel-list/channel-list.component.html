@@ -81,7 +81,7 @@
         </td>
         <td>
           <div class="pull-right">
-            <a routerLink="#" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
+            <a routerLink="/fdsn/channel/edit/{{ch.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
               <span class="fa fa-pencil icon-medium"></span>
             </a>
             <button (click)="openDeleteModal(deleteModalTemplate, ch)" class="btn btn-xs btn-default" 

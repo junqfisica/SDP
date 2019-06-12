@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
-import { FdsnService } from '../../../../services/fdsn/fdsn.service';
-import { NotificationService } from '../../../../services/notification/notification.service';
-import { DateUtil } from '../../../../statics/date-util';
-import { Station } from '../../../../model/model.station';
-import { AppValidador } from '../../../../statics/form-validators';
-import { Network } from '../../../../model/model.network';
-import { Channel } from '../../../../model/model.channel';
+import { FdsnService } from '../../../services/fdsn/fdsn.service';
+import { NotificationService } from '../../../services/notification/notification.service';
+import { DateUtil } from '../../../statics/date-util';
+import { Station } from '../../../model/model.station';
+import { AppValidador } from '../../../statics/form-validators';
+import { Network } from '../../../model/model.network';
+import { Channel } from '../../../model/model.channel';
 
 @Component({
   selector: 'app-station-edit',
