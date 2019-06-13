@@ -29,7 +29,7 @@ selector: 'app-station-list',
 export class StationListComponent extends ComponentUtils implements OnInit, IGoogleChart {
   
   private _chart: GoogleChartComponent;
-  @ViewChild('chart') set content(content: GoogleChartComponent) {
+  @ViewChild('chart', { static: false }) set content(content: GoogleChartComponent) {
     // Called everytime the isDataLoaded change status.
     this._chart = content;
     DataTable.reDrawGoogleChart(content);
@@ -69,7 +69,7 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
       // Runs on every search
       observer.next(this.searchValue);
     }).pipe(
-      mergeMap((term: string) => this.fdsnService.searchStations(this.buildQueryParams("network_id, name", term.toUpperCase()))
+      mergeMap((term: string) => this.fdsnService.searchStations(this.buildQueryParams("network_id, name", term.toUpperCase(),"creation_date"))
       .pipe(
         // Map search result observable to result list.
         map((data) => {

@@ -212,7 +212,7 @@ export class StationEditComponent implements OnInit {
   onSubmitStation(){
     this.closeUpdateModal();
     const updatedStation = this.stationFormToStation();
-    console.log(updatedStation);
+    // console.log(updatedStation);
 
     // stop here if form is invalid   
     if (this.stationForm.invalid) {

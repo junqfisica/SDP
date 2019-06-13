@@ -29,7 +29,7 @@ import { IGoogleChart } from '../../../interfaces/google-chart-interface';
 })
 export class ChannelListComponent extends ComponentUtils implements OnInit, IGoogleChart {
 
-  @ViewChild('chart') set content(content: GoogleChartComponent) {
+  @ViewChild('chart', { static: false }) set content(content: GoogleChartComponent) {
     // Called everytime the isDataLoaded change status.
     DataTable.reDrawGoogleChart(content);
   }
@@ -112,7 +112,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit, IGoo
     }
     const searchParms = new Search(searchBy, value).searchParms
     searchParms.orderBy = orderBy
-    searchParms.orderDesc = false
+    searchParms.orderDesc = false;
     searchParms.use_AND_Operator = true;
     searchParms.mapColumnAndValue = true;
     searchParms.page = this.page
