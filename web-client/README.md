@@ -43,6 +43,22 @@ After installing go to `angular.json` file and add at styles and scripts the .cs
 	  "./node_modules/bootstrap/dist/js/bootstrap.min.js"
 	],
 
+### Fixing dependencies vulnerability
+
+Check vulnerability:
+
+`sudo npm audit` 
+
+Run fix to update the packages. This will update the package.json and package-lock.json files.
+
+`sudo npm audit fix`
+
+Afer fix you must force angular to actually update the packages:
+
+`sudo ng update @angular/cli --force`
+
+`sudo ng update @angular/compiler-cli --force`
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
