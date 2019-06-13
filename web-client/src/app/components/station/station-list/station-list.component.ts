@@ -124,6 +124,7 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
         }
         this.deleteStation = null;
         this.closeDeleteModal();
+        this.loadChartData();
       },
       error => {
         console.log(error);
@@ -183,7 +184,7 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
   searchStations(searchBy="id", value="", orderBy="name"){
     // Forces to order by name when there is no input value.
     if (value.length === 0){
-      orderBy = "name";
+      orderBy = "name, creation_date";
     }
     this.fdsnService.searchStations(this.buildQueryParams(searchBy, value, orderBy)).subscribe(
       data => {        

@@ -106,7 +106,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit, IGoo
   ngOnInit() {
   }
 
-  buildQueryParams(value="", orderBy="start_time", searchBy = "station_id, name"): HttpParams {
+  buildQueryParams(value="", orderBy="name, start_time", searchBy = "station_id, name"): HttpParams {
     if (searchBy !== 'id') {
       value = this.stationId + "," + value;
     }
@@ -152,6 +152,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit, IGoo
         }
         this.deleteChannel = null;
         this.closeDeleteModal();
+        this.loadChartData();
       },
       error => {
         console.log(error);
@@ -206,7 +207,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit, IGoo
     }
   }
 
-  searchChannels(value="", orderBy="start_time", searchBy = "station_id, name"){
+  searchChannels(value="", orderBy="name, start_time", searchBy = "station_id, name"){
     
     this.fdsnService.searchChannels(this.buildQueryParams(value, orderBy, searchBy)).subscribe(
       data => {        

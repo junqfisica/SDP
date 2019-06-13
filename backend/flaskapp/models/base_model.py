@@ -35,6 +35,7 @@ class BaseModel:
         Gets a Model from a dictionary representation of it. Usually a Dto.
 
         :param dto: The data transfer object as a dictionary.
+
         :return: The model represent this class.
         """
         # Map column names back to structures fields. The keys must be equal to the column name.
@@ -116,6 +117,7 @@ class BaseModel:
         Gets the column in the table for the given c_name.
 
         :param c_name: The name of the column.
+
         :return: A table column or None if not found.
         """
 
@@ -124,6 +126,26 @@ class BaseModel:
             if c_name.lower().strip() == column.name:
                 return column
         return None
+
+    @classmethod
+    def _create_order_by_list(cls, search: Search):
+        """
+        Creates a list of order_by with columns from search.
+
+        :param search: A Search instance.
+
+        :return: A list contain columns to be used as order.
+        """
+
+        cls.__class_validation()
+        order_by_list = []
+        for searchBy in search.OrderBy.split(","):
+            order_by = cls._get_column_from_name(searchBy)
+            if search.OrderDesc and order_by is not None:
+                order_by = order_by.desc()
+            order_by_list.append(order_by)
+
+        return order_by_list
 
     @classmethod
     def _create_query(cls, search: Search):
@@ -155,15 +177,13 @@ class BaseModel:
             # makes n:x search for column:value
             search_filters = [sc.like(value) for sc in search_columns for value in find_values]
 
-        order_by = cls._get_column_from_name(search.OrderBy)
-        if search.OrderDesc and order_by is not None:
-            order_by = order_by.desc()
+        order_by_list = cls._create_order_by_list(search)
 
         # AND or OR
         if search.Use_AND_Operator:
-            query = cls.query.filter(and_(sf for sf in search_filters)).order_by(order_by)
+            query = cls.query.filter(and_(*search_filters)).order_by(*order_by_list)
         else:
-            query = cls.query.filter(or_(sf for sf in search_filters)).order_by(order_by)
+            query = cls.query.filter(or_(*search_filters)).order_by(*order_by_list)
 
         return query
 
@@ -173,6 +193,7 @@ class BaseModel:
         Search for entities based on :class:`Search` criteria.
 
         :param search: A Search instance.
+
         :return: A SearchResult instance
         """
 
@@ -193,6 +214,7 @@ class BaseModel:
         Find by id.
 
         :param entity_id: The id of the entity.
+
         :return: The entity if found, None otherwise.
         """
 
@@ -211,7 +233,9 @@ class BaseModel:
         Get a list of entities using pagination.
 
         :param per_page: The maximum number entities per page.
+
         :param page: The current page.
+
         :return: The list of entities, None otherwise.
         """
 
