@@ -23,8 +23,8 @@ export class UserService {
     return this.http.get<User[]>(ServerUrl.rootUrl + '/api/user/all');
   }
 
-  search(params: HttpParams): Observable<SearchResult> {
-    return this.http.get<SearchResult>(ServerUrl.rootUrl + '/api/user/search', { params });
+  search(params: HttpParams): Observable<SearchResult<User>> {
+    return this.http.get<SearchResult<User>>(ServerUrl.rootUrl + '/api/user/search', { params });
   }
 
   getByUsername(username: string): Observable<any> {

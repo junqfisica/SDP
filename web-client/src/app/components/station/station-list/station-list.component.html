@@ -1,9 +1,7 @@
 <div class="page-header">
   <h3 style="font-weight: bold; text-align: center; padding-bottom: 1%;">Stations</h3>
 </div>
-<div class="container table-responsive">
-  <google-chart #chart [data]="timelineChart" (chartSelect)="onSelectChart($event)" *ngIf="isDataLoaded"></google-chart>
-</div>
+<app-wrap-tl-google-chart [dataSet]="stations" (onSelectChart)="onSelectChart($event)"></app-wrap-tl-google-chart>
 <div class="d-flex justify-content-start navbar" id="header">
   <div>
     <a routerLink="/fdsn/create" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Stations">
@@ -16,6 +14,7 @@
       (typeaheadLoading)="changeTypeaheadLoading($event)"
       (typeaheadOnSelect)="typeaheadOnSelect($event)"
       [typeaheadOptionsLimit]="10"
+      [typeaheadMinLength]="1"
       typeaheadWaitMs="500"
       typeaheadOptionField="name"
       [typeaheadItemTemplate]="stationTypeaheadTemplate"

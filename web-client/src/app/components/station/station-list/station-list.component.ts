@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpParams } from '@angular/common/http';
 
@@ -9,16 +9,13 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/';
 
-import { GoogleChartComponent, ChartSelectEvent } from 'ng2-google-charts';
-import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
+import { ChartSelectEvent } from 'ng2-google-charts';
 
 import { Station } from '../../../model/model.station';
 import { FdsnService } from '../../../services/fdsn/fdsn.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { Search } from '../../../model/model.search';
 import { ComponentUtils } from '../../component.utils';
-import { DataTable } from '../../../auxiliary-classes/data-table';
-import { IGoogleChart } from '../../../interfaces/google-chart-interface';
 
 
 @Component({
@@ -26,16 +23,8 @@ selector: 'app-station-list',
   templateUrl: './station-list.component.html',
   styleUrls: ['./station-list.component.css']
 })
-export class StationListComponent extends ComponentUtils implements OnInit, IGoogleChart {
+export class StationListComponent extends ComponentUtils implements OnInit {
   
-  private _chart: GoogleChartComponent;
-  @ViewChild('chart', { static: false }) set content(content: GoogleChartComponent) {
-    // Called everytime the isDataLoaded change status.
-    this._chart = content;
-    DataTable.reDrawGoogleChart(content);
-  }
-  
-  isDataLoaded = false;
   deleteModalRef: BsModalRef | null;
   deleteStation: Station;
   stations: Station[] = []
@@ -45,20 +34,6 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
   dataSource: Observable<Station>;
   searchValue: string;
   typeaheadLoading: boolean;
-  timelineChart: GoogleChartInterface =  {
-    chartType: 'Timeline',
-    options: {
-      timeline: { 
-        showRowLabels: true,
-        showBarLabels: true
-      },
-      avoidOverlappingGridLines: false
-    },
-    dataTable: {
-      cols:[],
-      rows: []
-    }
-  };
 
   constructor(private fdsnService: FdsnService, private notificationService: NotificationService, private modalService: BsModalService, 
     private router: Router) {
@@ -69,13 +44,14 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
       // Runs on every search
       observer.next(this.searchValue);
     }).pipe(
-      mergeMap((term: string) => this.fdsnService.searchStations(this.buildQueryParams("network_id, name", term.toUpperCase(),"creation_date"))
-      .pipe(
+      mergeMap((term: string) => {
+      term = term !== undefined ? term.toUpperCase() : term
+      return this.fdsnService.searchStations(this.buildQueryParams("network_id, name", term,"name, creation_date")).pipe(
         // Map search result observable to result list.
         map((data) => {
           return data.result;
         }))
-      )
+      })
     );
 
   }
@@ -124,7 +100,6 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
         }
         this.deleteStation = null;
         this.closeDeleteModal();
-        this.loadChartData();
       },
       error => {
         console.log(error);
@@ -153,28 +128,6 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
     this.searchStations("id", e.item.id, "name");
   }
 
-  loadChartData() {
-    
-    this.isDataLoaded = false;
-    const data = new DataTable();
-    // add columns
-    data.addColumn("Name","string");
-    data.addColumn("Label","string");
-    data.addColumn("From","date");
-    data.addColumn("To","date");
-
-    for (const st of this.stations) {
-      data.addRow([st.network_id + "-" + st.name, st.name, new Date(st.creation_date),  new Date(st.removal_date)]);
-    };
-
-    this.timelineChart.dataTable = data;
-    
-    // Only re-draw if there is data.
-    if (this.timelineChart.dataTable.rows.length > 0){
-      this.isDataLoaded = true;
-    }
-  }
-
   onSelectChart(event: ChartSelectEvent){
     const row = event.row;
     const st = this.stations[row];
@@ -190,7 +143,6 @@ export class StationListComponent extends ComponentUtils implements OnInit, IGoo
       data => {        
         this.totalItems = data.total;
         this.stations = data.result;
-        this.loadChartData();              
       },
       error => {
         console.log(error);

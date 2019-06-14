@@ -16,4 +16,9 @@ export class Channel {
     stop_time: string;
     equipments: Equipments[];
 
+    // setup instanceOf check that. Assumes that anything with these atributtes is a Channel.
+    static [Symbol.hasInstance](obj: Channel) {
+        if (obj.id && obj.station_id && obj.equipments && obj.start_time) return true;
+    }
+
 }

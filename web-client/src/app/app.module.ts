@@ -42,6 +42,7 @@ import { ChannelCreateComponent } from './components/channel/channel-create/chan
 import { ChannelListComponent } from './components/channel/channel-list/channel-list.component';
 import { StationEditComponent } from './components/station/station-edit/station-edit.component';
 import { ChannelEditComponent } from './components/channel/channel-edit/channel-edit.component';
+import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google-chart/wrap-tl-google-chart.component';
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { ChannelEditComponent } from './components/channel/channel-edit/channel-
     ChannelCreateComponent,
     ChannelListComponent,
     StationEditComponent,
-    ChannelEditComponent
+    ChannelEditComponent,
+    WrapTlGoogleChartComponent,
   ],
   imports: [
     BrowserModule,

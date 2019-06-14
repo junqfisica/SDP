@@ -95,12 +95,12 @@ export class FdsnService {
       manufactory + '&instrument=' + instrument + '&gain=' + gain);
   }
 
-  searchStations(params: HttpParams): Observable<SearchResult> {
-    return this.http.get<SearchResult>(ServerUrl.rootUrl + '/api/fdsn/searchStations', { params });
+  searchStations(params: HttpParams): Observable<SearchResult<Station>> {
+    return this.http.get<SearchResult<Station>>(ServerUrl.rootUrl + '/api/fdsn/searchStations', { params });
   }
 
-  searchChannels(params: HttpParams): Observable<SearchResult> {
-    return this.http.get<SearchResult>(ServerUrl.rootUrl + '/api/fdsn/searchChannels', { params });
+  searchChannels(params: HttpParams): Observable<SearchResult<Channel>> {
+    return this.http.get<SearchResult<Channel>>(ServerUrl.rootUrl + '/api/fdsn/searchChannels', { params });
   }
 
   deleteStation(station: Station): Observable<boolean> {
