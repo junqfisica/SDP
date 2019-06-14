@@ -243,6 +243,13 @@ class ChannelModel(db.Model, BaseModel):
         channel_eq = ChannelEquipmentsModel(channel_id=self.id, equipment_id=equipment_id)
         self.equipments.append(channel_eq)
 
+    def _delete_equipments(self):
+        """
+        This will remove all equipments for this channel at the database.
+        """
+        for eq in self.equipments:
+            eq.delete()
+
     def add_equipments(self, equipments: List[EquipmentModel]):
         """
         Add equipments to this channel.
@@ -271,6 +278,35 @@ class ChannelModel(db.Model, BaseModel):
         channel.add_equipments(equipments=equipments)
 
         return channel.save()
+
+    @classmethod
+    def update(cls, channel_dict: dict):
+        """
+        Update the current channel.
+
+        Import: You must use save() to storage it in the database.
+
+        :param channel_dict: A dictionary representation of the channel.
+
+        :return: The updated channel or None if user if not valid.
+        """
+        channel: ChannelModel = cls.from_dict(channel_dict)
+        valid_channel: ChannelModel = ChannelModel.find_by_id(channel.id)
+        if not valid_channel:
+            return None
+
+        # validate creation to check if there is time overlap.
+        channel.creation_validation()
+
+        # Copy all attributes from channel to valid_channel.
+        valid_channel << channel
+
+        # update equipments.
+        equipments = [EquipmentModel.from_dict(eq_dict) for eq_dict in channel_dict.get("equipments")]
+        valid_channel._delete_equipments()
+        valid_channel.add_equipments(equipments)
+
+        return valid_channel
 
 
 class ChannelEquipmentsModel(db.Model, BaseModel):

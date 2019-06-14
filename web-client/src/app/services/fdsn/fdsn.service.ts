@@ -33,12 +33,20 @@ export class FdsnService {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/updateStation', st);
   }
 
+  updateChannel(ch: Channel): Observable<boolean> {
+    return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/updateChannel', ch);
+  }
+
   createChannel(ch: Channel): Observable<boolean> {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createChannel', ch);
   }
 
   getStation(id: string): Observable<Station>{
     return this.http.get<Station>(ServerUrl.rootUrl + '/api/fdsn/getStation?station_id=' + id);
+  }
+
+  getChannel(id: string): Observable<Channel>{
+    return this.http.get<Channel>(ServerUrl.rootUrl + '/api/fdsn/getChannel?channel_id=' + id);
   }
 
   isNetworkTaken(id: string): Observable<boolean>{

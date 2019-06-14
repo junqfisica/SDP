@@ -1,3 +1,204 @@
-<p>
-  channel-edit works!
-</p>
+<div class="container">
+  <div *ngIf="isLoaddingPage" style="text-align: center">
+    <i class="fa fa-spinner fa-spin" style="font-size:300%"></i>
+  </div>
+  <div *ngIf="!isLoaddingPage" style="text-align: center">
+    <h2> Update Channel at Station {{station.name}}</h2>
+    <div style="margin-bottom: 2%">
+      <span class="fa fa-globe" style="font-size: 130%; color: #515692" 
+        title="Station location"> {{station.latitude}}, {{station.longitude}} </span>
+    </div>
+    <div  class="fa fa-calendar-plus-o" style="margin-right: 5%; font-size: 130%; color: darkgreen" 
+      title="Station created at"> {{station.creation_date | date:'dd.MM.yyyy'}}</div>
+    <div  class="fa fa-calendar-minus-o" style="font-size: 130%; color: darkred" 
+      title="Station removed at"> {{station.removal_date | date:'dd.MM.yyyy'}}</div>
+  </div>
+  <hr>
+  <div *ngIf="!isLoaddingPage">
+  <form [formGroup]="channelForm">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Name</label>
+          <input type="text" formControlName="name" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.name.errors }" 
+              placeholder="Name" />
+          <div *ngIf="channelControl.name.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.name.errors.required">*required.</div>
+            <div *ngIf="channelControl.name.errors.minlength">It must have 3 characters.</div>
+            <div *ngIf="channelControl.name.errors.maxlength">It must have 3 characters.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Latitude (Deg)</label>
+          <input type="number" min="-90" max="90" class="form-control" formControlName="latitude" 
+          [ngClass]="{ 'is-invalid': channelControl.latitude.errors }">
+          <div *ngIf="channelControl.latitude.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.latitude.errors.required">*required.</div>
+            <div *ngIf="channelControl.latitude.errors.min">It must be bigger than -90 degrees.</div>
+            <div *ngIf="channelControl.latitude.errors.max">It must be smaller than 90 degrees.</div>
+            <div *ngIf="channelControl.latitude.errors.pattern">Must have at least 5 significant digits, i.e: 1.15234.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Longitude (Deg)</label>
+          <input type="number" min="-180" max="180" formControlName="longitude" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.longitude.errors }">
+          <div *ngIf="channelControl.longitude.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.longitude.errors.required">*required.</div>
+            <div *ngIf="channelControl.longitude.errors.min">It must be bigger than -180 degrees.</div>
+            <div *ngIf="channelControl.longitude.errors.max">It must be smaller than 180 degrees.</div>
+            <div *ngIf="channelControl.longitude.errors.pattern">Must have at least 5 significant digits, i.e: 1.15234.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Elevation (m)</label>
+          <input type="number" step="10" formControlName="elevation" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.elevation.errors }">
+            <div class="invalid-feedback">*required.</div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Depth (m)</label>
+          <input type="number" min="0" formControlName="depth" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.depth.errors }">
+            <div class="invalid-feedback">*required.</div>
+        </div>
+      </div>
+      <div class="form-row ">
+        <div class="form-group col-md-3">
+          <label>Start time 
+            <span class="fa fa-question-circle-o" title="Click for more info."
+              popoverTitle="Use UTC Date and Time"
+              placement="right"  
+              popover="The Start date and time for this channel.">
+            </span>
+         </label>
+          <input type="text" placeholder="DD.MM.YYYY" formControlName="startTime" class="form-control" 
+            bsDatepicker (bsValueChange)="onStartTimeChange($event)" readonly='true'
+            [bsConfig]="bsConfig" [minDate]="stationCreateDate" [maxDate]="stationRemovalDate"
+            [ngClass]="{ 'is-invalid': channelControl.startTime.errors }">
+          <div *ngIf="channelControl.startTime.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.startTime.errors.required">*required.</div>
+            <div *ngIf="channelControl.startTime.errors.minDate">It can't be smaller than {{stationCreateDate | date:'dd.MM.yyyy'}}.</div>
+            <div *ngIf="channelControl.startTime.errors.maxDate">It can't be bigger than {{stationRemovalDate | date:'dd.MM.yyyy'}}.</div>
+          </div>
+          <timepicker formControlName="timepickerStart" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
+          <div *ngIf="channelControl.timepickerStart.errors">
+            <div class="alert alert-danger" *ngIf="channelControl.timepickerStart.errors.required">A time is required.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-3">
+          <label>Stop time 
+            <span class="fa fa-question-circle-o" title="Click for more info."
+              popoverTitle="Use UTC Date and Time"
+              placement="right"  
+              popover="The Stop date and time for this channel.">
+            </span>
+          </label>
+          <input type="text" placeholder="DD.MM.YYYY"  
+            bsDatepicker [bsConfig]="bsConfig" [minDate]="channelControl.startTime.value" [maxDate]="stationRemovalDate"
+            formControlName="stopTime" class="form-control" readonly='true'
+            [ngClass]="{ 'is-invalid': channelControl.stopTime.errors }">
+            <div *ngIf="channelControl.stopTime.errors" class="invalid-feedback">
+              <div *ngIf="channelControl.stopTime.errors.required">*required.</div>
+              <div *ngIf="channelControl.stopTime.errors.minDate">It can't be smaller than 
+                {{channelControl.startTime.value | date:'dd.MM.yyyy - HH:mm:ss'}}h</div>
+              <div *ngIf="channelControl.stopTime.errors.maxDate">It can't be bigger than {{stationRemovalDate | date:'dd.MM.yyyy'}}</div>
+            </div>
+            <timepicker formControlName="timepickerStop" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
+            <div *ngIf="channelControl.timepickerStop.errors">
+              <div class="alert alert-danger" *ngIf="channelControl.timepickerStop.errors.required">A time is required.</div>
+            </div>
+          </div>
+      </div>
+      <div class="form-group">
+        <alert *ngIf="!restrictEquipments" type="warning">
+          The datalogger <strong>{{channelControl.datalogger.value.name}}</strong> doesn't exist at IRIS database. Therefore, 
+          <strong>gain</strong> and <strong>sample rate</strong> will not be restricted.
+        </alert>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label>Datalogger</label>
+          <select class="custom-select mr-sm-3" formControlName="datalogger" 
+            (change)="onChangeDatalogger(channelControl.datalogger.value)" 
+            [ngClass]="{ 'is-invalid': channelControl.datalogger.errors }">
+          <option selected [ngValue]="datalogger">{{datalogger.manufactory}} - {{datalogger.name}}</option>
+          <hr>
+          <option *ngFor="let dl of dataloggers | async" [ngValue]="dl">{{dl.manufactory}} - {{dl.name}}</option>
+          </select>
+          <div *ngIf="channelControl.datalogger.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.datalogger.errors.required">*required.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>DL No</label>
+          <input type="text" formControlName="dlNo" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.dlNo.errors }" placeholder="DL serial number">
+          <div *ngIf="channelControl.dlNo.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.dlNo.errors.required">*required.</div>
+          </div>
+        </div>
+        <div *ngIf="!channelControl.datalogger.errors" class="form-group col-md-2">
+          <label>Gain</label>
+          <input *ngIf="!restrictEquipments" type="text" formControlName="gain" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.gain.errors }" 
+              placeholder="Gain" />
+          <select *ngIf="restrictEquipments" class="custom-select mr-sm-2" formControlName="gain" 
+            (change)="onChangeGain(channelControl.datalogger.value, channelControl.gain.value)" 
+            [ngClass]="{ 'is-invalid': channelControl.gain.errors }">
+            <option selected [ngValue]="channelControl.gain.value">{{channelControl.gain.value}}</option>
+            <hr>
+            <option *ngFor="let gain of gains | async" [ngValue]="gain">{{gain}}</option>
+          </select>
+          <div *ngIf="channelControl.gain.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.gain.errors.required">*required.</div>
+          </div>
+        </div>
+        <div *ngIf="!channelControl.gain.errors" class="form-group col-md-2">
+          <label>Sample Rate</label>
+          <input *ngIf="!restrictEquipments" type="number" formControlName="sampleRate" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.sampleRate.errors }" 
+              placeholder="Sample rate" />
+          <select *ngIf="restrictEquipments" class="custom-select mr-sm-2" formControlName="sampleRate" 
+            (change)="onChangeSampleRate(channelControl.sampleRate.value)" 
+            [ngClass]="{ 'is-invalid': channelControl.sampleRate.errors }">
+            <option selected [ngValue]="channelControl.sampleRate.value">{{channelControl.sampleRate.value}}</option>
+            <hr>
+            <option *ngFor="let sampleRate of sampleRates | async" [ngValue]="sampleRate">{{sampleRate}}</option>
+          </select>
+          <div *ngIf="channelControl.sampleRate.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.sampleRate.errors.required">*required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label>Sensor</label>
+          <select class="custom-select mr-sm-2" formControlName="sensor" 
+            (change)="onChangeSensor(channelControl.sensor.value)" 
+            [ngClass]="{ 'is-invalid': channelControl.sensor.errors }">
+          <option selected [ngValue]="sensor">{{sensor.manufactory}} - {{sensor.name}}</option>
+          <hr>
+          <option *ngFor="let sensor of sensors | async" [ngValue]="sensor">{{sensor.manufactory}} - {{sensor.name}}</option>
+          </select>
+          <div *ngIf="channelControl.sensor.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.sensor.errors.required">*required.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Sensor No</label>
+          <input type="text" formControlName="sensorNumber" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.sensorNumber.errors }" placeholder="Sensor Number">
+          <div *ngIf="channelControl.sensorNumber.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.sensorNumber.errors.required">*required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <button type="button" [disabled]="channelControl.pending" class="btn btn-info" (click)="onSubmitChannel()">Update</button>
+      </div>
+    </form>
+  </div>
+</div>

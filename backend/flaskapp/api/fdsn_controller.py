@@ -64,7 +64,7 @@ def get_networks():
 
 
 @fdsn.route("/getLocation", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("lat", "long")
 def get_location(lat, long):
     location = GeoCoder().get_location(lat, long)
@@ -72,7 +72,7 @@ def get_location(lat, long):
 
 
 @fdsn.route("/getNRLManufacturers", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("instrument_type")
 def get_nrl_manufacturers(instrument_type: str):
     manufactures = EquipmentModel.get_all_manufactures_nrl(instrument_type)
@@ -80,7 +80,7 @@ def get_nrl_manufacturers(instrument_type: str):
 
 
 @fdsn.route("/getNRLInstrument", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("instrument_type", "manufactory")
 def get_nrl_instrument(instrument_type: str, manufactory: str):
     instruments = EquipmentModel.get_instruments_nrl(instrument_type, manufactory)
@@ -88,21 +88,21 @@ def get_nrl_instrument(instrument_type: str, manufactory: str):
 
 
 @fdsn.route("/getDataloggers", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 def get_data_loggers():
     dataloggers = EquipmentModel.find_by(type="Datalogger", order_by=EquipmentModel.manufactory, get_first=False)
     return response.model_to_response(dataloggers)
 
 
 @fdsn.route("/getSensors", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 def get_data_sensors():
     sensors = EquipmentModel.find_by(type="Sensor", order_by=EquipmentModel.name, get_first=False)
     return response.model_to_response(sensors)
 
 
 @fdsn.route("/getSensorExtraInfo", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("manufactory", "instrument")
 def get_sensor_extra_info(manufactory: str, instrument: str):
     sr = EquipmentModel.get_sensor_extra_information(manufactory, instrument)
@@ -110,7 +110,7 @@ def get_sensor_extra_info(manufactory: str, instrument: str):
 
 
 @fdsn.route("/getGains", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("manufactory", "instrument")
 def get_gains(manufactory: str, instrument: str):
     gains = EquipmentModel.get_gain_from_nrl(manufactory, instrument)
@@ -118,7 +118,7 @@ def get_gains(manufactory: str, instrument: str):
 
 
 @fdsn.route("/getSampleRates", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("manufactory", "instrument", "gain")
 def get_sample_rates(manufactory: str, instrument: str, gain: str):
     sr = EquipmentModel.get_sample_rate_from_nrl(manufactory, instrument, gain)
@@ -126,12 +126,23 @@ def get_sample_rates(manufactory: str, instrument: str, gain: str):
 
 
 @fdsn.route("/getStation", methods=["GET"])
-@secure(Right.CREATE_FDSN)
+@secure(Right.EDIT_FDSN)
 @query_param("station_id")
 def get_station(station_id: str):
     station = StationModel.find_by_id(station_id)
     if station:
         return response.model_to_response(station)
+
+    return response.empty_response()
+
+
+@fdsn.route("/getChannel", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+@query_param("channel_id")
+def get_channel(channel_id: str):
+    channel = ChannelModel.find_by_id(channel_id)
+    if channel:
+        return response.model_to_response(channel)
 
     return response.empty_response()
 
@@ -163,6 +174,19 @@ def update_station(station: dict):
         raise EntityNotFound("This station doesn't exist.")
 
     return response.bool_to_response(updated_station.save())
+
+
+@fdsn.route("/updateChannel", methods=["POST"])
+@secure(Right.EDIT_FDSN)
+@post()
+def update_channel(channel: dict):
+
+    updated_channel = ChannelModel.update(channel)
+
+    if not updated_channel:
+        raise EntityNotFound("This channel doesn't exist.")
+
+    return response.bool_to_response(updated_channel.save())
 
 
 @fdsn.route("/deleteStation/<string:station_id>", methods=["DELETE"])
