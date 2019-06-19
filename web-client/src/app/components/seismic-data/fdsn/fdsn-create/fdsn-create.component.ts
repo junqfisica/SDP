@@ -4,11 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from '../../../../services/notification/notification.service';
 import { Network } from '../../../../model/model.network';
 import { FdsnService } from '../../../../services/fdsn/fdsn.service';
-import { FdsnValidador, AppValidador } from '../../../../statics/form-validators';
+import { FdsnValidador } from '../../../../statics/form-validators';
 import { EquipmentType as EquipmentType } from '../../../../model/model.equipmentTypes';
 import { Equipments } from '../../../../model/model.equipments';
-import { Station } from '../../../../model/model.station';
-import { DateUtil } from '../../../../statics/date-util';
+import { StationForm } from '../../../../forms/station-form';
 
 @Component({
   selector: 'app-fdsn-create',
@@ -22,7 +21,8 @@ export class FdsnCreateComponent implements OnInit {
   isStationCollapsed = true;
   networkForm: FormGroup;
   equipmentForm: FormGroup;
-  stationForm: FormGroup;
+  stationForm: StationForm;
+  stationFormGroup: FormGroup;
   networks: Network[];
   equipmentType: EquipmentType[] = []
   nrlManufactures: string[] = [] 
@@ -67,23 +67,9 @@ export class FdsnCreateComponent implements OnInit {
       isRestrict: [true, {validators: [], updateOn: 'change'}]
     });
 
-    this.stationForm = this.formBuilder.group({
-      networkId: [null, {validators: [Validators.required]}],
-      name: ['', {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(5)], updateOn: 'change'}],
-      isPublicData: [true, {validators: [], updateOn: 'change'}],
-      latitude: ['', {validators: [Validators.required, Validators.min(-90), Validators.max(90), 
-        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
-      longitude: ['', {validators: [Validators.required, Validators.min(-180), Validators.max(180), 
-        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
-      elevation: ['', {validators: [Validators.required], updateOn: 'change'}],
-      depth: ['', {validators: [Validators.required], updateOn: 'change'}],
-      createDate: [null, {validators: [Validators.required], updateOn: 'change'}],
-      removeDate: [null, {validators: [AppValidador.minDate("createDate")], updateOn: 'change'}],
-      site: ['', {validators: [], updateOn: 'change'}],
-      geology: ['', {validators: [], updateOn: 'change'}],
-      province: ['', {validators: [], updateOn: 'change'}],
-      country: ['', {validators: [], updateOn: 'change'}]
-    });
+    this.stationForm =  new StationForm(this.formBuilder);
+    this.stationFormGroup =  this.stationForm.form;
+    
 
   }
 
@@ -118,7 +104,7 @@ export class FdsnCreateComponent implements OnInit {
   // convenience getter for easy access to form fields
   get networkControl() { return this.networkForm.controls }
   get equipmentControl() { return this.equipmentForm.controls }
-  get stationControl() { return this.stationForm.controls }
+  get stationControl() { return this.stationFormGroup.controls }
 
   getNetworks() {
     this.fdsnService.getNetworks().subscribe(
@@ -223,36 +209,14 @@ export class FdsnCreateComponent implements OnInit {
     }
   }
 
-  stationFormToStation(): Station {
-    const st = new Station();
-    st.public_data = this.stationControl.isPublicData.value;
-    st.network_id = this.stationControl.networkId.value;
-    st.name = this.stationControl.name.value.trim().toUpperCase();
-    st.latitude = this.stationControl.latitude.value;
-    st.longitude = this.stationControl.longitude.value;
-    st.elevation = this.stationControl.elevation.value;
-    st.depth = this.stationControl.depth.value;
-    st.province = this.stationControl.province.value;
-    st.country = this.stationControl.country.value;
-    st.site = this.stationControl.site.value;
-    st.geology = this.stationControl.geology.value;
-    st.creation_date = DateUtil.convertDateToUTCStringWithoutShift(this.stationControl.createDate.value);
-    if (this.stationControl.removeDate.value) {
-      st.removal_date = DateUtil.convertDateToUTCStringWithoutShift(this.stationControl.removeDate.value);
-    } else {
-      st.removal_date = null; 
-    }
-    return st;
-  }
-
   setLocation(latitude: number, longitude: number) {
     this.fdsnService.getLocation(latitude, longitude).subscribe(
       data => {
         if (data.country == null || data.province == null){
           this.notificationService.showWarningMessage("No continent found at location: " + latitude + "," + longitude);
         } 
-        this.stationForm.controls.province.setValue(data.province)
-        this.stationForm.controls.country.setValue(data.country)
+        this.stationFormGroup.controls.province.setValue(data.province)
+        this.stationFormGroup.controls.country.setValue(data.country)
       },
       error => {
         console.log(error);
@@ -308,15 +272,15 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   onSubmitStation(){
-    // console.log(this.stationFormToStation());
+    // console.log(this.stationForm.stationFormToStation());
     // console.log(this.stationControl);
 
     // stop here if form is invalid   
-    if (this.stationForm.invalid) {
+    if (this.stationFormGroup.invalid) {
       return;
     }
 
-    this.fdsnService.createStation(this.stationFormToStation()).subscribe(
+    this.fdsnService.createStation(this.stationForm.stationFormToStation()).subscribe(
       saved => {
         if (saved) {
           this.notificationService.showSuccessMessage("The new station was created.")

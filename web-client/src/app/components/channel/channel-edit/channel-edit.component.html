@@ -15,7 +15,7 @@
   </div>
   <hr>
   <div *ngIf="!isLoaddingPage">
-  <form [formGroup]="channelForm">
+  <form [formGroup]="channelFormGroup">
       <div class="form-row">
         <div class="form-group col-md-2">
           <label>Name</label>
@@ -76,12 +76,12 @@
          </label>
           <input type="text" placeholder="DD.MM.YYYY" formControlName="startTime" class="form-control" 
             bsDatepicker (bsValueChange)="onStartTimeChange($event)" readonly='true'
-            [bsConfig]="bsConfig" [minDate]="stationCreateDate" [maxDate]="stationRemovalDate"
+            [bsConfig]="bsConfig" [minDate]="channelForm.stationCreateDate" [maxDate]="channelForm.stationRemovalDate"
             [ngClass]="{ 'is-invalid': channelControl.startTime.errors }">
           <div *ngIf="channelControl.startTime.errors" class="invalid-feedback">
             <div *ngIf="channelControl.startTime.errors.required">*required.</div>
-            <div *ngIf="channelControl.startTime.errors.minDate">It can't be smaller than {{stationCreateDate | date:'dd.MM.yyyy'}}.</div>
-            <div *ngIf="channelControl.startTime.errors.maxDate">It can't be bigger than {{stationRemovalDate | date:'dd.MM.yyyy'}}.</div>
+            <div *ngIf="channelControl.startTime.errors.minDate">It can't be smaller than {{channelForm.stationCreateDate | date:'dd.MM.yyyy'}}.</div>
+            <div *ngIf="channelControl.startTime.errors.maxDate">It can't be bigger than {{channelForm.stationRemovalDate | date:'dd.MM.yyyy'}}.</div>
           </div>
           <timepicker formControlName="timepickerStart" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
           <div *ngIf="channelControl.timepickerStart.errors">
@@ -97,14 +97,14 @@
             </span>
           </label>
           <input type="text" placeholder="DD.MM.YYYY"  
-            bsDatepicker [bsConfig]="bsConfig" [minDate]="channelControl.startTime.value" [maxDate]="stationRemovalDate"
+            bsDatepicker [bsConfig]="bsConfig" [minDate]="channelControl.startTime.value" [maxDate]="channelForm.stationRemovalDate"
             formControlName="stopTime" class="form-control" readonly='true'
             [ngClass]="{ 'is-invalid': channelControl.stopTime.errors }">
             <div *ngIf="channelControl.stopTime.errors" class="invalid-feedback">
               <div *ngIf="channelControl.stopTime.errors.required">*required.</div>
               <div *ngIf="channelControl.stopTime.errors.minDate">It can't be smaller than 
                 {{channelControl.startTime.value | date:'dd.MM.yyyy - HH:mm:ss'}}h</div>
-              <div *ngIf="channelControl.stopTime.errors.maxDate">It can't be bigger than {{stationRemovalDate | date:'dd.MM.yyyy'}}</div>
+              <div *ngIf="channelControl.stopTime.errors.maxDate">It can't be bigger than {{channelForm.stationRemovalDate | date:'dd.MM.yyyy'}}</div>
             </div>
             <timepicker formControlName="timepickerStop" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
             <div *ngIf="channelControl.timepickerStop.errors">
@@ -124,7 +124,7 @@
           <select class="custom-select mr-sm-3" formControlName="datalogger" 
             (change)="onChangeDatalogger(channelControl.datalogger.value)" 
             [ngClass]="{ 'is-invalid': channelControl.datalogger.errors }">
-          <option selected [ngValue]="datalogger">{{datalogger.manufactory}} - {{datalogger.name}}</option>
+          <option selected [ngValue]="channelForm.datalogger">{{channelForm.datalogger.manufactory}} - {{channelForm.datalogger.name}}</option>
           <hr>
           <option *ngFor="let dl of dataloggers | async" [ngValue]="dl">{{dl.manufactory}} - {{dl.name}}</option>
           </select>
@@ -179,7 +179,7 @@
           <select class="custom-select mr-sm-2" formControlName="sensor" 
             (change)="onChangeSensor(channelControl.sensor.value)" 
             [ngClass]="{ 'is-invalid': channelControl.sensor.errors }">
-          <option selected [ngValue]="sensor">{{sensor.manufactory}} - {{sensor.name}}</option>
+          <option selected [ngValue]="channelForm.sensor">{{channelForm.sensor.manufactory}} - {{channelForm.sensor.name}}</option>
           <hr>
           <option *ngFor="let sensor of sensors | async" [ngValue]="sensor">{{sensor.manufactory}} - {{sensor.name}}</option>
           </select>

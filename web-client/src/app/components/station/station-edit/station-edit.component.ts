@@ -1,6 +1,6 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
@@ -11,6 +11,7 @@ import { Station } from '../../../model/model.station';
 import { AppValidador } from '../../../statics/form-validators';
 import { Network } from '../../../model/model.network';
 import { Channel } from '../../../model/model.channel';
+import { StationForm } from '../../../forms/station-form';
 
 @Component({
   selector: 'app-station-edit',
@@ -20,7 +21,8 @@ import { Channel } from '../../../model/model.channel';
 export class StationEditComponent implements OnInit {
 
   networks: Network[];
-  stationForm: FormGroup;
+  stationForm: StationForm;
+  stationFormGroup: FormGroup;
   station: Station;
   updateModalRef: BsModalRef | null;
   isLoaddingPage = true;
@@ -75,26 +77,8 @@ export class StationEditComponent implements OnInit {
 
   buildForms(){
 
-    const createDate = DateUtil.convertUTCStringToDate(this.station.creation_date);
-    const removeDate = DateUtil.convertUTCStringToDate(this.station.removal_date);  
-
-    this.stationForm = this.formBuilder.group({
-      networkId: [this.station.network_id, {validators: [Validators.required]}],
-      name: [this.station.name, {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(5)], updateOn: 'change'}],
-      isPublicData: [this.station.public_data, {validators: [], updateOn: 'change'}],
-      latitude: [this.station.latitude, {validators: [Validators.required, Validators.min(-90), Validators.max(90), 
-        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
-      longitude: [this.station.longitude, {validators: [Validators.required, Validators.min(-180), Validators.max(180), 
-        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
-      elevation: [this.station.elevation, {validators: [Validators.required], updateOn: 'change'}],
-      depth: [this.station.depth, {validators: [Validators.required], updateOn: 'change'}],
-      createDate: [createDate, {validators: [Validators.required], updateOn: 'change'}],
-      removeDate: [removeDate, {validators: [AppValidador.minDate("createDate")], updateOn: 'change'}],
-      site: [this.station.site, {validators: [], updateOn: 'change'}],
-      geology: [this.station.geology, {validators: [], updateOn: 'change'}],
-      province: [this.station.province, {validators: [], updateOn: 'change'}],
-      country: [this.station.country, {validators: [], updateOn: 'change'}]
-    });
+    this.stationForm = new StationForm(this.formBuilder, this.station);
+    this.stationFormGroup = this.stationForm.form;
 
     // Add minDate validator.
     this.minRemovelDate = this.getLatestChannelStopDate();
@@ -113,7 +97,7 @@ export class StationEditComponent implements OnInit {
   }
 
   // convenience getter for easy access to form fields
-  get stationControl() { return this.stationForm.controls }
+  get stationControl() { return this.stationFormGroup.controls }
 
   private getChannelOrderByDate(): Channel[] {
     const ch = this.station.channels.sort((a, b) => {
@@ -170,37 +154,14 @@ export class StationEditComponent implements OnInit {
     }
   }
 
-  stationFormToStation(): Station {
-    const st = new Station();
-    st.id = this.station.id;
-    st.public_data = this.stationControl.isPublicData.value;
-    st.network_id = this.stationControl.networkId.value;
-    st.name = this.stationControl.name.value.trim().toUpperCase();
-    st.latitude = this.stationControl.latitude.value;
-    st.longitude = this.stationControl.longitude.value;
-    st.elevation = this.stationControl.elevation.value;
-    st.depth = this.stationControl.depth.value;
-    st.province = this.stationControl.province.value;
-    st.country = this.stationControl.country.value;
-    st.site = this.stationControl.site.value;
-    st.geology = this.stationControl.geology.value;
-    st.creation_date = DateUtil.convertDateToUTCStringWithoutShift(this.stationControl.createDate.value);
-    if (this.stationControl.removeDate.value) {
-      st.removal_date = DateUtil.convertDateToUTCStringWithoutShift(this.stationControl.removeDate.value);
-    } else {
-      st.removal_date = null; 
-    }
-    return st;
-  }
-
   setLocation(latitude: number, longitude: number) {
     this.fdsnService.getLocation(latitude, longitude).subscribe(
       data => {
         if (data.country == null || data.province == null){
           this.notificationService.showWarningMessage("No continent found at location: " + latitude + "," + longitude);
         } 
-        this.stationForm.controls.province.setValue(data.province)
-        this.stationForm.controls.country.setValue(data.country)
+        this.stationFormGroup.controls.province.setValue(data.province)
+        this.stationFormGroup.controls.country.setValue(data.country)
       },
       error => {
         console.log(error);
@@ -211,11 +172,11 @@ export class StationEditComponent implements OnInit {
 
   onSubmitStation(){
     this.closeUpdateModal();
-    const updatedStation = this.stationFormToStation();
+    const updatedStation = this.stationForm.stationFormToStation();
     // console.log(updatedStation);
 
     // stop here if form is invalid   
-    if (this.stationForm.invalid) {
+    if (this.stationFormGroup.invalid) {
       return;
     }
 

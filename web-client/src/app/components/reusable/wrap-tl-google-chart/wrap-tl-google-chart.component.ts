@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 
 import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 import { ChartSelectEvent, GoogleChartComponent } from 'ng2-google-charts';
@@ -6,7 +6,7 @@ import { ChartSelectEvent, GoogleChartComponent } from 'ng2-google-charts';
 import { DataTable } from '../../../auxiliary-classes/data-table';
 import { Station } from '../../../model/model.station';
 import { Channel } from '../../../model/model.channel';
-import { DateUtil } from 'src/app/statics/date-util';
+import { DateUtil } from '../../../statics/date-util';
 
 @Component({
   selector: 'app-wrap-tl-google-chart',
@@ -77,7 +77,9 @@ export class WrapTlGoogleChartComponent implements OnInit {
       for (const data of dataSet) {
         count++;        
         if (data instanceof Station){
-          dataTable.addRow([data.network_id + "-" + data.name, data.name, new Date(data.creation_date),  new Date(data.removal_date)]);
+          const createDate = new Date(data.creation_date);
+          const removalDate = data.removal_date ? new Date(data.removal_date) : new Date();
+          dataTable.addRow([data.network_id + "-" + data.name, data.name, createDate,  removalDate]);
         
         } else if (data instanceof Channel) {
           dataTable.addRow(

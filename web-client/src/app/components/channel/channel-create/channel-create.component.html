@@ -15,7 +15,7 @@
   </div>
   <hr>
   <div *ngIf="!isLoaddingPage">
-  <form [formGroup]="channelForm">
+  <form [formGroup]="channelFormGroup">
       <div class="form-row">
         <div class="form-group col-md-2">
           <label>Name</label>
@@ -76,12 +76,12 @@
          </label>
           <input type="text" placeholder="DD.MM.YYYY" formControlName="startTime" class="form-control" 
             bsDatepicker (bsValueChange)="onStartTimeChange($event)" readonly='true'
-            [bsConfig]="bsConfig" [minDate]="stationCreateDate" [maxDate]="stationRemovalDate"
+            [bsConfig]="bsConfig" [minDate]="channelForm.stationCreateDate" [maxDate]="channelForm.stationRemovalDate"
             [ngClass]="{ 'is-invalid': channelControl.startTime.errors }">
           <div *ngIf="channelControl.startTime.errors" class="invalid-feedback">
             <div *ngIf="channelControl.startTime.errors.required">*required.</div>
-            <div *ngIf="channelControl.startTime.errors.minDate">It can't be smaller than {{stationCreateDate | date:'dd.MM.yyyy'}}.</div>
-            <div *ngIf="channelControl.startTime.errors.maxDate">It can't be bigger than {{stationRemovalDate | date:'dd.MM.yyyy'}}.</div>
+            <div *ngIf="channelControl.startTime.errors.minDate">It can't be smaller than {{channelForm.stationCreateDate | date:'dd.MM.yyyy'}}.</div>
+            <div *ngIf="channelControl.startTime.errors.maxDate">It can't be bigger than {{channelForm.stationRemovalDate | date:'dd.MM.yyyy'}}.</div>
           </div>
           <timepicker formControlName="timepickerStart" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
           <div *ngIf="channelControl.timepickerStart.errors">

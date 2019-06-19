@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { Observable } from 'rxjs';
 
@@ -10,9 +10,8 @@ import { NotificationService } from '../../../services/notification/notification
 import { FdsnService } from '../../../services/fdsn/fdsn.service';
 import { Channel } from '../../../model/model.channel';
 import { Station } from '../../../model/model.station';
-import { DateUtil } from '../../../statics/date-util';
 import { Equipments } from '../../../model/model.equipments';
-import { AppValidador } from '../../../statics/form-validators';
+import { ChannelForm } from '../../../forms/channel-form';
 
 @Component({
   selector: 'app-channel-edit',
@@ -22,7 +21,8 @@ import { AppValidador } from '../../../statics/form-validators';
 export class ChannelEditComponent implements OnInit {
 
   channel: Channel
-  channelForm: FormGroup;
+  channelForm: ChannelForm;
+  channelFormGroup: FormGroup;
   station: Station
   stationCreateDate: Date;
   stationRemovalDate: Date;
@@ -83,50 +83,9 @@ export class ChannelEditComponent implements OnInit {
   }
 
   buildForms(){
-    this.stationCreateDate = DateUtil.convertUTCStringToDate(this.station.creation_date);
-    this.stationCreateDate.setHours(0);
-    this.stationCreateDate.setMinutes(0);
-    this.stationCreateDate.setSeconds(0);
-    if (this.station.removal_date !== null) {
-      this.stationRemovalDate = DateUtil.convertUTCStringToDate(this.station.removal_date);
-      this.stationRemovalDate.setHours(23);
-      this.stationRemovalDate.setMinutes(59);
-      this.stationRemovalDate.setSeconds(59);
-    } else {
-      this.stationRemovalDate = null;
-    }
-
-    const startTime = DateUtil.convertUTCStringToDate(this.channel.start_time);
-    const stopTime = DateUtil.convertUTCStringToDate(this.channel.stop_time);
-
-    this.channelForm = this.formBuilder.group({
-      name: [this.channel.name, {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(3)], updateOn: 'change'}],
-      latitude: [this.channel.latitude, {validators: [Validators.required, Validators.min(-90), Validators.max(90), 
-        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
-      longitude: [this.channel.longitude, {validators: [Validators.required, Validators.min(-180), Validators.max(180), 
-        Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
-      elevation: [this.channel.elevation, {validators: [Validators.required], updateOn: 'change'}],
-      depth: [this.channel.depth, {validators: [Validators.required], updateOn: 'change'}],
-      datalogger:[this.datalogger, {validators: [Validators.required], updateOn: 'change'}],
-      sensor:[this.sensor, {validators: [Validators.required], updateOn: 'change'}],
-      gain: [this.channel.gain, {validators: [Validators.required], updateOn: 'change'}],
-      sampleRate:[String(this.channel.sample_rate), {validators: [Validators.required], updateOn: 'change'}],
-      dlNo: [this.channel.dl_no, {validators: [Validators.required], updateOn: 'change'}],
-      sensorNumber: [this.channel.sensor_number, {validators: [Validators.required], updateOn: 'change'}],
-      startTime: [startTime, {validators: [Validators.required, AppValidador.minDate(this.stationCreateDate), 
-        AppValidador.maxDate(this.stationRemovalDate)], updateOn: 'change'}],
-      stopTime: [stopTime, {validators: [Validators.required, AppValidador.minDate("startTime", true), 
-        AppValidador.maxDate(this.stationRemovalDate)], updateOn: 'change'}],
-      timepickerStop: [stopTime, {validators: [Validators.required], updateOn: 'change'}],
-      timepickerStart: [startTime, {validators: [Validators.required], updateOn: 'change'}]
-    });
-
-    if (this.stationRemovalDate === null) {
-      this.channelControl.startTime.clearValidators();
-      this.channelControl.startTime.setValidators([Validators.required, AppValidador.minDate(this.stationCreateDate)]);
-      this.channelControl.stopTime.clearValidators();
-      this.channelControl.stopTime.setValidators([Validators.required, AppValidador.minDate("startTime")]);
-    }
+    
+    this.channelForm = new ChannelForm(this.formBuilder, this.station, this.channel);
+    this.channelFormGroup = this.channelForm.form;
     
     // Call everytime the timepicker stoptime is changed.
     const timepickerStopObs: Observable<Date> = this.channelControl.timepickerStop.valueChanges;
@@ -146,15 +105,15 @@ export class ChannelEditComponent implements OnInit {
       }
     );
 
-    this.onChangeDatalogger(this.datalogger);
-    this.onChangeGain(this.datalogger, this.channel.gain);
+    this.onChangeDatalogger(this.channelForm.datalogger);
+    this.onChangeGain(this.channelForm.datalogger, this.channel.gain);
     this.onChangeSampleRate(String(this.channel.sample_rate));
     
   }
 
   private updateStopTime(date: Date){
     if (date !== null){
-      const newDate = new Date(this.channelControl.stopTime.value);
+      const newDate = new Date(this.channelControl.stopTime.value);      
       newDate.setHours(date.getHours());
       newDate.setMinutes(date.getMinutes());
       newDate.setSeconds(date.getSeconds());
@@ -174,28 +133,7 @@ export class ChannelEditComponent implements OnInit {
 
 
   // convenience getter for easy access to form fields
-  get channelControl() { return this.channelForm.controls }
-
-  get datalogger() {
-    let dl: Equipments;
-    this.channel.equipments.forEach( (eq) =>{ 
-      if (eq.type === "Datalogger"){
-        dl = eq;
-        return;
-      }
-    });
-    return dl;
-  } 
-
-  get sensor() {
-    let sensor: Equipments;
-    this.channel.equipments.forEach( (eq) =>{ 
-      if (eq.type === "Sensor"){
-        sensor = eq;
-      }
-    });
-    return sensor;
-  }
+  get channelControl() { return this.channelFormGroup.controls }
 
   onStartTimeChange(){
     setTimeout( () => { 
@@ -218,7 +156,7 @@ export class ChannelEditComponent implements OnInit {
         this.restrictEquipments = false;
       }
     );
-    if (this.datalogger.name !== datalogger.name) {
+    if (this.channelForm.datalogger.name !== datalogger.name) {
       this.channelControl.gain.setValue("");
     }  
   }
@@ -227,42 +165,22 @@ export class ChannelEditComponent implements OnInit {
 
   onChangeGain(datalogger: Equipments, gain: string){
     this.sampleRates = this.fdsnService.getSampleRates(datalogger.manufactory, datalogger.name, gain);
-    if (this.datalogger.name !== datalogger.name) {
+    if (this.channelForm.datalogger.name !== datalogger.name) {
       this.channelControl.sampleRate.setValue("");
     }
   }
 
   onChangeSampleRate(sampleRate: string){}
 
-  channelFormToChannel(): Channel {
-    const channel = new Channel();
-    channel.id = this.channel.id;
-    channel.station_id = this.station.id;
-    channel.name = this.channelControl.name.value.trim().toUpperCase();
-    channel.latitude = this.channelControl.latitude.value;
-    channel.longitude = this.channelControl.longitude.value;
-    channel.elevation = this.channelControl.elevation.value;
-    channel.depth = this.channelControl.depth.value;
-    channel.start_time = DateUtil.convertDateToUTCStringWithoutShift(this.channelControl.startTime.value);
-    channel.stop_time = DateUtil.convertDateToUTCStringWithoutShift(this.channelControl.stopTime.value);
-    channel.equipments = []
-    channel.equipments.push(this.channelControl.datalogger.value);
-    channel.equipments.push(this.channelControl.sensor.value);
-    channel.gain = this.channelControl.gain.value.trim();
-    channel.sample_rate = this.channelControl.sampleRate.value.trim();
-    channel.dl_no = this.channelControl.dlNo.value.trim();
-    channel.sensor_number = this.channelControl.sensorNumber.value.trim();
-    return channel;
-  }
-
   onSubmitChannel(){
-
+    // console.log(this.channelForm.channelFormToChannel());
+    
     // stop here if form is invalid   
-    if (this.channelForm.invalid) {
+    if (this.channelFormGroup.invalid) {
       return;
     }  
 
-    this.fdsnService.updateChannel(this.channelFormToChannel()).subscribe(
+    this.fdsnService.updateChannel(this.channelForm.channelFormToChannel()).subscribe(
       wasUpdate => {
         if (wasUpdate) {
           this.notificationService.showSuccessMessage("Channel update.")
