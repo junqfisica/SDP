@@ -164,3 +164,37 @@ class Location(AbstractStructure, NamedTuple):
         except Exception as error:
             app_logger.error(traceback.format_exc())
             raise AppException(str(error))
+
+
+class PreUploadFiles(AbstractStructure, NamedTuple):
+    """
+    Class that holds a structure to return the dir structure of the pre upload dir..
+
+    Fields:
+        path: Expect a str. Relative to root upload dir.
+
+        number_of_mseed_files: Expect an int. The number of valid mseed files within the path.
+
+    """
+
+    path: str
+    number_of_mseed_files: int
+
+    def to_dict(self) -> dict:
+        """
+        Map this object to a dictionary.
+
+        :return: The dictionary representation of this object.
+        """
+        return self._asdict()
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def from_dict(cls, dictionary):
+        try:
+            new_d = validate_dictionary(cls, dictionary)
+            return cls(**new_d)
+
+        except Exception as error:
+            app_logger.error(traceback.format_exc())
+            raise AppException(str(error))

@@ -92,7 +92,7 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
   private isFileDuplicateInQueue(fileItem: FileItem): boolean {
     let numberOfEqualFiles = 0
     this.uploader.queue.forEach(item => {
-      if (fileItem.file.name == fileItem.file.name) {
+      if (item.file.name == fileItem.file.name) {
         numberOfEqualFiles++;
         if (numberOfEqualFiles > 1){
           return
@@ -104,11 +104,12 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
 
   public fileAdd(fileItem: FileItem) {
     const file = fileItem._file;
+    /** 
     if (!this.hasValidaExtention(file)) {
       this.removeFileFromQueue(file);
       this.notificationService.showWarningMessage(file.name + " has not a valid extension or is a directory.");
       return
-    };
+    };*/
 
     if (this.isFileDuplicateInQueue(fileItem)) {
       this.removeFileFromQueue(file);
