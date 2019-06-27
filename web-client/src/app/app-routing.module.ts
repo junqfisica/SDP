@@ -16,6 +16,8 @@ import { StationListComponent } from './components/station/station-list/station-
 import { ChannelListComponent } from './components/channel/channel-list/channel-list.component';
 import { StationEditComponent } from './components/station/station-edit/station-edit.component';
 import { ChannelEditComponent } from './components/channel/channel-edit/channel-edit.component';
+import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
+import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -24,6 +26,8 @@ const routes: Routes = [
   { path: 'user/edit/:id', component: UserEditComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_USER_EDIT"]}},
   { path: 'user/account/:username', component: AccountComponent, canActivate: [SameUserPermission]},
   { path: 'data/upload/:username', component: DataUploadComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_DATA_UPLOAD"]}},
+  { path: 'data/uplaod-list', component: UploadListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_DATA_UPLOAD"]}},
+  { path: 'data/uplaod-list/files/:folderPath', component: FilesListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_DATA_UPLOAD"]}},
   { path: 'fdsn/create', component: FdsnCreateComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_CREATE"]}},
   { path: 'fdsn/create/channel/:stationId', component: ChannelCreateComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_CREATE"]}},
   { path: 'fdsn/channel/:stationId', component: ChannelListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},

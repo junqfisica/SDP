@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 
 import { FileUploader, FileItem } from 'ng2-file-upload';
+
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 import { ServerUrl } from '../../../statics/server-url';
 import { ComponentUtils } from '../../component.utils';
@@ -15,17 +17,19 @@ import { FileUtil } from '../../../statics/file-util';
 })
 export class DataUploadComponent extends ComponentUtils implements OnInit {
 
+  @ViewChild('loaddingModalTemplate', {static: true}) private template : TemplateRef<BsModalRef>
+  
+  loadingModalRef: BsModalRef | null;
   uploader: FileUploader;
   hasBaseDropZoneOver = false;
   serviceUrl = ServerUrl.rootUrl + '/api/preProduction/upload'
   private supportedFileExt: string[] = ['mseed'];
 
-  constructor(private notificationService: NotificationService) { 
+  constructor(private notificationService: NotificationService,  private modalService: BsModalService) { 
     super(notificationService);
   }
 
-  ngOnInit() {
-
+  ngOnInit() {    
     this.uploader = new FileUploader({
       url: this.serviceUrl,
       headers: [
@@ -37,8 +41,8 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
       item.withCredentials = false;
     };
 
-    this.uploader.onAfterAddingFile = (fileItem) => {
-      this.fileAdd(fileItem)     
+    this.uploader.onAfterAddingFile = (fileItem) => {   
+      this.fileAdd(fileItem);
     }
     
     this.uploader.onCompleteItem = (item: any, responseJson: any, status: any, headers: any) => {
@@ -63,6 +67,88 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
 
   }
 
+  openModal() {
+    this.loadingModalRef = this.modalService.show(this.template, {backdrop: 'static'});
+  }
+
+  closeModal() {
+    if(this.loadingModalRef) {
+      // wait 1s to close, avoid error when modal open and close to fast.
+      setTimeout(() => {
+        this.loadingModalRef.hide();
+        this.loadingModalRef = null;
+      }, 1000) 
+    }
+  }
+
+  readDir(directoryReader: any) {
+    return new Promise((resolve, reject) => {
+      directoryReader.readEntries(async(entries: any) => {
+        if (entries.length) {
+          await this.parseFiles(entries);
+          resolve(entries);
+        } else {
+          resolve(null);
+        }
+      },
+      (error: any) => {
+        console.log(error);
+        reject(error);
+      });
+    });
+  }
+  
+  getFile(fileEntry: any) {
+    return new Promise((resolve, reject) => {
+        fileEntry.file(
+            (file: File) => {
+              resolve(file);
+            },
+            (error: any) => {
+              console.log(error);
+              reject(error);
+            }
+        );
+    });
+  }
+
+  async parseFiles(entries: any) {
+    for (let fileEntry of entries) {
+      const file = <File>await this.getFile(fileEntry);
+      this.uploader.addToQueue(new Array<File>(file));
+    }
+  }
+
+
+  async parseDirectoryEntry(directoryReader, directoryEntry: any) {
+    const result = await this.readDir(directoryReader);
+    if(!result) {      
+      console.log("Done");
+      this.removeFileFromQueue(directoryEntry);
+      this.closeModal();  
+    } else {
+      this.parseDirectoryEntry(directoryReader, directoryEntry);
+    }
+  }
+
+
+  drop(event) {
+    if (this.uploader.options.isHTML5) {
+      const items = event.dataTransfer.items;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.kind === 'file') {
+          const entry = item.webkitGetAsEntry();
+          if (entry.isDirectory) {
+            this.openModal();
+            const directoryReader = entry.createReader();
+            this.parseDirectoryEntry(directoryReader, entry);
+          }
+        }
+      }
+    }
+  }
+
   public fileOverBase(e: any): void {
     this.hasBaseDropZoneOver = e;
   }
@@ -78,7 +164,7 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
   }
 
   private removeFileFromQueue(file: File) {
-    const removeFile = this.getFileItemFromQueue(file);
+    const removeFile = this.getFileItemFromQueue(file);    
     if (removeFile) {
       this.uploader.removeFromQueue(removeFile);
     }

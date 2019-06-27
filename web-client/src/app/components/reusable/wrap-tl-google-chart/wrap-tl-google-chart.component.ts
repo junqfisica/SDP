@@ -7,6 +7,7 @@ import { DataTable } from '../../../auxiliary-classes/data-table';
 import { Station } from '../../../model/model.station';
 import { Channel } from '../../../model/model.channel';
 import { DateUtil } from '../../../statics/date-util';
+import { UploadFile } from '../../../model/model.upload-file';
 
 @Component({
   selector: 'app-wrap-tl-google-chart',
@@ -61,7 +62,7 @@ export class WrapTlGoogleChartComponent implements OnInit {
     return this._dataSet;
   }
 
-  loadChartData(dataSet :Station[] | Channel[]) {
+  loadChartData(dataSet :Station[] | Channel[] | UploadFile[]) {
     
     this.isDataLoaded = false;
 
@@ -86,8 +87,14 @@ export class WrapTlGoogleChartComponent implements OnInit {
             [data.name, data.name + "-" + count, DateUtil.convertUTCStringToDate(data.start_time),  
             DateUtil.convertUTCStringToDate(data.stop_time)]);
         
+        } else if (data instanceof UploadFile) {
+          const startTime = DateUtil.convertUTCStringToDate(data.start_time);          
+          dataTable.addRow(
+            [data.ch + " at " + startTime.toLocaleDateString() , 
+              data.file_name, startTime, DateUtil.convertUTCStringToDate(data.end_time)]);
+        
         } else {
-          console.error("Data must be instance of Station or Channel.");
+          console.error("Data must be instance of [Station, Channel, UploadFile].");
         }
       };
       

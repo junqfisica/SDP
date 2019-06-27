@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import TestCase
 
 import matplotlib.pyplot as plt
@@ -19,18 +20,17 @@ class TestMseed(TestCase):
         TestMseed.file_paths = []
         # TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830_1.pri0"))
         TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830000000.pri0"))
-        TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830010000.pri0"))
-        # TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830130000.pri0"))
+        # TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830010000.pri0"))
+        TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830130000.pri0"))
 
     def test_read_mseed(self):
         st: Stream = read(TestMseed.file_paths.pop(0))
         for path in TestMseed.file_paths:
             st += read(path)
-        st.print_gaps()
+        # st.print_gaps()
+        newst = st.split()
         print(st.get_gaps())
-        print(st)
-        print(st[0].get_id())
-        print(st[0].stats)
+        print(newst.get_gaps())
 
     def test_obspy_scanner(self):
         scanner = Scanner("MSEED")
@@ -87,6 +87,10 @@ class TestMseed(TestCase):
         # paths = get_mseed_dirs(root_path)
         # print(paths)
 
-
-
+    def test_test(self):
+        path = "/media/junqueira/DATA/test_sdp_data_transfer/XX/A2M/200Hz/p0/exA2M130830_1.pri0"
+        p = Path(path).parents[0]
+        d = {path: 1}
+        print(d)
+        print(p)
 

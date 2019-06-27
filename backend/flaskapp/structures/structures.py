@@ -198,3 +198,46 @@ class PreUploadFiles(AbstractStructure, NamedTuple):
         except Exception as error:
             app_logger.error(traceback.format_exc())
             raise AppException(str(error))
+
+
+class UploadMseedFiles(AbstractStructure, NamedTuple):
+    """
+    Class that holds a structure to return the file info of the pre upload dir.
+
+    Fields:
+        file_path: Expect a str. The full path to the file.
+
+        file_name: Expect a str. The file name.
+
+        ch: Expect a str. The channel.
+
+        start_time: Expect a str. The string value of the start datetime.
+
+        end_time: Expect a str. The string value of the end datetime.
+
+    """
+
+    file_path: str
+    file_name: str
+    ch: str
+    start_time: str
+    end_time: str
+
+    def to_dict(self) -> dict:
+        """
+        Map this object to a dictionary.
+
+        :return: The dictionary representation of this object.
+        """
+        return self._asdict()
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def from_dict(cls, dictionary):
+        try:
+            new_d = validate_dictionary(cls, dictionary)
+            return cls(**new_d)
+
+        except Exception as error:
+            app_logger.error(traceback.format_exc())
+            raise AppException(str(error))

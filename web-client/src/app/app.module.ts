@@ -26,8 +26,13 @@ import { UserService } from './services/user/user.service';
 import { AuthService } from './services/auth/auth.service';
 import { ApplicationParamService } from './services/setting/application-param.service';
 import { NotificationService } from './services/notification/notification.service';
+import { FdsnService } from './services/fdsn/fdsn.service';
+import { PreProductionService } from './services/pre-production/pre-production.service';
+
 import { TokenInterceptor } from './interceptors/token.interceptor';
+
 import { LoginPermission, SameUserPermission, AdminPermission, RightPermission } from './urlPermission/url.permission';
+
 import { LoginComponent } from './components/login/login.component';
 import { CreateUserComponent } from './components/user/create-user/create-user.component';
 import { UserListComponent } from './components/user/user-list/user-list.component';
@@ -37,13 +42,14 @@ import { DataUploadComponent } from './components/seismic-data/data-upload/data-
 import { SettingListComponent } from './components/setting/setting-list/setting-list.component';
 import { ApplicationParamEditComponent } from './components/setting/application-param-edit/application-param-edit.component';
 import { FdsnCreateComponent } from './components/seismic-data/fdsn/fdsn-create/fdsn-create.component';
-import { FdsnService } from './services/fdsn/fdsn.service';
 import { StationListComponent } from './components/station/station-list/station-list.component';
 import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
 import { ChannelListComponent } from './components/channel/channel-list/channel-list.component';
 import { StationEditComponent } from './components/station/station-edit/station-edit.component';
 import { ChannelEditComponent } from './components/channel/channel-edit/channel-edit.component';
 import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google-chart/wrap-tl-google-chart.component';
+import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
+import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
 
 @NgModule({
   declarations: [
@@ -63,6 +69,8 @@ import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google
     StationEditComponent,
     ChannelEditComponent,
     WrapTlGoogleChartComponent,
+    UploadListComponent,
+    FilesListComponent,
   ],
   imports: [
     BrowserModule,
@@ -91,6 +99,7 @@ import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google
     UserService,
     ApplicationParamService,
     FdsnService,
+    PreProductionService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

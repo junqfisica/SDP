@@ -9,11 +9,13 @@
         <label for="uploader-input" ng2FileDrop
           [ngClass]="{'nv-file-over-class': hasBaseDropZoneOver}" (fileOver)="fileOverBase($event)" 
           [uploader]="uploader" class="card card-body bg-light my-drop-zone"
+          (drop)="drop($event)"
+          webkitdirectory
           style="height: 100%; text-align: center;">
           <h5>Choose files</h5>
           <span>Click or Drag here to add files.</span>
-      </label>
-        <input type="file" ng2FileSelect [uploader]="uploader" multiple id="uploader-input" style="display:none" />
+        </label>
+        <input type="file" [uploader]="uploader" ng2FileSelect multiple id="uploader-input" style="display:none" />
       </div>
       <div class="col-sm-9">
         <h5>Upload Progress</h5>
@@ -68,7 +70,6 @@
             </tr>
           </tbody>
         </table>
-
         <div>
           <div>
             Progress:
@@ -96,3 +97,15 @@
     <span *ngFor="let ext of supportedFileExt"> *.{{ext}}</span> 
   </div>
 </div>
+
+<ng-template #loaddingModalTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title">Loading files from folder</h4>
+  </div>
+  <div class="modal-body">
+    <div class="center">
+      <p>Wait please, this may take few seconds.</p>
+      <i class="fa fa-spinner fa-spin" style="font-size:300%"></i>
+    </div>
+  </div>
+</ng-template>
