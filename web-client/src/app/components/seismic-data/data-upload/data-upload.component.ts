@@ -75,8 +75,10 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
     if(this.loadingModalRef) {
       // wait 1s to close, avoid error when modal open and close to fast.
       setTimeout(() => {
-        this.loadingModalRef.hide();
-        this.loadingModalRef = null;
+        if(this.loadingModalRef) {
+          this.loadingModalRef.hide();
+          this.loadingModalRef = null;
+        }
       }, 1000) 
     }
   }
@@ -107,32 +109,39 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
             (error: any) => {
               console.log(error);
               reject(error);
+              this.closeModal();
             }
         );
     });
   }
 
   async parseFiles(entries: any) {
-    for (let fileEntry of entries) {
-      const file = <File>await this.getFile(fileEntry);
-      this.uploader.addToQueue(new Array<File>(file));
+    for (let entry of entries) {
+      if(entry.isFile){
+        const file = <File>await this.getFile(entry);
+        this.uploader.addToQueue(new Array<File>(file));
+      } else if (entry.isDirectory){
+        await this.parseDirectoryEntry(entry.createReader(), entry, true);
+      }
     }
   }
 
 
-  async parseDirectoryEntry(directoryReader, directoryEntry: any) {
+  async parseDirectoryEntry(directoryReader: any, directoryEntry: any, isSubFolder=false) {
     const result = await this.readDir(directoryReader);
     if(!result) {      
-      console.log("Done");
       this.removeFileFromQueue(directoryEntry);
-      this.closeModal();  
+      if (!isSubFolder){
+        console.log("Done");
+        this.closeModal();  
+      }
     } else {
-      this.parseDirectoryEntry(directoryReader, directoryEntry);
+      this.parseDirectoryEntry(directoryReader, directoryEntry, isSubFolder);
     }
   }
 
 
-  drop(event) {
+  drop(event: any) {
     if (this.uploader.options.isHTML5) {
       const items = event.dataTransfer.items;
       for (let i = 0; i < items.length; i++) {
