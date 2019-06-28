@@ -12,4 +12,6 @@ drop table if exists SDP.T_STATIONS;
 drop table if exists SDP.S_EQUIPMENT;
 drop table if exists SDP.S_EQUIPMENT_TYPE;
 drop table if exists SDP.T_NETWORKS;
+drop table if exists SDP.T_TRANSFERRED_FILES;
+drop table if exists SDP.S_TRANSFERRED_STATUS;
 drop schema SDP;

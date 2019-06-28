@@ -35,6 +35,8 @@ class TableNames:
     T_STATIONS = "t_stations"
     T_CHANNELS = "t_channels"
     T_CHANNELS_EQUIPMENTS = "t_channels_equipments"
+    S_TRANSFERRED_STATUS = "s_transferred_status"
+    T_TRANSFERRED_FILES = "t_transferred_files"
 
 
 class Role:
@@ -64,4 +66,5 @@ from flaskapp.models.app_params_model import AppParamsModel
 from flaskapp.models.networks_model import NetworkModel
 from flaskapp.models.equipments_model import EquipmentTypeModel, EquipmentModel
 from flaskapp.models.station_channel_model import StationModel, ChannelModel, ChannelEquipmentsModel
+from flaskapp.models.file_transferred_model import TransferredStatusModel, FileTransferredModel
 

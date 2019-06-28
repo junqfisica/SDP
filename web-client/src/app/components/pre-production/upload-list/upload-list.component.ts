@@ -20,6 +20,7 @@ export class UploadListComponent implements OnInit {
   itemsPerPage = 10;
   totalItems = 0;
   deleteModalRef: BsModalRef | null;
+  transferStatusModalTemplateRef: BsModalRef | null;
   dirs:UploadDirStructure[] = [];
   showDirs:UploadDirStructure[];
   deleteDir: UploadDirStructure;
@@ -66,6 +67,11 @@ export class UploadListComponent implements OnInit {
     this.deleteDir = dir;
   }
 
+  openTransferStatusModal(template: TemplateRef<any>, dir: UploadDirStructure) {
+    const initialState = { message: 'popup message', title:'popup title'};
+    this.transferStatusModalTemplateRef = this.modalService.show(template, Object.assign({}, {}, { class: 'modal-sm', initialState }));
+  }
+
   closeDeleteModal() {
     this.deleteModalRef.hide();
     this.deleteModalRef = null;
@@ -107,6 +113,23 @@ export class UploadListComponent implements OnInit {
       );
     }
     this.closeDeleteModal();
+  }
+
+  transferData(dir: UploadDirStructure){
+    const path = FileUtil.formatPath(dir.path);
+    dir.isTransfering = true;
+    this.preProductionService.transferFolderData(path).subscribe(
+      results => {
+        console.log(results);
+        dir.isTransfering = false;
+      }, 
+      error=>{
+        console.log(error);
+        this.notificationService.showErrorMessage(error.error.message);
+        dir.isTransfering = false;
+      }
+    );
+
   }
   
 }

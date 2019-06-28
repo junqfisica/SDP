@@ -29,7 +29,8 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
     super(notificationService);
   }
 
-  ngOnInit() {    
+  ngOnInit() { 
+    
     this.uploader = new FileUploader({
       url: this.serviceUrl,
       headers: [
@@ -68,7 +69,7 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
   }
 
   openModal() {
-    this.loadingModalRef = this.modalService.show(this.template, {backdrop: 'static'});
+    this.loadingModalRef = this.modalService.show(this.template, {backdrop: 'static',  animated: true});
   }
 
   closeModal() {

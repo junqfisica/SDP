@@ -2,7 +2,8 @@ from unittest import TestCase
 
 from flaskapp import create_app
 from flaskapp.models import AppParamsModel, NetworkModel, EquipmentModel, EquipmentTypeModel, StationModel, \
-    ChannelModel, ChannelEquipmentsModel
+    ChannelModel, ChannelEquipmentsModel, FileTransferredModel
+from flaskapp.models.file_transferred_model import FileStatus
 
 
 class TestModels(TestCase):
@@ -59,3 +60,12 @@ class TestModels(TestCase):
         self.assertIsNotNone(sensors)
         print(dataloggers)
         print(sensors)
+
+    def test_file_transferred_model(self):
+        ftm: FileTransferredModel = FileTransferredModel.find_by_id("test")
+        if ftm:
+            print(ftm)
+        else:
+            ftm = FileTransferredModel(id="test", status_id=FileStatus.TRANSFERRED)
+            ftm.save()
+            print(FileTransferredModel.find_by_id("test"))

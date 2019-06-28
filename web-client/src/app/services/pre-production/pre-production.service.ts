@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { ServerUrl } from '../../statics/server-url';
 import { UploadDirStructure } from '../../model/model.upload-dir-structure';
 import { UploadFile } from '../../model/model.upload-file';
+import { FileTransferResult } from '../../model/model.file-transfer-result';
 
 
 @Injectable()
@@ -28,4 +29,9 @@ export class PreProductionService {
   deleteFile(file: UploadFile): Observable<boolean> {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/preProduction/deleteFile', file);
   }
+
+  transferFolderData(path: string): Observable<FileTransferResult[]> {
+    return this.http.get<FileTransferResult[]>(ServerUrl.rootUrl + '/api/preProduction/transferFolderData/' + path);
+  }
+
 }

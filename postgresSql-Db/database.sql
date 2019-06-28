@@ -235,3 +235,24 @@ grant all privileges on table SDP.T_CHANNELS_EQUIPMENTS to SDP;
 insert into SDP.T_CHANNELS_EQUIPMENTS values ('test1234','hjsuaier');
 insert into SDP.T_CHANNELS_EQUIPMENTS values ('test1234','hjfsaior');
 
+create table SDP.S_TRANSFERRED_STATUS (
+    ID varchar(16) not null,
+    DESCRIPTION varchar(200),
+    primary key (ID)
+);
+insert into SDP.S_TRANSFERRED_STATUS values ('Transferred','File was succefully tranfered to the storage area.');
+insert into SDP.S_TRANSFERRED_STATUS values ('Deleted','File was removed from the storage area.');
+insert into SDP.S_TRANSFERRED_STATUS values ('Merged','File was merged with other streams.');
+
+grant all privileges on table SDP.S_TRANSFERRED_STATUS to SDP;
+
+create table SDP.T_TRANSFERRED_FILES (
+    ID varchar(50) not null,
+    STATUS_ID varchar(16) not null,
+    TRANSFERRED_BY varchar(50) not null,
+    TRANSFERRED_AT timestamp not null,
+    primary key (ID),
+    foreign key (STATUS_ID) references SDP.S_TRANSFERRED_STATUS (ID) on delete restrict
+);
+grant all privileges on table SDP.T_TRANSFERRED_FILES to SDP;
+

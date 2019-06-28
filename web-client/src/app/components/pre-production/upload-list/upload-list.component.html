@@ -11,6 +11,8 @@
         <tr>
           <th>Folder (NW.ST.SR.CH)</th>
           <th class="center">Files</th>
+          <th class="center">Transfer</th>
+          <th class="center">Transfer Info</th>
           <th></th>
         </tr>
       </thead>
@@ -22,6 +24,20 @@
               title="{{dir.number_of_mseed_files}}">
               <span class="fa fa-folder-open icon-medium"></span>
             </a>
+          </td>
+          <td class="center">
+            <button  (click)="transferData(dir)" class="btn btn-xs btn-default" title="delete" 
+              title="Transfer all files to database." [disabled]="dir.isTransfering">
+              <span *ngIf="dir.isTransfering" class="fa fa-spinner fa-spin	icon-medium"></span>
+              <span *ngIf="!dir.isTransfering" class="fa fa-database	icon-medium"></span>
+            </button>
+          </td>
+          <td class="center">
+            <button  (click)="openTransferStatusModal(TransferStatusModalTemplate, dir)" class="btn btn-xs btn-default" title="delete" 
+              title="click" [disabled]="dir.isTransfering">
+              <span *ngIf="dir.isTransfering" class="fa fa-spinner fa-spin	icon-medium"></span>
+              <span *ngIf="!dir.isTransfering" class="fa fa-info	icon-medium"></span>
+            </button>
           </td>
           <td>
             <div class="pull-right">
@@ -76,5 +92,16 @@
       lastText="&raquo;">
       </pagination>
     </div>
+  </div>
+</ng-template>
+
+
+<!-- Modal temples -->
+<ng-template #TransferStatusModalTemplate let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Transfer Status at {{message}}</h4>
+  </div>
+  <div class="modal-body">
+    <p>{{message}}</p>
   </div>
 </ng-template>

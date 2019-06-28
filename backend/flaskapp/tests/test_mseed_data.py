@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from unittest import TestCase
 
@@ -88,9 +89,8 @@ class TestMseed(TestCase):
         # print(paths)
 
     def test_test(self):
-        path = "/media/junqueira/DATA/test_sdp_data_transfer/XX/A2M/200Hz/p0/exA2M130830_1.pri0"
-        p = Path(path).parents[0]
-        d = {path: 1}
-        print(d)
-        print(p)
+        path = "/media/junqueira/DATA/test_sdp_data_transfer/XX/A2M/400Hz/p0/exA2M131016154449.pri0"
+        topath = "/media/junqueira/DATA/test_sdp_data_storage/2013/exA2M131016154449.pri0"
+        if os.path.isfile(path):
+            shutil.copy(path, topath)
 

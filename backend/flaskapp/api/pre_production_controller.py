@@ -80,3 +80,18 @@ def get_files(dir_path: str):
 
     except NotADirectoryError as error:
         raise AppException(str(error))
+
+
+@pre_production.route("/transferFolderData/<string:dir_path>", methods=["GET"])
+@secure(Right.UPLOAD_DATA)
+def transfer_folder_data(dir_path: str):
+    root_dir = AppParamsModel.get_upload_folder_path()
+    relative_path = MseedDirManager.reconstruct_path(dir_path)
+    dir_path = os.path.join(root_dir, relative_path)
+    try:
+        mdm = MseedDirManager(dir_path)
+        result = mdm.transfer_all_to_storage()
+        return response.model_to_response(result)
+
+    except (NotADirectoryError, OSError) as error:
+        raise AppException(str(error))
