@@ -5,14 +5,17 @@ export class FileUtil {
     }
 
     static formatPath(path: string){
-        const paths = path.split("/");
-        let formatPath = paths.shift();
-        if (formatPath === ""){
-            formatPath = paths.shift() // removes second time when formmatPath is still blank.
+        if(path){
+            const paths = path.split("/");
+            let formatPath = paths.shift();
+            if (formatPath === ""){
+                formatPath = paths.shift() // removes second time when formmatPath is still blank.
+            }
+            for (let value of paths) {
+                formatPath += "." + value;
+            }
+            return formatPath;
         }
-        for (let value of paths) {
-            formatPath += "." + value;
-        }
-        return formatPath;
+        return "";
     }
 }

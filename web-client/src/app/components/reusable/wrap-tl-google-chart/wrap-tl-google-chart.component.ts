@@ -16,11 +16,13 @@ import { UploadFile } from '../../../model/model.upload-file';
 })
 export class WrapTlGoogleChartComponent implements OnInit {
 
+  @Input() height: number;
   
-  @Input() set dataSet (value: Station[] | Channel[]) {
+  @Input() set dataSet (value: Station[] | Channel[] | UploadFile[]) {
     this._dataSet = value;
     this.dataChanged();
-  } 
+  }
+  
   
   @Output()
   onSelectChart = new EventEmitter<ChartSelectEvent>();
@@ -30,7 +32,7 @@ export class WrapTlGoogleChartComponent implements OnInit {
   
   
   isDataLoaded = false;
-  private _dataSet: Station[] | Channel[];
+  private _dataSet: Station[] | Channel[] | UploadFile[];
   private _chart: GoogleChartComponent
 
   @ViewChild('chart', { static: false }) set content(content: GoogleChartComponent) {
@@ -41,6 +43,7 @@ export class WrapTlGoogleChartComponent implements OnInit {
   timelineChart: GoogleChartInterface =  {
     chartType: 'Timeline',
     options: {
+      height: this.height,
       timeline: { 
         showRowLabels: true,
         showBarLabels: true
@@ -53,12 +56,12 @@ export class WrapTlGoogleChartComponent implements OnInit {
     }
   };
 
-  constructor() {}
+  constructor() { }
 
   ngOnInit() {
   }
 
-  get dataSet(): Station[] | Channel[] {
+  get dataSet(): Station[] | Channel[] | UploadFile[] {
     return this._dataSet;
   }
 
@@ -113,6 +116,13 @@ export class WrapTlGoogleChartComponent implements OnInit {
   }
 
   dataChanged(){
+    this.timelineChart.options = {
+      height: this.height,
+      timeline: { 
+        showRowLabels: true,
+        showBarLabels: true
+      }
+    };
     
     this.loadChartData(this.dataSet);
     DataTable.reDrawGoogleChart(this._chart);

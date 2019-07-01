@@ -1,12 +1,24 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { HttpParams } from '@angular/common/http';
+
+import { Observable } from 'rxjs';
+import { mergeMap, map } from 'rxjs/operators';
 
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { PageChangedEvent } from 'ngx-bootstrap/pagination';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
 
 import { PreProductionService } from '../../../services/pre-production/pre-production.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { UploadDirStructure } from '../../../model/model.upload-dir-structure';
 import { FileUtil } from '../../../statics/file-util';
+import { Network } from '../../../model/model.network';
+import { FdsnService } from '../../../services/fdsn/fdsn.service';
+import { Station } from '../../../model/model.station';
+import { Search } from '../../../model/model.search';
+import { Channel } from '../../../model/model.channel';
+import { DateUtil } from './../../../statics/date-util';
 
 @Component({
   selector: 'app-upload-list',
@@ -21,17 +33,28 @@ export class UploadListComponent implements OnInit {
   totalItems = 0;
   deleteModalRef: BsModalRef | null;
   transferStatusModalTemplateRef: BsModalRef | null;
+  transferModalTemplateRef: BsModalRef | null;
   dirs:UploadDirStructure[] = [];
   showDirs:UploadDirStructure[];
   deleteDir: UploadDirStructure;
+  selectedDir: UploadDirStructure;
+
+  networks: Network[];
+  transferForm: FormGroup;
+  stationsDataSource: Observable<Station>;
+  channelDataSource: Observable<Channel>;
+  stationLoading: boolean;
+  channelLoading: boolean;
 
   constructor(private preProductionService: PreProductionService, private notificationService: NotificationService, 
-    private modalService: BsModalService) { 
+    private modalService: BsModalService, private fdsnService: FdsnService, private formBuilder: FormBuilder) { 
       preProductionService.scanUploadDir().subscribe(
         dirStructure => {
           this.dirs = dirStructure;
           this.totalItems = this.dirs.length;
           this.setShowDirs();
+          this.getNetworks();
+          this.buildForm();
           this.isLoaddingPage = false;
         },
         error => {
@@ -40,9 +63,95 @@ export class UploadListComponent implements OnInit {
           this.isLoaddingPage = false;
         }
       );
+
+    // Search for stations
+    this.stationsDataSource = Observable.create((observer: any) => {
+      // Runs on every search
+      observer.next(this.transferControl.searchStation.value);
+    }).pipe(
+      mergeMap((term: string) => {      
+      term = term !== undefined ? term.toUpperCase() : term
+      return this.fdsnService.searchStations(this.buildQueryParams("network_id, name", term,"name, creation_date")).pipe(
+        // Map search result observable to result list.
+        map((data) => {
+          return data.result;
+        }))
+      })
+    );
+
+    // Search for channel
+    this.channelDataSource = Observable.create((observer: any) => {
+      // Runs on every search
+      observer.next(this.transferControl.searchChannel.value);
+    }).pipe(
+      mergeMap((term: string) => this.fdsnService.searchChannels(
+        this.buildQueryParams( "station_id, name", this.transferControl.station.value.id + "," +term.toUpperCase(),"name, start_time", true))
+      .pipe(
+        // Map search result observable to result list.
+        map((data) => {
+          return data.result;
+        }))
+      )
+    );
   }
 
   ngOnInit() {}
+
+  buildForm(){
+
+    this.transferForm = this.formBuilder.group({
+      searchStation: ['', {}],
+      searchChannel: ['', {}],
+      station: ['', {validators: [Validators.required], updateOn: 'change'}],
+      channel: ['', {validators: [Validators.required], updateOn: 'change'}],
+    });
+
+  }
+
+  buildQueryParams(searchBy="name", value="", orderBy="", isAnd=false): HttpParams {    
+    const searchParms = new Search(searchBy, value).searchParms;
+    searchParms.orderBy = orderBy;
+    searchParms.orderDesc = false;
+    searchParms.use_AND_Operator = isAnd;
+    searchParms.mapColumnAndValue = isAnd;
+    searchParms.page = 1;
+    searchParms.perPage = 200;
+
+    return new HttpParams({ fromObject: searchParms });
+  }
+
+  get transferControl() { return this.transferForm.controls };
+
+  changeStationLoading(e: boolean): void {
+    this.stationLoading = e;
+  }
+
+  onSelectStation(e: TypeaheadMatch): void {
+    this.transferControl.station.setValue(e.item);
+    this.transferControl.searchChannel.setValue('');
+    this.transferControl.channel.setValue(null);
+
+  }
+
+  changeChannelLoading(e: boolean): void {
+    this.channelLoading = e;
+  }
+
+  onSelectChannel(e: TypeaheadMatch): void {
+    this.transferControl.channel.setValue(e.item);
+  }
+
+  getNetworks() {
+    this.fdsnService.getNetworks().subscribe(
+      data => {
+        this.networks = data;
+      },
+      error => {
+        console.log(error);
+        this.notificationService.showErrorMessage("Error when trying to get networks");
+      }
+    );
+  }
 
   pageChanged(event: PageChangedEvent) {
     this.page = event.page;
@@ -68,8 +177,19 @@ export class UploadListComponent implements OnInit {
   }
 
   openTransferStatusModal(template: TemplateRef<any>, dir: UploadDirStructure) {
-    const initialState = { message: 'popup message', title:'popup title'};
-    this.transferStatusModalTemplateRef = this.modalService.show(template, Object.assign({}, {}, { class: 'modal-sm', initialState }));
+    this.selectedDir = dir;
+    this.transferStatusModalTemplateRef = this.modalService.show(template, {class: 'modal-dialog modal-lg'});
+  }
+
+  openTransferModal(template: TemplateRef<any>, dir: UploadDirStructure) {
+    this.selectedDir = dir;
+    this.transferModalTemplateRef = this.modalService.show(template, {class: 'modal-dialog modal-lg'});
+  }
+
+  closeTransferModal() {
+    this.transferModalTemplateRef.hide();
+    this.transferModalTemplateRef = null;
+    this.selectedDir = null;
   }
 
   closeDeleteModal() {
@@ -115,11 +235,17 @@ export class UploadListComponent implements OnInit {
     this.closeDeleteModal();
   }
 
+  dateTimeToUTC(dateTime: string){
+    return DateUtil.convertUTCStringToDate(dateTime);
+  }
+
   transferData(dir: UploadDirStructure){
-    const path = FileUtil.formatPath(dir.path);
+    // const path = FileUtil.formatPath(dir.path);
     dir.isTransfering = true;
-    this.preProductionService.transferFolderData(path).subscribe(
+    dir.transferResults = undefined; // set transferResults to undefined. Avoid pass this structure to the server.
+    this.preProductionService.transferFolderData(dir).subscribe(
       results => {
+        dir.transferResults = results;
         console.log(results);
         dir.isTransfering = false;
       }, 
@@ -130,6 +256,17 @@ export class UploadListComponent implements OnInit {
       }
     );
 
+  }
+
+  onSubmitTransfer(){
+    if (this.transferForm.invalid || !this.selectedDir) {
+      return;
+    }
+    const channelId = this.transferControl.channel.value.id;
+    this.selectedDir.channel_id = channelId;
+    this.transferData(this.selectedDir);
+    this.closeTransferModal();
+    
   }
   
 }

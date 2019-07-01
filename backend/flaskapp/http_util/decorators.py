@@ -60,7 +60,7 @@ def query(class_to_map: AbstractStructure):
     return app_decorator
 
 
-def post(*post_parameters: str):
+def post(class_to_map = None, *post_parameters: str):
     """
     Get post data as a dictionary if no post parameter is given. Otherwise
     it will map the parameters from post to the decorate function.
@@ -91,6 +91,17 @@ def post(*post_parameters: str):
 
     This would print "Joe" and 26.
 
+    * Method 3::
+
+        @api.route("/api/login", methods=["POST"])
+        @post(User)
+        def my_func(user: User):
+             print(user.name)
+             print(user.age)
+
+    This would print "Joe" and 26.
+
+    :param class_to_map: Expected to be a class with from_dict.
     :param post_parameters: (Optional) The names of the json keys from your body request.
     :return: Map the body request to the given parameters at the decorated method.
     """
@@ -102,6 +113,10 @@ def post(*post_parameters: str):
             if post_parameters:
                 parm = (json_data.get(param) for param in post_parameters)
                 return func(*parm, *args, **kwargs)
+
+            if class_to_map and hasattr(class_to_map, "from_dict"):
+                class_instance = class_to_map.from_dict(json_data)
+                return func(class_instance, *args, **kwargs)
 
             # Otherwise just return the dictionary.
             return func(json_data, *args, **kwargs)

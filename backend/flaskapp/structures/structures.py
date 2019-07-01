@@ -25,7 +25,10 @@ def validate_dictionary(cls: NamedTuple, dic: dict):
         elif cls._field_types.get(safe_key) == float:
             valid_dic[safe_key] = float(dic.get(k))
         elif cls._field_types.get(safe_key) == bool:
-            valid_dic[safe_key] = True if dic.get(k).capitalize() == "True" else False
+            if hasattr(dic.get(k), "capitalize"):
+                valid_dic[safe_key] = True if dic.get(k).capitalize() == "True" else False
+            else:
+                valid_dic[safe_key] = dic.get(k)
         elif cls._field_types.get(safe_key) == str:
             if dic.get(k) == "null":
                 valid_dic[safe_key] = None
@@ -175,10 +178,16 @@ class PreUploadFiles(AbstractStructure, NamedTuple):
 
         number_of_mseed_files: Expect an int. The number of valid mseed files within the path.
 
+        isTransfering: Expect an bool. Used by the front end.
+
+        channel_id: Expect a str. Channel id that this files may be insert to.
+
     """
 
     path: str
     number_of_mseed_files: int
+    isTransfering: bool = False
+    channel_id: str = None
 
     def to_dict(self) -> dict:
         """

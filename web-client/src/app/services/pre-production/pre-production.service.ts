@@ -30,8 +30,8 @@ export class PreProductionService {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/preProduction/deleteFile', file);
   }
 
-  transferFolderData(path: string): Observable<FileTransferResult[]> {
-    return this.http.get<FileTransferResult[]>(ServerUrl.rootUrl + '/api/preProduction/transferFolderData/' + path);
+  transferFolderData(dir: UploadDirStructure): Observable<FileTransferResult[]> {
+    return this.http.post<FileTransferResult[]>(ServerUrl.rootUrl + '/api/preProduction/transferFolderData', dir);
   }
 
 }

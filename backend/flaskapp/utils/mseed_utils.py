@@ -158,7 +158,7 @@ class MseedDirManager:
             for file in files:
                 if os.path.isfile(os.path.join(root, file)) and _is_mseed(os.path.join(root, file)):
                     num_mseed_files = MseedDirManager(root).get_number_of_mseed_from_info()
-                    relative_path = root.split(root_dir)[-1]
+                    relative_path = os.path.relpath(root, root_dir)
                     dir_info = PreUploadFiles(relative_path, num_mseed_files)
                     dirs_info.append(dir_info)
                     break

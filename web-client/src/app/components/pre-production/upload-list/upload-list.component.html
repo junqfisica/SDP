@@ -26,7 +26,7 @@
             </a>
           </td>
           <td class="center">
-            <button  (click)="transferData(dir)" class="btn btn-xs btn-default" title="delete" 
+            <button  (click)="openTransferModal(transferModalTemplate, dir)" class="btn btn-xs btn-default" title="delete" 
               title="Transfer all files to database." [disabled]="dir.isTransfering">
               <span *ngIf="dir.isTransfering" class="fa fa-spinner fa-spin	icon-medium"></span>
               <span *ngIf="!dir.isTransfering" class="fa fa-database	icon-medium"></span>
@@ -34,7 +34,7 @@
           </td>
           <td class="center">
             <button  (click)="openTransferStatusModal(TransferStatusModalTemplate, dir)" class="btn btn-xs btn-default" title="delete" 
-              title="click" [disabled]="dir.isTransfering">
+              title="click" [disabled]="dir.isTransfering || !dir.transferResults">
               <span *ngIf="dir.isTransfering" class="fa fa-spinner fa-spin	icon-medium"></span>
               <span *ngIf="!dir.isTransfering" class="fa fa-info	icon-medium"></span>
             </button>
@@ -52,6 +52,19 @@
   </div>
   <ng-template [ngTemplateOutlet]="pagination"></ng-template>
 </div>
+
+<ng-template #stationTypeaheadTemplate let-station="item">
+  <span><i class="fa fa-bullseye" title="Network">:</i> {{station.network_id}} - 
+    <i class="fa fa-cube" title="Station name">:</i> {{station.name}} - 
+    <i class="fa fa-calendar-plus-o" title="Create at">:</i> {{ station.creation_date | date:'dd.MM.yyyy'}}
+  </span>
+</ng-template>
+
+<ng-template #channelTypeaheadTemplate let-channel="item">
+  <span><i class="fa fa-cube" title="Channel name">:</i> {{channel.name}} - 
+    <i class="fa fa-calendar-plus-o" title="Start at">:</i> {{ channel.start_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}
+  </span>
+</ng-template>
   
 <!-- Modal temples -->
 <ng-template #deleteModalTemplate let-c="close" let-d="dismiss">
@@ -97,11 +110,90 @@
 
 
 <!-- Modal temples -->
-<ng-template #TransferStatusModalTemplate let-c="close" let-d="dismiss">
+<ng-template #TransferStatusModalTemplate let-c="close" let-d="dismiss" class="modal fade">
   <div class="modal-header">
-    <h4 class="modal-title">Transfer Status at {{message}}</h4>
+    <h4 class="modal-title pull-left">File transfer Status at {{formatPath(selectedDir?.path)}}</h4>
   </div>
   <div class="modal-body">
-    <p>{{message}}</p>
+    <h5>Files: {{selectedDir?.transferResults.length}}</h5>
+    <div *ngFor= "let result of selectedDir?.transferResults">
+      <alert *ngIf="!result.error && result.status === 'Ok'" type="info">File {{result.file_name}} was transferred.</alert>
+      <alert *ngIf="!result.error && result.status !== 'Ok'" type="warning">{{result.status}}</alert>
+      <alert *ngIf="result.error" type="danger">{{result.error}}</alert>
+    </div>
   </div>
+</ng-template>
+
+<ng-template #transferModalTemplate let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Transfer files from folder {{formatPath(selectedDir?.path)}} to</h4>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="transferForm">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Select a station</label>
+          <div class="form-inline">
+            <input [ngClass]="{ 'is-invalid': transferControl.station.errors }"
+              formControlName="searchStation"
+              [typeahead]="stationsDataSource"
+              (typeaheadLoading)="changeStationLoading($event)"
+              (typeaheadOnSelect)="onSelectStation($event)"
+              [typeaheadOptionsLimit]="10"
+              [typeaheadMinLength]="1"
+              typeaheadWaitMs="500"
+              typeaheadOptionField="name"
+              [typeaheadItemTemplate]="stationTypeaheadTemplate"
+              placeholder="Network or Station name"
+              class="form-control mr-sm-2">
+            <div class="invalid-feedback">*required.</div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!transferControl.station.errors" class="form-row">
+        <div class="form-group col-md-2">
+          <label>Select a channel</label>
+          <div class="form-inline">
+            <input [ngClass]="{ 'is-invalid': transferControl.channel.errors }"
+              formControlName="searchChannel"
+              [typeahead]="channelDataSource"
+              (typeaheadLoading)="changeChannelLoading($event)"
+              (typeaheadOnSelect)="onSelectChannel($event)"
+              [typeaheadOptionsLimit]="10"
+              [typeaheadMinLength]="0"
+              typeaheadWaitMs="500"
+              typeaheadOptionField="name"
+              [typeaheadItemTemplate]="channelTypeaheadTemplate"
+              placeholder="Channel name"
+              class="form-control mr-sm-2">
+            <div class="invalid-feedback">*required.</div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div *ngIf="!transferControl.channel.errors">
+      <ng-template *ngTemplateOutlet="channelInfo; context:{channel: transferControl.channel.value}"></ng-template>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" [disabled]="transferControl.pending" class="btn btn-info" (click)="onSubmitTransfer()">Transfer</button>
+    <button type="button" class="btn btn-outline-dark" (click)="closeTransferModal()">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #channelInfo let-ch="channel">
+    <h2> Info:</h2>
+    <app-wrap-tl-google-chart height=100 [dataSet]="[ch]"></app-wrap-tl-google-chart>
+    <div  class="fa fa-calendar-plus-o icon-medium" style="margin-right: 5%; color: darkgreen" 
+      title="Channel start at"> {{dateTimeToUTC(ch.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</div>
+    <div  class="fa fa-calendar-minus-o icon-medium" style="color: darkred" 
+      title="Channel stop at"> {{dateTimeToUTC(ch.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</div>
+    <div>
+      <span class="fa fa-globe icon-medium" style="color: #515692" 
+        title="Channel location"> {{ch.latitude}}, {{ch.longitude}} </span>
+    </div>
+    <div *ngFor="let eq of ch.equipments">
+      <div class="fa fa-microchip icon-medium" style="color: #515692" title="Equipments"> {{eq.type}} : {{eq.name}}</div>
+    </div>
+    <div class="fa fa-line-chart icon-medium" style="color:#515692" title="Gain/Sample rate"> {{ch.gain}} / {{ch.sample_rate}}</div>
 </ng-template>
