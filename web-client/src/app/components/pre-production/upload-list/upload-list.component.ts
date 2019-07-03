@@ -39,6 +39,7 @@ export class UploadListComponent implements OnInit {
   showDirs:UploadDirStructure[];
   deleteDir: UploadDirStructure;
   selectedDir: UploadDirStructure;
+  transferStatusFilter: string = "";
 
   networks: Network[];
   transferForm: FormGroup;

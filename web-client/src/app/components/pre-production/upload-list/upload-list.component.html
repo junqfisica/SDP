@@ -114,18 +114,32 @@
   </div>
 </ng-template>
 
-
 <!-- Modal temples -->
 <ng-template #TransferStatusModalTemplate let-c="close" let-d="dismiss" class="modal fade">
   <div class="modal-header">
-    <h4 class="modal-title pull-left">File transfer Status at {{formatPath(selectedDir?.path)}}</h4>
+    <h5 class="modal-title pull-left">File transfer Status at {{formatPath(selectedDir?.path)}}</h5>
+    <h5 class="modal-title pull-right">Files processed: {{selectedDir?.transferResults.length}}</h5>
   </div>
   <div class="modal-body">
-    <h5>Files: {{selectedDir?.transferResults.length}}</h5>
+    <div class="form-group">
+      <label for="filter">Filter</label>
+      <select class="form-control col-md-2" [(ngModel)]="transferStatusFilter" id="filter">
+        <option selected value="">None</option>
+        <option value="Ok">Transferred</option>
+        <option value="Warning">Fail</option>
+        <option value="Error">Errors</option>
+      </select>
+    </div>
     <div *ngFor= "let result of selectedDir?.transferResults">
-      <alert *ngIf="!result.error && result.status === 'Ok'" type="info">File {{result.file_name}} was transferred.</alert>
-      <alert *ngIf="!result.error && result.status !== 'Ok'" type="warning">{{result.status}}</alert>
-      <alert *ngIf="result.error" type="danger">{{result.error}}</alert>
+      <alert *ngIf="(!result.error && result.status === 'Ok') && (transferStatusFilter ==='' || transferStatusFilter === 'Ok')" 
+        type="info">File {{result.file_name}} was transferred.
+      </alert>
+      <alert *ngIf="(!result.error && result.status !== 'Ok') && (transferStatusFilter ==='' || transferStatusFilter === 'Warning')" 
+        type="warning">{{result.status}}
+      </alert>
+      <alert *ngIf="(result.error) && (transferStatusFilter === '' || transferStatusFilter === 'Error')" 
+        type="danger">{{result.error}}
+      </alert>
     </div>
   </div>
 </ng-template>
