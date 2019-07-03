@@ -9,7 +9,7 @@ export class Channel {
     elevation: number;
     depth: number;
     gain: string;
-    sample_rate:number;
+    sample_rate: number;
     dl_no: string;
     sensor_number: string;
     start_time: string;

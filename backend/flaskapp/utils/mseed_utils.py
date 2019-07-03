@@ -8,7 +8,7 @@ import obspy
 from obspy.io.mseed.core import _is_mseed
 from werkzeug.datastructures import FileStorage
 
-from flaskapp.models import FileTransferredModel
+from flaskapp.models import FileTransferredModel, TargetFolderModel, ChannelModel, SeismicDataModel
 from flaskapp.models.file_transferred_model import FileStatus
 from flaskapp.structures.structures import PreUploadFiles, UploadMseedFiles, FileTransferResult
 from flaskapp.utils.date_utils import DateUtils
@@ -31,6 +31,17 @@ def get_mseed_files(dir_path: str):
         return []
 
     return mseed_files
+
+
+def construct_relative_destination_dir(upload_file: UploadMseedFiles):
+    """
+    Construct a relative path to be used to save mseed files to the storage area.
+    This path must be join with the active folder.
+    :param upload_file: The upload file structure.
+    :return: A relative path to save mseed files.
+    """
+    relative_path = str(DateUtils.convert_string_to_utc(upload_file.start_time).year)
+    return relative_path
 
 
 class ObspyStatsKeys:
@@ -122,6 +133,11 @@ class MseedFileManager:
 
 
 class MseedDirManager:
+    """
+    Class that deal with upload and transference of mseed files.
+
+    dir_path: The path location of the files at the upload area.
+    """
 
     info_file_name = ".info"
 
@@ -134,9 +150,8 @@ class MseedDirManager:
         self.info_file_path = os.path.join(self.dir_path, MseedDirManager.info_file_name)
 
     @property
-    def storage_root(self):
-        root = "/media/junqueira/DATA/test_sdp_data_storage"
-        return root
+    def active_folder(self):
+        return TargetFolderModel.get_active_folder()
 
     @staticmethod
     def reconstruct_path(path: str):
@@ -221,9 +236,10 @@ class MseedDirManager:
             file_path = os.path.join(self.dir_path, mseed_file)
             st = obspy.read(file_path)
             ch = st[0].stats.get(ObspyStatsKeys.CHANNEL)
+            sr = int(st[0].stats.get(ObspyStatsKeys.SAMPLE_RATE))
             start_time = str(st[0].stats.get(ObspyStatsKeys.START_TIME))
             end_time = str(st[0].stats.get(ObspyStatsKeys.END_TIME))
-            upload_file = UploadMseedFiles(file_path, mseed_file, ch, start_time, end_time)
+            upload_file = UploadMseedFiles(file_path, mseed_file, ch, sr, start_time, end_time)
             upload_files.append(upload_file)
 
         # sort files using start time!!
@@ -236,7 +252,14 @@ class MseedDirManager:
         with LockById(self.dir_path):
             return self.__get_files()
 
-    def __transfer_file_to_storage(self, upload_file: UploadMseedFiles):
+    def __make_destination_dir(self, upload_file: UploadMseedFiles):
+        relative_path = construct_relative_destination_dir(upload_file)
+        dest_dir = os.path.join(self.active_folder.path, relative_path)
+        if not os.path.isdir(dest_dir):
+            os.makedirs(dest_dir, mode=0o660)
+        return dest_dir
+
+    def __transfer_file_to_storage(self, upload_file: UploadMseedFiles, channel: ChannelModel):
 
         if not upload_file:
             raise TypeError("Upload file can't be None.")
@@ -252,11 +275,20 @@ class MseedDirManager:
             should_transfer = False
 
         if should_transfer:
-            year = str(DateUtils.convert_string_to_utc(upload_file.start_time).year)
-            dest_dir = os.path.join(self.storage_root, year)
             try:
-                if not os.path.isdir(dest_dir):
-                    os.makedirs(dest_dir, mode=0o660)
+                relative_path = construct_relative_destination_dir(upload_file)
+                start_time = DateUtils.convert_string_to_utc(upload_file.start_time)
+                stop_time = DateUtils.convert_string_to_utc(upload_file.end_time)
+                data = SeismicDataModel.create_data(id=None, filename=upload_file.file_name,
+                                                    relative_path=relative_path,
+                                                    target_folder_id=self.active_folder.id,
+                                                    start_time=start_time, stop_time=stop_time,
+                                                    channel_id=channel.id)
+                is_valid, msg = data.is_valid_upload_file(upload_file)
+                if not is_valid:
+                    return FileTransferResult(upload_file.file_name, msg)
+
+                dest_dir = self.__make_destination_dir(upload_file)
                 dest_path = os.path.join(dest_dir, upload_file.file_name)
                 shutil.move(upload_file.file_path, dest_path)
                 self.add_value_to_info_file(-1)
@@ -265,7 +297,7 @@ class MseedDirManager:
                 else:
                     ftm = FileTransferredModel(id=upload_file.file_name, status_id=FileStatus.TRANSFERRED)
                     ftm.save()
-                # TODO add seismic_data into database
+                data.save()
                 return FileTransferResult(upload_file.file_name, "Ok")
             except OSError as error:
                 return FileTransferResult(upload_file.file_name, "Fail", str(error))
@@ -274,18 +306,24 @@ class MseedDirManager:
             return FileTransferResult(upload_file.file_name,
                                       "File {} already exists in the database.".format(upload_file.file_name))
 
-    def transfer_file_to_storage(self, file: UploadMseedFiles):
+    def transfer_file_to_storage(self, file: UploadMseedFiles, channel_id: str):
+        channel = ChannelModel.find_by_id(channel_id)
+        if not channel:
+            raise TypeError("An valid channel id must be provide to transfer files")
         with LockById(self.dir_path):
-            result = self.__transfer_file_to_storage(file)
+            result = self.__transfer_file_to_storage(file, channel)
 
         return result
 
-    def transfer_all_to_storage(self):
+    def transfer_all_to_storage(self, channel_id: str):
+        channel = ChannelModel.find_by_id(channel_id)
+        if not channel:
+            raise TypeError("An valid channel id must be provide to transfer files")
         results = []
         with LockById(self.dir_path):
             files = self.__get_files()
             for file in files:
-                result = self.__transfer_file_to_storage(file)
+                result = self.__transfer_file_to_storage(file, channel)
                 results.append(result)
 
         return results

@@ -18,7 +18,8 @@ import { FdsnService } from '../../../services/fdsn/fdsn.service';
 import { Station } from '../../../model/model.station';
 import { Search } from '../../../model/model.search';
 import { Channel } from '../../../model/model.channel';
-import { DateUtil } from './../../../statics/date-util';
+import { DateUtil } from '../../../statics/date-util';
+import { FileTransferResult } from '../../../model/model.file-transfer-result';
 
 @Component({
   selector: 'app-upload-list',
@@ -115,7 +116,7 @@ export class UploadListComponent implements OnInit {
     searchParms.use_AND_Operator = isAnd;
     searchParms.mapColumnAndValue = isAnd;
     searchParms.page = 1;
-    searchParms.perPage = 200;
+    searchParms.perPage = 1000;
 
     return new HttpParams({ fromObject: searchParms });
   }
@@ -239,14 +240,27 @@ export class UploadListComponent implements OnInit {
     return DateUtil.convertUTCStringToDate(dateTime);
   }
 
+  transferStatusOverview(transferResults: FileTransferResult[]) {
+    for (const result of transferResults){
+      if (result.error){
+        return "Error";
+      } else if (result.status !== "Ok"){
+        return "Warning"
+      }
+    };
+    return "Ok";
+  }
+
   transferData(dir: UploadDirStructure){
     // const path = FileUtil.formatPath(dir.path);
     dir.isTransfering = true;
     dir.transferResults = undefined; // set transferResults to undefined. Avoid pass this structure to the server.
+    dir.status = undefined; // set transferResults to undefined. Avoid pass this structure to the server.
     this.preProductionService.transferFolderData(dir).subscribe(
       results => {
         dir.transferResults = results;
-        console.log(results);
+        // console.log(results);
+        dir.status = this.transferStatusOverview(dir.transferResults);
         dir.isTransfering = false;
       }, 
       error=>{

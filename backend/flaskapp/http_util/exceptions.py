@@ -59,6 +59,16 @@ class InvalidInstrumentType(AppException):
     status_code = http.HTTPStatus.NOT_ACCEPTABLE
 
 
+class ActiveFolderNotFound(AppException):
+
+    status_code = http.HTTPStatus.NOT_FOUND
+
+
+class FileNotFound(AppException):
+
+    status_code = http.HTTPStatus.NOT_FOUND
+
+
 def error_to_response(error: AppException):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
@@ -111,4 +121,14 @@ def handle_file_already_exists(error: AppException):
 
 @errors.app_errorhandler(InvalidInstrumentType)
 def handle_invalid_instrument_type(error: AppException):
+    return error_to_response(error)
+
+
+@errors.app_errorhandler(ActiveFolderNotFound)
+def handle_active_folder_not_found(error: AppException):
+    return error_to_response(error)
+
+
+@errors.app_errorhandler(FileNotFound)
+def handle_file_not_found(error: AppException):
     return error_to_response(error)

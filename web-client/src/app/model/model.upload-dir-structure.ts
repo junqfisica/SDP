@@ -6,4 +6,5 @@ export class UploadDirStructure {
     channel_id = null;
     isTransfering = false;
     transferResults: FileTransferResult[];
+    status: string;
 }

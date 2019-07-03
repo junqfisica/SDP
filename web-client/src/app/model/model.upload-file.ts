@@ -3,6 +3,7 @@ export class UploadFile {
     file_path: string;
     file_name: string;
     ch: string;
+    sample_rate: number;
     start_time: string;
     end_time: string;
     isOverlap: boolean = null;

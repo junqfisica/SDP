@@ -160,6 +160,8 @@ class ChannelModel(db.Model, BaseModel):
     stop_time: datetime = db.Column(db.DateTime(timezone=True), nullable=True)
     equipments = db.relationship(RelationShip.CHANNEL_EQUIPMENTS, backref="channel",
                                  cascade="save-update, merge, delete", lazy=True)
+    seismic_data = db.relationship(RelationShip.SEISMIC_DATA, backref="channel",
+                                   cascade="save-update, merge, delete", lazy=True)
 
     def __repr__(self):
         return "ChannelModel(id={},station_id={},name={},gain={},dl_no={},dl_no={},sample_rate={}, " \
@@ -184,10 +186,16 @@ class ChannelModel(db.Model, BaseModel):
         # convert columns to dict
         dict_representation = super().to_dict()
 
-        # add channels
+        # add equipments
         dict_representation["equipments"] = [eqs.get_equipment().to_dict() for eqs in self.equipments]
 
         return dict_representation
+
+    def is_within_deltatime(self, start_time: datetime, stop_time: datetime):
+        if self.start_time <= start_time and self.stop_time >= stop_time:
+            return True
+
+        return False
 
     def is_time_overlap(self, other):
 

@@ -220,6 +220,8 @@ class UploadMseedFiles(AbstractStructure, NamedTuple):
 
         ch: Expect a str. The channel.
 
+        sample_rate: Expect an int. The sample rate.
+
         start_time: Expect a str. The string value of the start datetime.
 
         end_time: Expect a str. The string value of the end datetime.
@@ -229,6 +231,7 @@ class UploadMseedFiles(AbstractStructure, NamedTuple):
     file_path: str
     file_name: str
     ch: str
+    sample_rate: int
     start_time: str
     end_time: str
 

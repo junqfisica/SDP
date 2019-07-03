@@ -12,6 +12,8 @@ class RelationShip:
     STATIONS = "StationModel"
     CHANNEL = "ChannelModel"
     CHANNEL_EQUIPMENTS = "ChannelEquipmentsModel"
+    SEISMIC_DATA = "SeismicDataModel"
+    FILE_DATA = "FileDataModel"
 
 
 # Include the name of tables from your data base. Use this to map table's name.
@@ -37,6 +39,9 @@ class TableNames:
     T_CHANNELS_EQUIPMENTS = "t_channels_equipments"
     S_TRANSFERRED_STATUS = "s_transferred_status"
     T_TRANSFERRED_FILES = "t_transferred_files"
+    T_TARGET_FOLDERS = "t_target_folders"
+    T_SEISMIC_DATA = "t_seismic_data"
+    T_FILE_DATA = "t_files_data"
 
 
 class Role:
@@ -63,8 +68,10 @@ from flaskapp.models.token_model import TokenModel
 from flaskapp.models.roles_model import RoleModel, UserRoleModel, RightModel, RolesRightsModel, UserRightModel
 from flaskapp.models.user_model import UserModel
 from flaskapp.models.app_params_model import AppParamsModel
+from flaskapp.models.target_folder_model import TargetFolderModel
 from flaskapp.models.networks_model import NetworkModel
 from flaskapp.models.equipments_model import EquipmentTypeModel, EquipmentModel
 from flaskapp.models.station_channel_model import StationModel, ChannelModel, ChannelEquipmentsModel
 from flaskapp.models.file_transferred_model import TransferredStatusModel, FileTransferredModel
+from flaskapp.models.seismic_data_model import SeismicDataModel, FileDataModel
 

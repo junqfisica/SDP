@@ -116,7 +116,7 @@ export class ChannelForm {
         channel.equipments.push(this.controls.datalogger.value);
         channel.equipments.push(this.controls.sensor.value);
         channel.gain = this.controls.gain.value.trim();
-        channel.sample_rate = this.controls.sampleRate.value.trim();
+        channel.sample_rate = this.controls.sampleRate.value;
         channel.dl_no = this.controls.dlNo.value.trim();
         channel.sensor_number = this.controls.sensorNumber.value.trim();
         return channel;

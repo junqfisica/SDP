@@ -5,7 +5,7 @@ from werkzeug.datastructures import FileStorage
 
 from flaskapp.api import pre_production
 from flaskapp.http_util import response
-from flaskapp.http_util.decorators import secure, post_file, post, query, query_param
+from flaskapp.http_util.decorators import secure, post_file, post
 from flaskapp.http_util.exceptions import FileAlreadyExists, AppException
 from flaskapp.models import Right, AppParamsModel
 from flaskapp.structures.structures import UploadMseedFiles, PreUploadFiles
@@ -89,8 +89,8 @@ def transfer_folder_data(dir_structure: PreUploadFiles):
     dir_path = os.path.join(root_dir, dir_structure.path)
     try:
         mdm = MseedDirManager(dir_path)
-        result = mdm.transfer_all_to_storage()
+        result = mdm.transfer_all_to_storage(dir_structure.channel_id)
         return response.model_to_response(result)
 
-    except (NotADirectoryError, OSError) as error:
+    except (NotADirectoryError, OSError, TypeError) as error:
         raise AppException(str(error))

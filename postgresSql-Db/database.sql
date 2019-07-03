@@ -135,6 +135,17 @@ grant all privileges on table SDP.T_APPLICATION_PARAMS to SDP;
 
 insert into SDP.T_APPLICATION_PARAMS values ('uploadFolder','Root directory to upload data', '/media/junqueira/DATA/test_sdp_data_transfer');
 
+create table SDP.T_TARGET_FOLDERS
+(
+    ID varchar(16) not null,
+    PATH varchar(400) not null,
+    ACTIVE boolean not null,
+    primary key (ID)
+);
+grant all privileges on table SDP.T_TARGET_FOLDERS to SDP;
+
+insert into SDP.T_TARGET_FOLDERS values ('test1234','/media/junqueira/DATA/test_sdp_data_storage', true);
+
 create table SDP.T_NETWORKS
 (
     ID varchar(5) not null,
@@ -255,4 +266,29 @@ create table SDP.T_TRANSFERRED_FILES (
     foreign key (STATUS_ID) references SDP.S_TRANSFERRED_STATUS (ID) on delete restrict
 );
 grant all privileges on table SDP.T_TRANSFERRED_FILES to SDP;
+
+create table SDP.T_SEISMIC_DATA (
+    ID varchar(16) not null,
+    FILENAME varchar(50) not null,
+    RELATIVE_PATH varchar(400) not null,
+    TARGET_FOLDER_ID varchar(16) not null,
+    START_TIME timestamptz not null,
+    STOP_TIME timestamptz not null,
+    CHANNEL_ID varchar(16) not null,
+    primary key (ID),
+    foreign key (TARGET_FOLDER_ID) references SDP.T_TARGET_FOLDERS (ID) on delete restrict,
+    foreign key (CHANNEL_ID) references SDP.T_CHANNELS (ID) on delete restrict
+);
+grant all privileges on table SDP.T_SEISMIC_DATA to SDP;
+
+create table SDP.T_FILES_DATA
+(
+    DATA_ID varchar(16) not null,
+    FILE_ID varchar(50) not null,
+    primary key (DATA_ID,FILE_ID),
+    foreign key (DATA_ID) references SDP.T_SEISMIC_DATA (ID) on delete restrict,
+    foreign key (FILE_ID) references SDP.T_TRANSFERRED_FILES (ID) on delete restrict
+    
+);
+grant all privileges on table SDP.T_FILES_DATA to SDP;
 
