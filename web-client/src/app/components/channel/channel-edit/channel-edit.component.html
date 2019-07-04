@@ -145,7 +145,7 @@
           <input *ngIf="!restrictEquipments" type="text" formControlName="gain" class="form-control" 
               [ngClass]="{ 'is-invalid': channelControl.gain.errors }" 
               placeholder="Gain" />
-          <select *ngIf="restrictEquipments" class="custom-select mr-sm-2" formControlName="gain" 
+          <select *ngIf="restrictEquipments" class="custom-select mr-sm-2" formControlName="gain"
             (change)="onChangeGain(channelControl.datalogger.value, channelControl.gain.value)" 
             [ngClass]="{ 'is-invalid': channelControl.gain.errors }">
             <option selected [ngValue]="channelControl.gain.value">{{channelControl.gain.value}}</option>
@@ -161,7 +161,7 @@
           <input *ngIf="!restrictEquipments" type="number" formControlName="sampleRate" class="form-control" 
               [ngClass]="{ 'is-invalid': channelControl.sampleRate.errors }" 
               placeholder="Sample rate" />
-          <select *ngIf="restrictEquipments" class="custom-select mr-sm-2" formControlName="sampleRate" 
+          <select *ngIf="restrictEquipments" class="custom-select mr-sm-2" formControlName="sampleRate"
             (change)="onChangeSampleRate(channelControl.sampleRate.value)" 
             [ngClass]="{ 'is-invalid': channelControl.sampleRate.errors }">
             <option selected [ngValue]="channelControl.sampleRate.value">{{channelControl.sampleRate.value}}</option>

@@ -72,12 +72,17 @@ class SeismicDataModel(db.Model, BaseModel):
         return True, ""
 
     @property
+    def mseed_file(self):
+        file = open(self.file_path, mode="rb")
+        return file
+
+    @property
     def file_path(self):
         target_folder: TargetFolderModel = TargetFolderModel.find_by_id(self.target_folder_id)
         if not target_folder:
             raise EntityNotFound("Location for file {} not found".format(self.filename))
 
-        file_path = os.path.join(target_folder, self.relative_path, self.filename)
+        file_path = os.path.join(target_folder.path, self.relative_path, self.filename)
         SeismicDataModel.validate_path(file_path)
         return file_path
 

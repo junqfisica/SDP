@@ -63,6 +63,7 @@ def create_app(config_class=Config):
     from flaskapp.api import pre_production as seismic_data_blueprint
     from flaskapp.api import setting as setting_blueprint
     from flaskapp.api import fdsn as fdsn_blueprint
+    from flaskapp.api import data as data_blueprint
     from flaskapp.main.index import main as main_blueprint
     from flaskapp.http_util.exceptions import errors
 
@@ -72,6 +73,7 @@ def create_app(config_class=Config):
     app.register_blueprint(seismic_data_blueprint, url_prefix='/api/preProduction')
     app.register_blueprint(setting_blueprint, url_prefix='/api/setting')
     app.register_blueprint(fdsn_blueprint, url_prefix='/api/fdsn')
+    app.register_blueprint(data_blueprint, url_prefix='/api/data')
 
     # redirect to Angular build.
     app.register_blueprint(main_blueprint)
@@ -79,7 +81,7 @@ def create_app(config_class=Config):
     # register error blueprint.
     app.register_blueprint(errors)
 
-    app_logger.info("Webservice started.")
+    app_logger.info("SDP server started.")
 
     return app
 

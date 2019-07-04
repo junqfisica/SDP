@@ -15,6 +15,7 @@ export class Channel {
     start_time: string;
     stop_time: string;
     equipments: Equipments[];
+    number_of_files: number;
 
     // setup instanceOf check that. Assumes that anything with these atributtes is a Channel.
     static [Symbol.hasInstance](obj: Channel) {

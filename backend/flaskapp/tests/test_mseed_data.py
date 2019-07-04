@@ -20,18 +20,16 @@ class TestMseed(TestCase):
         TestMseed.root_path = "/media/junqueira/DATA/Test_SDP_DATA/ROBO/200Hz"
         TestMseed.file_paths = []
         # TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830_1.pri0"))
-        TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830000000.pri0"))
+        #TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830000000.pri0"))
         # TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830010000.pri0"))
-        TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830130000.pri0"))
+        #TestMseed.file_paths.append(os.path.join(TestMseed.root_path, "exA2M130830130000.pri0"))
+        TestMseed.file_paths.append(os.path.join("/media/junqueira/DATA/Test_SDP_DATA", "mseed_from_app"))
 
     def test_read_mseed(self):
         st: Stream = read(TestMseed.file_paths.pop(0))
         for path in TestMseed.file_paths:
             st += read(path)
-        # st.print_gaps()
-        newst = st.split()
-        print(st.get_gaps())
-        print(newst.get_gaps())
+        print(st)
 
     def test_obspy_scanner(self):
         scanner = Scanner("MSEED")

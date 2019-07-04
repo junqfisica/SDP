@@ -189,6 +189,9 @@ class ChannelModel(db.Model, BaseModel):
         # add equipments
         dict_representation["equipments"] = [eqs.get_equipment().to_dict() for eqs in self.equipments]
 
+        # add info of how much data files are attach to it
+        dict_representation["number_of_files"] = self.number_of_files()
+
         return dict_representation
 
     def is_within_deltatime(self, start_time: datetime, stop_time: datetime):
@@ -272,6 +275,20 @@ class ChannelModel(db.Model, BaseModel):
                 self.add_equipment(equipment_id=eq.id)
         else:
             raise CreateEntityError("Channel must have 2 equipments. A datalogger and a sensor.")
+
+    def has_data(self):
+        data = self.seismic_data
+        if not data or len(data) == 0:
+            return False
+
+        return True
+
+    def number_of_files(self):
+        data = self.seismic_data
+        if not data:
+            return 0
+
+        return len(data)
 
     @classmethod
     def create_channel(cls, channel_dict: dict):

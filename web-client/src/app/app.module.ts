@@ -28,6 +28,7 @@ import { ApplicationParamService } from './services/setting/application-param.se
 import { NotificationService } from './services/notification/notification.service';
 import { FdsnService } from './services/fdsn/fdsn.service';
 import { PreProductionService } from './services/pre-production/pre-production.service';
+import { DataService } from './services/data/data.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -50,6 +51,7 @@ import { ChannelEditComponent } from './components/channel/channel-edit/channel-
 import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google-chart/wrap-tl-google-chart.component';
 import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
 import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
+import { DataListComponent } from './components/seismic-data/data-list/data-list.component';
 
 @NgModule({
   declarations: [
@@ -71,6 +73,7 @@ import { FilesListComponent } from './components/pre-production/files-list/files
     WrapTlGoogleChartComponent,
     UploadListComponent,
     FilesListComponent,
+    DataListComponent,
   ],
   imports: [
     BrowserModule,
@@ -100,6 +103,7 @@ import { FilesListComponent } from './components/pre-production/files-list/files
     ApplicationParamService,
     FdsnService,
     PreProductionService,
+    DataService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

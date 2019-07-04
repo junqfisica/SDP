@@ -55,6 +55,7 @@
         <th class="center">Start Date & Time (UTC)</th>
         <th class="center">Stop Date & Time (UTC)</th>
         <th class="center">Equipment Info</th>
+        <th class="center">Files</th>
         <th></th>
       </tr>
     </thead>
@@ -78,6 +79,11 @@
             [popover]="popEqInfoTemplate"> 
             <span class="fa fa-microchip icon-medium"></span>
           </button>
+        </td>
+        <td class="center">
+          <a routerLink="/fdsn/data/{{ch.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="{{ch.number_of_files}} files">
+            <span class="fa fa-folder-open icon-medium"></span>
+          </a>
         </td>
         <td>
           <div class="pull-right">

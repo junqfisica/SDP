@@ -98,6 +98,15 @@ export class ChannelForm {
             this.controls.stopTime.setValue(stopTime);
             this.controls.timepickerStop.setValue(stopTime);
             this.controls.timepickerStart.setValue(startTime);
+
+            this.disableFormFields(channel);
+        }
+    }
+
+    private disableFormFields(channel: Channel){
+        if (channel.number_of_files > 0) {
+            this.controls.datalogger.reset({ value: this.datalogger, disabled: true });
+            this.controls.sampleRate.reset({ value: channel.sample_rate, disabled: true });
         }
     }
 

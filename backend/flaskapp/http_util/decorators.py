@@ -185,11 +185,15 @@ def post_file():
 
 def secure(permission: str):
     """
-    Check if user has a given role/right. If not, raise :class:`PermissionDenied` exception witch
+    Check if user has a given role/right. If not, raises :class:`PermissionDenied` exception witch
     sends an unauthorized response to the client.
 
-    :param permission: The role/right to be checked. Use the class Role/Right from models to pass a secure value.
+    :param permission: The role/right to be checked. Use the Role/Right from models to pass a secure value.
+    :type permission: str
+
     :return: An unauthorized response to the client if the user don't have the right permission.
+
+    :raises PermissionDenied: Exception witch sends an unauthorized response to the client.
     """
     def app_decorator(func):
         @wraps(func)

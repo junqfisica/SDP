@@ -6,8 +6,9 @@ users = Blueprint('users', __name__)
 pre_production = Blueprint('pre_production', __name__)
 setting = Blueprint('setting', __name__)
 fdsn = Blueprint('fdsn', __name__)
+data = Blueprint('data', __name__)
 
 
 # import the controllers.
 from flaskapp.api import user_controller, login_controller, pre_production_controller, setting_controler, \
-    fdsn_controller
+    fdsn_controller, data_controller

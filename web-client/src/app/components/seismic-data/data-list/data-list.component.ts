@@ -1,0 +1,180 @@
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
+
+import { Observable } from 'rxjs';
+import { mergeMap, map } from 'rxjs/operators';
+
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal'
+import { PageChangedEvent } from 'ngx-bootstrap/pagination';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/';
+
+import { FdsnService } from '../../../services/fdsn/fdsn.service';
+import { DataService } from '../../../services/data/data.service';
+import { NotificationService } from '../../../services/notification/notification.service';
+
+import { DateUtil } from '../../../statics/date-util';
+
+import { Search } from '../../../model/model.search';
+import { ComponentUtils } from '../../component.utils';
+import { Channel } from '../../../model/model.channel';
+import { Station } from '../../../model/model.station';
+import { SeismicData } from '../../../model/model.seismic-data';
+
+@Component({
+  selector: 'app-data-list',
+  templateUrl: './data-list.component.html',
+  styleUrls: ['./data-list.component.css']
+})
+export class DataListComponent extends ComponentUtils implements OnInit {
+
+  channelId: string;
+  station: Station;
+  channel: Channel;
+  seismicData: SeismicData[] = [];
+  page = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  dataSource: Observable<SeismicData>;
+  searchValue: string;
+  typeaheadLoading: boolean;
+  isLoaddingPage = true;
+  isChannelInfoCollapsed = true;
+
+  constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
+    private modalService: BsModalService, private dataService: DataService) {
+    super(notificationService)
+    this.route.params.subscribe(
+      params => {          
+        if (params && params.channelId) {
+          this.fdsnService.getChannel(params.channelId).subscribe(
+            channel => {
+              this.channel = channel;
+              this.fetchStation(this.channel.station_id);
+              console.log(this.channel);
+              this.isLoaddingPage = false;
+              this.searchFiles();
+            },
+            error =>{
+              console.log(error);
+              this.notificationService.showErrorMessage(error.message);
+              this.isLoaddingPage = false;
+            }
+          );
+          this.channelId = params.channelId;
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+
+    // Search for stations
+    this.dataSource = Observable.create((observer: any) => {
+      // Runs on every search
+      observer.next(this.searchValue);
+    }).pipe(
+      mergeMap((term: string) => this.dataService.searchData(this.buildQueryParams(term))
+      .pipe(
+        // Map search result observable to result list.
+        map((data) => {
+          return data.result;
+        }))
+      )
+    );
+  }
+
+  ngOnInit() {
+  }
+
+  fetchStation(stationId: string){
+    this.fdsnService.getStation(stationId).subscribe(
+      station => {
+        this.station = station;
+      },
+      error =>{
+        console.log(error);
+        this.notificationService.showErrorMessage(error.message);
+      }
+    );
+  }
+
+  buildQueryParams(value="", orderBy="filename, start_time", searchBy = "channel_id, filename"): HttpParams {
+    if (searchBy !== 'id') {
+      value = this.channelId + "," + value;
+    }
+    
+    const searchParms = new Search(searchBy, value).searchParms
+    searchParms.orderBy = orderBy
+    searchParms.orderDesc = false;
+    searchParms.use_AND_Operator = true;
+    searchParms.mapColumnAndValue = true;
+    searchParms.page = this.page
+    searchParms.perPage = this.itemsPerPage
+
+    return new HttpParams({ fromObject: searchParms });
+  }
+
+  dateTimeToUTC(dateTime: string){
+    return DateUtil.convertUTCStringToDate(dateTime);
+  }
+
+  pageChanged(event: PageChangedEvent) {
+    this.page = event.page;
+    this.searchFiles();
+  }
+
+  itemsPerPageChanged(itemsPerPage: number) {
+    this.itemsPerPage = itemsPerPage;
+    this.page = 1;
+    this.searchFiles();
+  }
+
+  changeTypeaheadLoading(e: boolean): void {
+    this.typeaheadLoading = e;
+  }
+
+  typeaheadOnSelect(e: TypeaheadMatch): void {
+    this.searchFiles(e.item.id, "start_time", "id");
+  }
+
+  searchFiles(value="", orderBy="filename, start_time", searchBy = "channel_id, filename"){
+    
+    this.dataService.searchData(this.buildQueryParams(value, orderBy, searchBy)).subscribe(
+      data => {        
+        this.totalItems = data.total;
+        this.seismicData = data.result;
+        console.log(this.seismicData);
+      },
+      error => {
+        console.log(error);
+        this.notificationService.showErrorMessage(error.message)
+      }      
+    )
+  }
+
+  downloadFile(data: SeismicData){
+    this.dataService.downloadFile(data).subscribe(
+      file => {
+        if (file !== null) {
+          const blob = new Blob([file], { type: file.type});
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.setAttribute('style', 'display: none');
+          a.href = url;
+          a.download = data.filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a); // remove the element
+          window.URL.revokeObjectURL(url);
+        } else {
+          console.log('No images to download.');
+          this.notificationService.showWarningMessage("The file " + data.filename + " is not avaible.")
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+}

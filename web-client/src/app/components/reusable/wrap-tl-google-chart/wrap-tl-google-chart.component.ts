@@ -8,6 +8,7 @@ import { Station } from '../../../model/model.station';
 import { Channel } from '../../../model/model.channel';
 import { DateUtil } from '../../../statics/date-util';
 import { UploadFile } from '../../../model/model.upload-file';
+import { SeismicData } from '../../../model/model.seismic-data';
 
 @Component({
   selector: 'app-wrap-tl-google-chart',
@@ -18,7 +19,7 @@ export class WrapTlGoogleChartComponent implements OnInit {
 
   @Input() height: number;
   
-  @Input() set dataSet (value: Station[] | Channel[] | UploadFile[]) {
+  @Input() set dataSet (value: any) {
     this._dataSet = value;
     this.dataChanged();
   }
@@ -32,7 +33,7 @@ export class WrapTlGoogleChartComponent implements OnInit {
   
   
   isDataLoaded = false;
-  private _dataSet: Station[] | Channel[] | UploadFile[];
+  private _dataSet: any;
   private _chart: GoogleChartComponent
 
   @ViewChild('chart', { static: false }) set content(content: GoogleChartComponent) {
@@ -61,11 +62,11 @@ export class WrapTlGoogleChartComponent implements OnInit {
   ngOnInit() {
   }
 
-  get dataSet(): Station[] | Channel[] | UploadFile[] {
+  get dataSet(): any {
     return this._dataSet;
   }
 
-  loadChartData(dataSet :Station[] | Channel[] | UploadFile[]) {
+  loadChartData(dataSet :any) {
     
     this.isDataLoaded = false;
 
@@ -96,6 +97,11 @@ export class WrapTlGoogleChartComponent implements OnInit {
             [data.ch + " at " + startTime.toLocaleDateString() , 
               data.file_name, startTime, DateUtil.convertUTCStringToDate(data.end_time)]);
         
+        } else if (data instanceof SeismicData) {
+          const startTime = DateUtil.convertUTCStringToDate(data.start_time);          
+          dataTable.addRow(
+            ["File at " + startTime.toLocaleDateString() , 
+              data.filename, startTime, DateUtil.convertUTCStringToDate(data.stop_time)]);
         } else {
           console.error("Data must be instance of [Station, Channel, UploadFile].");
         }
