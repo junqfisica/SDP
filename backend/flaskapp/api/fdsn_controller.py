@@ -6,6 +6,7 @@ from flaskapp.http_util.decorators import secure, post, query_param, query
 from flaskapp.http_util.exceptions import EntityNotFound
 from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel, ChannelModel
 from flaskapp.structures.structures import Search, SearchResult
+from flaskapp.utils.date_utils import DateUtils
 
 
 @fdsn.route("/createNetwork", methods=["POST"])
@@ -214,10 +215,12 @@ def delete_channel(channel_id):
 
     deleted = channel.delete()
     if deleted:
-        app_logger.info("Station/Channel {}-{} - {} has been deleted".
-                        format(channel.get_station().name, channel.name, channel.start_time))
+        app_logger.info("Channel {}-{}-{} has been deleted".
+                        format(channel.get_station().name, channel.name,
+                               DateUtils.convert_datetime_to_utc(channel.start_time)))
     else:
-        app_logger.warning("Station/Channel {}-{} - {} could't be deleted.".
-                           format(channel.get_station().name, channel.name, channel.start_time))
+        app_logger.warning("Channel {}-{}-{} could't be deleted.".
+                           format(channel.get_station().name, channel.name,
+                                  DateUtils.convert_datetime_to_utc(channel.start_time)))
 
     return response.bool_to_response(deleted)

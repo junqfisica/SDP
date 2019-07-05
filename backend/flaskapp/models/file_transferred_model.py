@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from flask_login import current_user
+from sqlalchemy import event
 
 from flaskapp import db
 from flaskapp.models import BaseModel, TableNames
@@ -51,4 +52,14 @@ class FileTransferredModel(db.Model, BaseModel):
         self.status_id = status_id
         self.transferred_at = transferred_at
         self.save()
+
+
+# This event is called every time a FileTransferredModel instance is deleted.
+@event.listens_for(FileTransferredModel, 'after_delete')
+def receive_after_delete(mapper, connection, target: FileTransferredModel):
+    @event.listens_for(db.session, "after_flush", once=True)
+    def receive_after_flush(session, context):
+        session.add(FileTransferredModel(id=target.id, status_id=FileStatus.DELETED,
+                                         transferred_by=current_user.username,
+                                         transferred_at=datetime.utcnow()))
 

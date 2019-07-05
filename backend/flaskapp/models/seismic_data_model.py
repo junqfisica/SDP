@@ -1,7 +1,10 @@
 import os
 from datetime import datetime
+from typing import List
 
-from flaskapp import db, app_utils
+from sqlalchemy import event
+
+from flaskapp import db, app_utils, app_logger
 from flaskapp.http_util.exceptions import EntityNotFound, FileNotFound
 from flaskapp.models import BaseModel, TableNames, TargetFolderModel, RelationShip, FileTransferredModel, ChannelModel
 from flaskapp.structures.structures import UploadMseedFiles
@@ -41,7 +44,7 @@ class SeismicDataModel(db.Model, BaseModel):
         :return:
         """
         if not os.path.exists(path):
-            raise FileNotFound("The folder/file {} was not found at the server.".format(path))
+            raise FileNotFound("The dir or file {} was not found at the server.".format(path))
 
     def is_valid_upload_file(self, upload_file: UploadMseedFiles):
         """
@@ -71,6 +74,15 @@ class SeismicDataModel(db.Model, BaseModel):
                         DateUtils.convert_datetime_to_utc(ch.start_time))
         return True, ""
 
+    def delete_file(self):
+        """
+        This will delete the file at the storage area.
+
+        :return:
+        """
+        if os.path.isfile(self.file_path):
+            os.remove(self.file_path)
+
     @property
     def mseed_file(self):
         file = open(self.file_path, mode="rb")
@@ -87,8 +99,13 @@ class SeismicDataModel(db.Model, BaseModel):
         return file_path
 
     @property
-    def files(self):
-        files = [fd.file for fd in self.file_data]
+    def files(self) -> List[FileTransferredModel]:
+        """
+        Gets the list of :class:`FileTransferredModel`
+
+        :return: A list of FileTransferredModel
+        """
+        files = [fd.transferred_file for fd in self.file_data]
         return files
 
     def add_file_data(self, file_transferred_id: str):
@@ -145,5 +162,33 @@ class FileDataModel(db.Model, BaseModel):
             .format(self.data_id, self.file_id)
 
     @property
-    def file(self):
+    def transferred_file(self) -> FileTransferredModel:
         return FileTransferredModel.find_by_id(self.file_id)
+
+
+# Event handlers when FileDataModel and SeismicDataModel are deleted. This is useful when this
+# instances are deleted in cascade.
+
+# This event is called every time a FileDataModel instance is deleted.
+@event.listens_for(FileDataModel, 'after_delete')
+def receive_after_delete(mapper, connection, target: FileDataModel):
+    @event.listens_for(db.session, "after_flush", once=True)
+    def receive_after_flush(session, context):
+        ft: FileTransferredModel = FileTransferredModel.find_by_id(target.file_id)
+        # Must delete file transferred instance, because here is not possible to update.
+        # When deleted it will trigger its event after_delete.
+        if ft:
+            session.delete(ft)
+
+# This event is called every time a SeismicDataModel instance is deleted.
+@event.listens_for(SeismicDataModel, 'after_delete')
+def receive_after_delete(mapper, connection, target: SeismicDataModel):
+    try:
+        file_path = target.file_path
+        target.delete_file()
+        app_logger.info("File {} was deleted.".format(file_path))
+
+    except FileNotFound:
+        app_logger.info("File {} was already deleted.".format(target.filename))
+
+
