@@ -1,9 +1,11 @@
 import os
 import shutil
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
 import obspy
+from obspy import Stream
 # noinspection PyProtectedMember
 from obspy.io.mseed.core import _is_mseed
 from werkzeug.datastructures import FileStorage
@@ -31,6 +33,31 @@ def get_mseed_files(dir_path: str):
         return []
 
     return mseed_files
+
+
+def save_data_plot(mseed_file_path: str, image_name: str, size=(1000, 400)):
+    """
+    Save the wave format plot as a PNG image. The image will be saved at
+    the temporary directory.
+
+    :param mseed_file_path: The full path of the mseed file.
+
+    :param image_name: The name of the output image file, without extension.
+
+    :param size: (optional) A tuple for the image's size (x, y).
+
+    :return: The full path of the generated image. None, if the file is not a valid mseed format.
+    """
+    if _is_mseed(mseed_file_path):
+        st: Stream = obspy.read(mseed_file_path)
+        folder_path = tempfile.gettempdir()
+        image_path = os.path.join(folder_path, image_name + ".png")
+        if not os.path.exists(image_path):
+            st.plot(size=size, outfile=image_path)
+
+        return image_path
+
+    return None
 
 
 def construct_relative_destination_dir(upload_file: UploadMseedFiles):

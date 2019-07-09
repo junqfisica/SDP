@@ -19,4 +19,12 @@ export class DataService {
   downloadFile(seismicData: SeismicData):  Observable<Blob> {
     return this.http.post(ServerUrl.rootUrl + '/api/data/downloadFile', seismicData, {responseType: 'blob'});
   }
+
+  deleteData(seismicData: SeismicData): Observable<boolean> {
+    return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/data/deleteSeismicData/' + seismicData.id);
+  }
+
+  plotData(seismicData: SeismicData): Observable<Blob> {
+    return this.http.get(ServerUrl.rootUrl + '/api/data/plotData/' + seismicData.id, {responseType: 'blob'});
+  }
 }

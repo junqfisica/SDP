@@ -77,6 +77,8 @@
           <th>Filename</th>
           <th class="center">Start time</th>
           <th class="center">Stop Time</th>
+          <th class="center">Stored at</th>
+          <th class="center">Tranferred File Info</th>
           <th></th>
         </tr>
       </thead>
@@ -85,8 +87,23 @@
           <td class="fa fa-file-o icon-medium" > {{sd.filename}}</td>
           <td class="center">{{ dateTimeToUTC(sd.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
           <td class="center">{{ dateTimeToUTC(sd.stop_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
+          <td class="center">{{ sd.folder_path}}</td>
+          <td class="center">
+            <button type="button" class="btn btn-xs btn-default" title="click" placement="left"
+              [outsideClick]="true"
+              [popoverContext]="sd"
+              adaptivePosition="true"
+              containerClass="customClass"
+              popoverTitle="Associated transferred files"
+              [popover]="popOriginalFileTemplate"> 
+              <span class="fa fa-hdd-o icon-medium"></span>
+            </button>
+          </td>
           <td>
             <div class="pull-right">
+              <button (click)="openPlotModal(plotModalTemplate,sd)" class="btn btn-xs btn-default" title="plot">
+                <span class="fa fa-line-chart icon-medium"></span>
+              </button>
               <button (click)="downloadFile(sd)" class="btn btn-xs btn-default" title="download">
                 <span class="fa fa-download icon-medium"></span>
               </button>
@@ -110,16 +127,16 @@
 </ng-template>
     
 <!-- Modal temples -->
-<ng-template #deleteModalTemplate let-c="close" let-d="dismiss">
+<ng-template #deleteModalTemplate let-c="close" let-d="dismiss"  class="modal fade">
   <div class="modal-header">
-    <h4 class="modal-title">Delete folder at {{deleteDir?.path}}</h4>
+    <h4 class="modal-title">Delete file {{deleteData?.filename}}</h4>
   </div>
   <div class="modal-body">
     <p>Are you sure you want to delete this?</p>
-    <p style="color: red">*All files inside this folder will be removed!!</p>
+    <p style="color: red">*The mseed file will be removed from storage!!</p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="deleteDirFromModal()">Delete</button>
+    <button type="button" class="btn btn-outline-dark" (click)="deleteDataFromModal()">Delete</button>
     <button type="button" class="btn btn-outline-dark" (click)="closeDeleteModal()">Cancel</button>
   </div>
 </ng-template>
@@ -182,6 +199,49 @@
         </tr>
       </tbody>
     </table>
+  </div>
+</ng-template>
+
+<ng-template #popOriginalFileTemplate let-files="files">
+  <div class="table-responsive">
+    <table class="table table-dark table-bordered hover" id="infoTable" style="margin-bottom: 0%;">
+      <thead>
+        <tr>
+          <th>Filename</th>
+          <th class="center">Status</th>
+          <th class="center">Tansferred By</th>
+          <th class="center">Tansferred at</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let file of files">
+          <td>{{file.id}}</td>
+          <td class="center">{{file.status_id}}</td>
+          <td class="center">{{file.transferred_by}}</td>
+          <td class="center">{{file.transferred_at | date:'dd.MM.yyyy'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-template>
+
+<ng-template #plotModalTemplate let-c="close" let-d="dismiss"  class="modal fade">
+  <div class="modal-header">
+    <h4 class="modal-title">File {{plotSeismicData?.filename}}</h4>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="plotUrl == null" style="text-align: center">
+      <h5>Loading, please wait.</h5> 
+      <i class="fa fa-spinner fa-spin" style="font-size:300%"></i>
+    </div>
+    <div class="table-responsive center">
+      <a *ngIf="plotUrl != null" target="_blank">
+        <img [src]="plotUrl">
+      </a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="closePlotModal()">Close</button>
   </div>
 </ng-template>
   

@@ -89,3 +89,9 @@ table.table-dark>thead>tr {
     background-color: rgba(0, 0, 0, 1) !important;
     color: white !important;
 }
+
+/* Use this class to increase size of modals */
+.bs-xl {
+    max-width: 90% !important;
+    width: auto !important;
+}

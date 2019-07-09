@@ -89,12 +89,21 @@ class SeismicDataModel(db.Model, BaseModel):
         return file
 
     @property
-    def file_path(self):
+    def folder_path(self):
+        """
+        The folder location for this data.
+        :return: The folder location of this data.
+        """
         target_folder: TargetFolderModel = TargetFolderModel.find_by_id(self.target_folder_id)
         if not target_folder:
             raise EntityNotFound("Location for file {} not found".format(self.filename))
 
-        file_path = os.path.join(target_folder.path, self.relative_path, self.filename)
+        folder_path = os.path.join(target_folder.path, self.relative_path)
+        return folder_path
+
+    @property
+    def file_path(self):
+        file_path = os.path.join(self.folder_path, self.filename)
         SeismicDataModel.validate_path(file_path)
         return file_path
 
@@ -144,6 +153,9 @@ class SeismicDataModel(db.Model, BaseModel):
 
         # add file transferred
         dict_representation["files"] = [file.to_dict() for file in self.files]
+
+        # add file location
+        dict_representation["folder_path"] = self.folder_path
 
         return dict_representation
 

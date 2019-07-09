@@ -115,7 +115,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
     }
   }
 
-  deleteStationFromModal() {
+  deleteChannelFromModal() {
     
     this.fdsnService.deleteChannel(this.deleteChannel).subscribe(
       wasDeleted => {

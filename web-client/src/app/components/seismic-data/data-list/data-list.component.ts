@@ -1,6 +1,7 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { Observable } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
@@ -32,6 +33,10 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   station: Station;
   channel: Channel;
   seismicData: SeismicData[] = [];
+  deleteModalRef: BsModalRef | null;
+  plotModalRef: BsModalRef | null;
+  deleteData: SeismicData;
+  plotSeismicData: SeismicData;
   page = 1;
   itemsPerPage = 10;
   totalItems = 0;
@@ -40,9 +45,10 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   typeaheadLoading: boolean;
   isLoaddingPage = true;
   isChannelInfoCollapsed = true;
+  plotUrl: SafeUrl;
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
-    private modalService: BsModalService, private dataService: DataService) {
+    private modalService: BsModalService, private dataService: DataService, private sanitizer: DomSanitizer,) {
     super(notificationService)
     this.route.params.subscribe(
       params => {          
@@ -51,7 +57,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
             channel => {
               this.channel = channel;
               this.fetchStation(this.channel.station_id);
-              console.log(this.channel);
+              // console.log(this.channel);
               this.isLoaddingPage = false;
               this.searchFiles();
             },
@@ -105,12 +111,12 @@ export class DataListComponent extends ComponentUtils implements OnInit {
     }
     
     const searchParms = new Search(searchBy, value).searchParms
-    searchParms.orderBy = orderBy
+    searchParms.orderBy = orderBy;
     searchParms.orderDesc = false;
     searchParms.use_AND_Operator = true;
     searchParms.mapColumnAndValue = true;
-    searchParms.page = this.page
-    searchParms.perPage = this.itemsPerPage
+    searchParms.page = this.page;
+    searchParms.perPage = this.itemsPerPage;
 
     return new HttpParams({ fromObject: searchParms });
   }
@@ -144,13 +150,83 @@ export class DataListComponent extends ComponentUtils implements OnInit {
       data => {        
         this.totalItems = data.total;
         this.seismicData = data.result;
-        console.log(this.seismicData);
+        // console.log(this.seismicData);
       },
       error => {
         console.log(error);
         this.notificationService.showErrorMessage(error.message)
       }      
     )
+  }
+
+  openDeleteModal(template: TemplateRef<any>, data: SeismicData) {
+    this.deleteModalRef = this.modalService.show(template);
+    this.deleteData = data;
+  }
+
+  closeDeleteModal() {
+    this.deleteModalRef.hide();
+    this.deleteModalRef = null;
+  }
+
+  openPlotModal(template: TemplateRef<any>, data: SeismicData) {
+    this.plotModalRef = this.modalService.show(template, {class: 'modal-dialog bs-xl'});
+    this.plotSeismicData = data;
+    this.fetchImagePlotUrl(data);
+  }
+
+  closePlotModal() {
+    this.plotModalRef.hide();
+    this.plotModalRef = null;
+    this.plotUrl = null;
+  }
+
+  private removeChannelFromList() {
+    if (this.deleteData) {
+      const index = this.seismicData.indexOf(this.deleteData);
+      if (index > -1) {
+        this.seismicData.splice(index, 1);
+      }
+    }
+  }
+
+  deleteDataFromModal() {
+    
+    this.dataService.deleteData(this.deleteData).subscribe(
+      wasDeleted => {
+        if (wasDeleted) {
+          this.notificationService.showSuccessMessage("Seismic data " + this.deleteData.filename + " has been deleted.");
+          this.removeChannelFromList();
+        } else {
+          this.notificationService.showWarningMessage("Fail to delete Seismic data " + this.deleteData.filename + ".");
+        }
+        this.deleteData = null;
+        this.closeDeleteModal();
+      },
+      error => {
+        console.log(error);
+        this.notificationService.showErrorMessage(error.error.message);
+        this.closeDeleteModal();
+      }
+    )
+  }
+
+  private fetchImagePlotUrl(sd: SeismicData) {
+    if (sd != null) {
+      this.plotUrl = null;
+      this.dataService.plotData(sd).subscribe(
+        imageData => {
+          if (imageData) {
+            const url = this.sanitizer.bypassSecurityTrustUrl(URL.createObjectURL(imageData));
+            this.plotUrl =  url;
+          }
+        },
+        error => {
+          this.notificationService.showErrorMessage('Please repeat the request later, as the server is busy.');
+          console.log(error);
+        }
+      );
+    }
   }
 
   downloadFile(data: SeismicData){

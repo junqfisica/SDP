@@ -8,6 +8,7 @@ export class SeismicData {
     start_time: string;
     stop_time: string;
     channel_id: string;
+    folder_path: string;
     files: FileTransferred[];
 
     // setup instanceOf check that. Assumes that anything with these atributtes is a Channel.

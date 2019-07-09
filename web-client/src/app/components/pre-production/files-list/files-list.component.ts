@@ -51,8 +51,7 @@ export class FilesListComponent implements OnInit {
       files => {
         this.uploadFiles = files;
         this.totalItems = this.uploadFiles.length;
-        console.log(this.totalItems);
-        
+        // console.log(this.totalItems); 
         this.setShowFiles();
         this.isLoaddingPage = false;
       }, 
