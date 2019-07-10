@@ -7,6 +7,7 @@ from flaskapp.http_util.exceptions import EntityNotFound
 from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel, ChannelModel
 from flaskapp.structures.structures import Search, SearchResult
 from flaskapp.utils.date_utils import DateUtils
+from flaskapp.utils.mseed_utils import MseedMetadataHandler
 
 
 @fdsn.route("/createNetwork", methods=["POST"])
@@ -224,3 +225,16 @@ def delete_channel(channel_id):
                                   DateUtils.convert_datetime_to_utc(channel.start_time)))
 
     return response.bool_to_response(deleted)
+
+
+@fdsn.route("/getMetadata/<string:channel_id>", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+def get_metadata(channel_id):
+    channel: ChannelModel = ChannelModel.find_by_id(channel_id)
+    if not channel:
+        raise EntityNotFound("The channel id {} doesn't exist".format(channel_id))
+
+    mdh = MseedMetadataHandler(channel)
+    file_path = mdh.save_metadata()
+
+    return response.file_to_response(file_path, delete_after=True)

@@ -7,10 +7,13 @@ from pathlib import Path
 import obspy
 from obspy import Stream
 # noinspection PyProtectedMember
+from obspy.clients.nrl import NRL
+from obspy.core.inventory import Inventory, Network, Station, Channel, Site
 from obspy.io.mseed.core import _is_mseed
 from werkzeug.datastructures import FileStorage
 
-from flaskapp.models import FileTransferredModel, TargetFolderModel, ChannelModel, SeismicDataModel
+from flaskapp.models import FileTransferredModel, TargetFolderModel, ChannelModel, SeismicDataModel, StationModel, \
+    NetworkModel, EquipmentModel
 from flaskapp.models.file_transferred_model import FileStatus
 from flaskapp.structures.structures import PreUploadFiles, UploadMseedFiles, FileTransferResult
 from flaskapp.utils.date_utils import DateUtils
@@ -35,14 +38,12 @@ def get_mseed_files(dir_path: str):
     return mseed_files
 
 
-def save_data_plot(mseed_file_path: str, image_name: str, size=(1000, 400)):
+def save_data_plot(mseed_file_path: str, size=(1000, 400)):
     """
     Save the wave format plot as a PNG image. The image will be saved at
-    the temporary directory.
+    the temporary directory as a temp file.
 
     :param mseed_file_path: The full path of the mseed file.
-
-    :param image_name: The name of the output image file, without extension.
 
     :param size: (optional) A tuple for the image's size (x, y).
 
@@ -50,12 +51,10 @@ def save_data_plot(mseed_file_path: str, image_name: str, size=(1000, 400)):
     """
     if _is_mseed(mseed_file_path):
         st: Stream = obspy.read(mseed_file_path)
-        folder_path = tempfile.gettempdir()
-        image_path = os.path.join(folder_path, image_name + ".png")
-        if not os.path.exists(image_path):
-            st.plot(size=size, outfile=image_path)
+        file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+        st.plot(size=size, outfile=file.name)
 
-        return image_path
+        return file.name
 
     return None
 
@@ -354,3 +353,112 @@ class MseedDirManager:
                 results.append(result)
 
         return results
+
+
+class MseedMetadataHandler:
+
+    def __init__(self, ch: ChannelModel):
+        self.ch = ch
+        self.st: StationModel = self.ch.station
+        self.nw: NetworkModel = self.st.network
+
+        for eqs in self.ch.equipments:
+            eq: EquipmentModel = eqs.get_equipment()
+            if eq.type == "Datalogger":
+                self.datalogger = eq
+            elif eq.type == "Sensor":
+                self.sensor = eq
+
+        self.inv = self.__create_inventory()
+
+    def __create_inventory(self):
+        # We'll first create all the various objects. These strongly follow the
+        # hierarchy of StationXML files.
+        inv = Inventory(
+            # We'll add networks later.
+            networks=[],
+            # The source should be the id whoever create the file.
+            source="SDP-Potsdam")
+
+        net = Network(
+            # This is the network code according to the SEED standard.
+            code=self.nw.id,
+            # A list of stations. We'll add one later.
+            stations=[],
+            description=self.nw.description)
+
+        site = self.st.site if self.st.site else "Unknown"
+        sta = Station(
+            # This is the station code according to the SEED standard.
+            code=self.st.name,
+            latitude=self.st.latitude,
+            longitude=self.st.longitude,
+            elevation=self.st.elevation,
+            creation_date=obspy.UTCDateTime(self.st.creation_date),
+            end_date=obspy.UTCDateTime(self.st.removal_date) if self.st.removal_date else None,
+            geology=self.st.geology,
+            site=Site(name=site, country=self.st.country, region=self.st.province))
+
+        cha = Channel(
+            # This is the channel code according to the SEED standard.
+            code=self.ch.name,
+            # This is the location code according to the SEED standard.
+            location_code="",
+            # Note that these coordinates can differ from the station coordinates.
+            latitude=self.ch.latitude,
+            longitude=self.ch.longitude,
+            elevation=self.ch.elevation,
+            start_date=obspy.UTCDateTime(self.ch.start_time),
+            end_date=obspy.UTCDateTime(self.ch.stop_time),
+            depth=self.ch.depth,
+            data_logger=obspy.core.inventory.Equipment(type=self.datalogger.type,
+                                                       manufacturer=self.datalogger.manufactory,
+                                                       model=self.datalogger.name,
+                                                       description=self.datalogger.description),
+            sensor=obspy.core.inventory.Equipment(type=self.sensor.type,
+                                                  manufacturer=self.sensor.manufactory,
+                                                  model=self.sensor.name, description=self.sensor.description),
+            azimuth=0.0,  # TODO add azimuth to channel model.
+            dip=0.0,  # TODO add dip to channel model.
+            sample_rate=self.ch.sample_rate)
+
+        response = self.get_response_from_nrl()
+
+        # Now tie it all together.
+        cha.response = response
+        sta.channels.append(cha)
+        net.stations.append(sta)
+        inv.networks.append(net)
+
+        return inv
+
+    def get_response_from_nrl(self):
+        """
+        Uses Obspy NRL library to get the sensor extra information.
+
+        :return: A list of extra information.
+        """
+        nrl = NRL()
+        try:
+            if self.sensor.description:
+                sensor_keys = [self.sensor.manufactory, self.sensor.name, self.sensor.description]
+            else:
+                sensor_keys = [self.sensor.manufactory, self.sensor.name]
+            datalogger_keys = [self.datalogger.manufactory, self.datalogger.name, self.ch.gain,
+                               str(self.ch.sample_rate)]
+            response = nrl.get_response(sensor_keys=sensor_keys, datalogger_keys=datalogger_keys)
+            return response
+        except KeyError:
+            return None
+
+    def save_metadata(self):
+        """
+        Save the metadata associate with the given channel in a xml file. The file will be saved
+        as a temporary file.
+
+        :return: The file location of the temporary xml file.
+        """
+        file = tempfile.NamedTemporaryFile(suffix=".xml", delete=False)
+        self.inv.write(file.name, format="STATIONXML", validate=True)
+        return file.name
+

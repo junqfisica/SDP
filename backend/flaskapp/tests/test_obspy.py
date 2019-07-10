@@ -24,3 +24,17 @@ class TestObspyUtils(TestCase):
             sensor_names.extend(list(mfk.keys()))
 
         print(sensor_names)
+
+    def test_response(self):
+        nrl = NRL()
+        description = None
+        try:
+            if description:
+                sensor_keys = ["Lennartz", "LE-3D/5s", description]
+            else:
+                sensor_keys = ["Lennartz", "LE-3D/5s"]
+            datalogger_keys = ["DiGOS/Omnirecs", "DATACUBE", "1", "400"]
+            response = nrl.get_response(sensor_keys=sensor_keys, datalogger_keys=datalogger_keys)
+            print(response)
+        except KeyError:
+            print(None)

@@ -48,10 +48,13 @@
       </div>
     </div>
   </div>
-  <div style="margin-top: 2%">
+  <div class="center" style="margin-top: 1%">
+    <app-download-metadata [channel]=channel filename="{{station?.name}}-{{channel.name}}" [showIcon]="false"></app-download-metadata>
+  </div>
+  <div style="margin-top: 1%">
     <app-wrap-tl-google-chart [dataSet]="seismicData"></app-wrap-tl-google-chart>
   </div>
-  <div class="d-flex justify-content-start navbar" id="header">
+  <div class="d-flex navbar" id="header">
     <div class="form-inline">
       <input [(ngModel)]="searchValue"
         [typeahead]="dataSource"

@@ -52,6 +52,7 @@ import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google
 import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
 import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
 import { DataListComponent } from './components/seismic-data/data-list/data-list.component';
+import { DownloadMetadataComponent } from './components/reusable/download-metadata/download-metadata.component';
 
 @NgModule({
   declarations: [
@@ -74,6 +75,7 @@ import { DataListComponent } from './components/seismic-data/data-list/data-list
     UploadListComponent,
     FilesListComponent,
     DataListComponent,
+    DownloadMetadataComponent,
   ],
   imports: [
     BrowserModule,

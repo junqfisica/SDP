@@ -1,0 +1,17 @@
+<button *ngIf="_showIcon" (click)="getMetadata(loadingModalTemplate)" class="btn btn-xs btn-default" title="download metadata">
+  <span class="fa fa-file-code-o icon-medium"></span>
+</button>
+
+<button *ngIf="!_showIcon" (click)="getMetadata(loadingModalTemplate)" class="btn btn-dark" title="download metadata">
+  <span class="fa fa-file-code-o icon-medium"></span> Metadata 
+</button>
+
+
+<ng-template #loadingModalTemplate>
+  <div class="modal-body">
+    <div class="center">
+      <h5>Creating metadata, please wait</h5>
+      <i class="fa fa-spinner fa-spin icon-big"></i>
+    </div>
+  </div>
+</ng-template>

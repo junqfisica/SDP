@@ -244,7 +244,6 @@ export class DataListComponent extends ComponentUtils implements OnInit {
           document.body.removeChild(a); // remove the element
           window.URL.revokeObjectURL(url);
         } else {
-          console.log('No images to download.');
           this.notificationService.showWarningMessage("The file " + data.filename + " is not avaible.")
         }
       },

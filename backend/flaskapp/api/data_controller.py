@@ -44,7 +44,7 @@ def plot_data(data_id):
     if not sd:
         raise EntityNotFound("The file with id {} doesn't exist".format(data_id))
 
-    image_path = save_data_plot(sd.file_path, sd.filename)
+    image_path = save_data_plot(sd.file_path)
     if not image_path:
         ForbiddenFileFormat("The file {} is not a valid mseed file.".format(sd.filename))
 
