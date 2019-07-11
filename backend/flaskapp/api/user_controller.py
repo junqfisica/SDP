@@ -42,7 +42,7 @@ def get_roles():
 @users.route("/rights", methods=["GET"])
 @secure(Role.USER)
 def get_rights():
-    rights: List[RightModel] = RightModel.get_all(order_by=RightModel.label)
+    rights: List[RightModel] = RightModel.get_all(order_by=RightModel.right_id)
     if rights:
         return response.model_to_response(rights)
 

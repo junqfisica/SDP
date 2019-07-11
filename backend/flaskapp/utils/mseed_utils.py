@@ -378,7 +378,7 @@ class MseedMetadataHandler:
             # We'll add networks later.
             networks=[],
             # The source should be the id whoever create the file.
-            source="SDP-Potsdam")
+            source="University of Potsdam")
 
         net = Network(
             # This is the network code according to the SEED standard.
@@ -414,10 +414,13 @@ class MseedMetadataHandler:
             data_logger=obspy.core.inventory.Equipment(type=self.datalogger.type,
                                                        manufacturer=self.datalogger.manufactory,
                                                        model=self.datalogger.name,
+                                                       serial_number=self.ch.dl_no,
                                                        description=self.datalogger.description),
             sensor=obspy.core.inventory.Equipment(type=self.sensor.type,
                                                   manufacturer=self.sensor.manufactory,
-                                                  model=self.sensor.name, description=self.sensor.description),
+                                                  model=self.sensor.name,
+                                                  serial_number=self.ch.sensor_number,
+                                                  description=self.sensor.description),
             azimuth=0.0,  # TODO add azimuth to channel model.
             dip=0.0,  # TODO add dip to channel model.
             sample_rate=self.ch.sample_rate)

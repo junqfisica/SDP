@@ -69,12 +69,13 @@ export class DownloadMetadataComponent implements OnInit {
         } else {
           this.notificationService.showWarningMessage("Fail to get metadata, try it later.")
         }
+        this.closeLoadingModal();
       },
       error => {
         console.log(error);
       },
       () => {
-        this.closeLoadingModal();
+        // this.closeLoadingModal();
       }
     );
   }
