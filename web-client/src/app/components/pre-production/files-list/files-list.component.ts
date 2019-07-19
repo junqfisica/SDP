@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
@@ -7,7 +7,8 @@ import { PageChangedEvent } from 'ngx-bootstrap/pagination';
 import { PreProductionService } from '../../../services/pre-production/pre-production.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { UploadFile } from '../../../model/model.upload-file';
-import { FileUtil } from '../../../statics/file-util';
+import { ProgressEventComponent } from '../../reusable/progress-event/progress-event.component';
+import { AppUtil } from '../../../statics/app-util';
 
 
 @Component({
@@ -15,8 +16,13 @@ import { FileUtil } from '../../../statics/file-util';
   templateUrl: './files-list.component.html',
   styleUrls: ['./files-list.component.css']
 })
-export class FilesListComponent implements OnInit {
+export class FilesListComponent implements OnInit, AfterViewInit {
 
+  @ViewChild(ProgressEventComponent, {static: false})
+  private progressEvent: ProgressEventComponent;
+
+  private eventId = AppUtil.generateId();
+  
   dirPath: string;
   uploadFiles: UploadFile[] = [];
   showFiles: UploadFile[] = [];
@@ -43,11 +49,14 @@ export class FilesListComponent implements OnInit {
     );
   }
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngAfterViewInit() {
+    this.progressEvent.startListenProgress(this.eventId);
   }
 
-  fetchFiles(){
-    this.preProductionService.getFiles(this.dirPath).subscribe(
+  fetchFiles(){    
+    this.preProductionService.getFiles(this.dirPath, this.eventId).subscribe(
       files => {
         this.uploadFiles = files;
         this.totalItems = this.uploadFiles.length;

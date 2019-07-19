@@ -27,4 +27,5 @@ export class DataService {
   plotData(seismicData: SeismicData): Observable<Blob> {
     return this.http.get(ServerUrl.rootUrl + '/api/data/plotData/' + seismicData.id, {responseType: 'blob'});
   }
+
 }

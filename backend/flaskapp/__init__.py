@@ -64,6 +64,7 @@ def create_app(config_class=Config):
     from flaskapp.api import setting as setting_blueprint
     from flaskapp.api import fdsn as fdsn_blueprint
     from flaskapp.api import data as data_blueprint
+    from flaskapp.api import sse as sse_blueprint
     from flaskapp.main.index import main as main_blueprint
     from flaskapp.http_util.exceptions import errors
 
@@ -74,6 +75,7 @@ def create_app(config_class=Config):
     app.register_blueprint(setting_blueprint, url_prefix='/api/setting')
     app.register_blueprint(fdsn_blueprint, url_prefix='/api/fdsn')
     app.register_blueprint(data_blueprint, url_prefix='/api/data')
+    app.register_blueprint(sse_blueprint, url_prefix='/api/sse')
 
     # redirect to Angular build.
     app.register_blueprint(main_blueprint)

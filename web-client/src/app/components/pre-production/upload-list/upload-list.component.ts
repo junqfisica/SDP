@@ -20,6 +20,8 @@ import { Search } from '../../../model/model.search';
 import { Channel } from '../../../model/model.channel';
 import { DateUtil } from '../../../statics/date-util';
 import { FileTransferResult } from '../../../model/model.file-transfer-result';
+import { ProgressEventComponent } from '../../reusable/progress-event/progress-event.component';
+import { AppUtil } from 'src/app/statics/app-util';
 
 @Component({
   selector: 'app-upload-list',
@@ -39,6 +41,7 @@ export class UploadListComponent implements OnInit {
   showDirs:UploadDirStructure[];
   deleteDir: UploadDirStructure;
   selectedDir: UploadDirStructure;
+  progressEvent: ProgressEventComponent;
   transferStatusFilter: string = "";
 
   networks: Network[];
@@ -51,7 +54,7 @@ export class UploadListComponent implements OnInit {
   constructor(private preProductionService: PreProductionService, private notificationService: NotificationService, 
     private modalService: BsModalService, private fdsnService: FdsnService, private formBuilder: FormBuilder) { 
       preProductionService.scanUploadDir().subscribe(
-        dirStructure => {
+        dirStructure => {          
           this.dirs = dirStructure;
           this.totalItems = this.dirs.length;
           this.setShowDirs();
@@ -183,8 +186,9 @@ export class UploadListComponent implements OnInit {
     this.transferStatusModalTemplateRef = this.modalService.show(template, {class: 'modal-dialog modal-lg'});
   }
 
-  openTransferModal(template: TemplateRef<any>, dir: UploadDirStructure) {
+  openTransferModal(template: TemplateRef<any>, dir: UploadDirStructure, progressEvent: ProgressEventComponent) {
     this.selectedDir = dir;
+    this.progressEvent = progressEvent;
     this.transferModalTemplateRef = this.modalService.show(template, {class: 'modal-dialog modal-lg'});
   }
 
@@ -192,6 +196,7 @@ export class UploadListComponent implements OnInit {
     this.transferModalTemplateRef.hide();
     this.transferModalTemplateRef = null;
     this.selectedDir = null;
+    this.progressEvent = null;
   }
 
   closeDeleteModal() {
@@ -252,17 +257,17 @@ export class UploadListComponent implements OnInit {
     return "Ok";
   }
 
-  transferData(dir: UploadDirStructure){
+  transferData(dir: UploadDirStructure, progressEvent: ProgressEventComponent){
     // const path = FileUtil.formatPath(dir.path);
     dir.isTransfering = true;
-    dir.transferResults = undefined; // set transferResults to undefined. Avoid pass this structure to the server.
+    dir.progressId = AppUtil.generateId();
     dir.status = undefined; // set transferResults to undefined. Avoid pass this structure to the server.
     this.preProductionService.transferFolderData(dir).subscribe(
       results => {
-        dir.transferResults = results;
-        // console.log(results);
+        dir.transferResults = results.transferResults;
         dir.status = this.transferStatusOverview(dir.transferResults);
         dir.isTransfering = false;
+        progressEvent.setProgress(100);
       }, 
       error=>{
         console.log(error);
@@ -270,7 +275,8 @@ export class UploadListComponent implements OnInit {
         dir.isTransfering = false;
       }
     );
-
+    // Listen to progress.
+    progressEvent.startListenProgress(dir.progressId);
   }
 
   onSubmitTransfer(){
@@ -279,7 +285,7 @@ export class UploadListComponent implements OnInit {
     }
     const channelId = this.transferControl.channel.value.id;
     this.selectedDir.channel_id = channelId;
-    this.transferData(this.selectedDir);
+    this.transferData(this.selectedDir, this.progressEvent);
     this.closeTransferModal();
     
   }

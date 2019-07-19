@@ -18,8 +18,9 @@ export class PreProductionService {
     return this.http.get<UploadDirStructure[]>(ServerUrl.rootUrl + '/api/preProduction/scanUploadDir');
   }
 
-  getFiles(path: string): Observable<UploadFile[]> {
-    return this.http.get<UploadFile[]>(ServerUrl.rootUrl + '/api/preProduction/getFiles/' + path);
+  getFiles(path: string, progressId?: string): Observable<UploadFile[]> {
+    progressId = progressId === undefined || progressId === null ? "" : progressId
+    return this.http.get<UploadFile[]>(ServerUrl.rootUrl + '/api/preProduction/getFiles?dir_path=' + path + '&progress_id=' + progressId);
   }
 
   delete(path: string): Observable<boolean> {
@@ -30,8 +31,8 @@ export class PreProductionService {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/preProduction/deleteFile', file);
   }
 
-  transferFolderData(dir: UploadDirStructure): Observable<FileTransferResult[]> {
-    return this.http.post<FileTransferResult[]>(ServerUrl.rootUrl + '/api/preProduction/transferFolderData', dir);
+  transferFolderData(dir: UploadDirStructure): Observable<UploadDirStructure> {
+    return this.http.post<UploadDirStructure>(ServerUrl.rootUrl + '/api/preProduction/transferFolderData', dir);
   }
 
 }

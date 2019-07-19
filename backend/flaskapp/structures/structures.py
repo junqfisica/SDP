@@ -1,5 +1,5 @@
 import traceback
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 from flaskapp import app_logger
 from flaskapp.http_util.exceptions import AppException
@@ -169,6 +169,43 @@ class Location(AbstractStructure, NamedTuple):
             raise AppException(str(error))
 
 
+class FileTransferResult(AbstractStructure, NamedTuple):
+    """
+    Class that holds a structure to return the file transfer result.
+
+    Fields:
+        file_name: Expect a str. The file name.
+
+        status: Expect a str. The status of transference (Ok or Fail).
+
+        error: Expect a str. An error if it occur, i.e OSError.
+
+    """
+
+    file_name: str
+    status: str
+    error: str = None
+
+    def to_dict(self) -> dict:
+        """
+        Map this object to a dictionary.
+
+        :return: The dictionary representation of this object.
+        """
+        return self._asdict()
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def from_dict(cls, dictionary):
+        try:
+            new_d = validate_dictionary(cls, dictionary)
+            return cls(**new_d)
+
+        except Exception as error:
+            app_logger.error(traceback.format_exc())
+            raise AppException(str(error))
+
+
 class PreUploadFiles(AbstractStructure, NamedTuple):
     """
     Class that holds a structure to return the dir structure of the pre upload dir..
@@ -186,8 +223,10 @@ class PreUploadFiles(AbstractStructure, NamedTuple):
 
     path: str
     number_of_mseed_files: int
+    progressId: str = '0'
     isTransfering: bool = False
     channel_id: str = None
+    transferResults: List[FileTransferResult] = []
 
     def to_dict(self) -> dict:
         """
@@ -195,7 +234,12 @@ class PreUploadFiles(AbstractStructure, NamedTuple):
 
         :return: The dictionary representation of this object.
         """
-        return self._asdict()
+        puf_asdict = self._asdict()
+        puf_asdict["transferResults"] = [entity.to_dict() for entity in self.transferResults]
+        return puf_asdict
+
+    def set_file_transfer_results(self, status: List[FileTransferResult]):
+        self.transferResults.extend(status)
 
     # noinspection PyTypeChecker
     @classmethod
@@ -254,39 +298,3 @@ class UploadMseedFiles(AbstractStructure, NamedTuple):
             app_logger.error(traceback.format_exc())
             raise AppException(str(error))
 
-
-class FileTransferResult(AbstractStructure, NamedTuple):
-    """
-    Class that holds a structure to return the file transfer result.
-
-    Fields:
-        file_name: Expect a str. The file name.
-
-        status: Expect a str. The status of transference (Ok or Fail).
-
-        error: Expect a str. An error if it occur, i.e OSError.
-
-    """
-
-    file_name: str
-    status: str
-    error: str = None
-
-    def to_dict(self) -> dict:
-        """
-        Map this object to a dictionary.
-
-        :return: The dictionary representation of this object.
-        """
-        return self._asdict()
-
-    # noinspection PyTypeChecker
-    @classmethod
-    def from_dict(cls, dictionary):
-        try:
-            new_d = validate_dictionary(cls, dictionary)
-            return cls(**new_d)
-
-        except Exception as error:
-            app_logger.error(traceback.format_exc())
-            raise AppException(str(error))

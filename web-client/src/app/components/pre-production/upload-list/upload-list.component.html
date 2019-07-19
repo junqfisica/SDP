@@ -12,6 +12,7 @@
           <th>Folder (NW.ST.SR.CH)</th>
           <th class="center">Files</th>
           <th class="center">Transfer</th>
+          <th class="center">Progress</th>
           <th class="center">Transfer Info</th>
           <th></th>
         </tr>
@@ -26,20 +27,23 @@
             </a>
           </td>
           <td class="center">
-            <button  (click)="openTransferModal(transferModalTemplate, dir)" class="btn btn-xs btn-default" title="delete" 
+            <button  (click)="openTransferModal(transferModalTemplate, dir, progressEvent)" class="btn btn-xs btn-default" title="delete" 
               title="Transfer all files to database." [disabled]="dir.isTransfering">
               <span *ngIf="dir.isTransfering" class="fa fa-spinner fa-spin	icon-medium"></span>
-              <span *ngIf="!dir.isTransfering && !dir.transferResults" class="fa fa-database	icon-medium"></span>
+              <span *ngIf="!dir.isTransfering && !dir.status" class="fa fa-database	icon-medium"></span>
               <span *ngIf="!dir.isTransfering && dir.status === 'Ok'" class="fa fa-database	icon-medium icon-green"></span>
               <span *ngIf="!dir.isTransfering && dir.status === 'Warning'" class="fa fa-database icon-medium icon-yellow"></span>
               <span *ngIf="!dir.isTransfering && dir.status === 'Error'" class="fa fa-database	icon-medium icon-red"></span>
             </button>
           </td>
           <td class="center">
+            <app-progress-event #progressEvent></app-progress-event>
+          </td>
+          <td class="center">
             <button  (click)="openTransferStatusModal(TransferStatusModalTemplate, dir)" class="btn btn-xs btn-default" title="delete" 
               title="transfer status." [disabled]="dir.isTransfering || !dir.transferResults">
               <span *ngIf="dir.isTransfering" class="fa fa-spinner fa-spin	icon-medium"></span>
-              <span *ngIf="!dir.isTransfering && !dir.transferResults" class="fa fa-info	icon-medium"></span>
+              <span *ngIf="!dir.isTransfering && !dir.status" class="fa fa-info	icon-medium"></span>
               <span *ngIf="!dir.isTransfering && dir.status === 'Ok'" class="fa fa-info	icon-medium icon-green"></span>
               <span *ngIf="!dir.isTransfering && dir.status === 'Warning'" class="fa fa-info	icon-medium icon-yellow"></span>
               <span *ngIf="!dir.isTransfering && dir.status === 'Error'" class="fa fa-info	icon-medium icon-red"></span>

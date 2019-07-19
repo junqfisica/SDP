@@ -16,6 +16,7 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PopoverModule } from 'ngx-bootstrap/popover';
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 
 import { FileUploadModule } from 'ng2-file-upload';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
@@ -53,6 +54,7 @@ import { UploadListComponent } from './components/pre-production/upload-list/upl
 import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
 import { DataListComponent } from './components/seismic-data/data-list/data-list.component';
 import { DownloadMetadataComponent } from './components/reusable/download-metadata/download-metadata.component';
+import { ProgressEventComponent } from './components/reusable/progress-event/progress-event.component';
 
 @NgModule({
   declarations: [
@@ -76,6 +78,7 @@ import { DownloadMetadataComponent } from './components/reusable/download-metada
     FilesListComponent,
     DataListComponent,
     DownloadMetadataComponent,
+    ProgressEventComponent,
   ],
   imports: [
     BrowserModule,
@@ -95,6 +98,7 @@ import { DownloadMetadataComponent } from './components/reusable/download-metada
     BsDatepickerModule.forRoot(),
     PopoverModule.forRoot(),
     TimepickerModule.forRoot(),
+    ProgressbarModule.forRoot(),
     FileUploadModule,
     Ng2GoogleChartsModule
   ],

@@ -5,11 +5,12 @@ from werkzeug.datastructures import FileStorage
 
 from flaskapp.api import pre_production
 from flaskapp.http_util import response
-from flaskapp.http_util.decorators import secure, post_file, post
+from flaskapp.http_util.decorators import secure, post_file, post, query_param
 from flaskapp.http_util.exceptions import FileAlreadyExists, AppException
 from flaskapp.models import Right, AppParamsModel
 from flaskapp.structures.structures import UploadMseedFiles, PreUploadFiles
 from flaskapp.utils.mseed_utils import MseedFileManager, MseedDirManager
+from flaskapp.utils.progress_event import ProgressEvent
 
 ACCEPTED_FILES = ["mseed"]
 
@@ -67,18 +68,21 @@ def delete_file(upload_file: UploadMseedFiles):
     return response.bool_to_response(file_manager.delete())
 
 
-@pre_production.route("/getFiles/<string:dir_path>", methods=["GET"])
+@pre_production.route("/getFiles", methods=["GET"])
 @secure(Right.UPLOAD_DATA)
-def get_files(dir_path: str):
+@query_param("dir_path", "progress_id")
+def get_files(dir_path: str, progress_id: str):
+    progress_id = progress_id if progress_id != '' else '0'
     root_dir = AppParamsModel.get_upload_folder_path()
     relative_path = MseedDirManager.reconstruct_path(dir_path)
     dir_path = os.path.join(root_dir, relative_path)
-    try:
-        mdm = MseedDirManager(dir_path)
-        return response.model_to_response(mdm.get_files())
+    with ProgressEvent(progress_id) as pe:
+        try:
+            mdm = MseedDirManager(dir_path)
+            return response.model_to_response(mdm.get_files(pe))
 
-    except NotADirectoryError as error:
-        raise AppException(str(error))
+        except NotADirectoryError as error:
+            raise AppException(str(error))
 
 
 @pre_production.route("/transferFolderData", methods=["POST"])
@@ -87,10 +91,12 @@ def get_files(dir_path: str):
 def transfer_folder_data(dir_structure: PreUploadFiles):
     root_dir = AppParamsModel.get_upload_folder_path()
     dir_path = os.path.join(root_dir, dir_structure.path)
-    try:
-        mdm = MseedDirManager(dir_path)
-        result = mdm.transfer_all_to_storage(dir_structure.channel_id)
-        return response.model_to_response(result)
+    with ProgressEvent(dir_structure.progressId) as pe:
+        try:
+            mdm = MseedDirManager(dir_path)
+            result = mdm.transfer_all_to_storage(dir_structure.channel_id, pe)
+            dir_structure.set_file_transfer_results(result)
+            return response.model_to_response(dir_structure)
 
-    except (NotADirectoryError, OSError, TypeError) as error:
-        raise AppException(str(error))
+        except (NotADirectoryError, OSError, TypeError) as error:
+            raise AppException(str(error))

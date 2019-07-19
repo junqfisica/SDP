@@ -18,6 +18,7 @@ from flaskapp.models.file_transferred_model import FileStatus
 from flaskapp.structures.structures import PreUploadFiles, UploadMseedFiles, FileTransferResult
 from flaskapp.utils.date_utils import DateUtils
 from flaskapp.utils.locks_util import LockById
+from flaskapp.utils.progress_event import ProgressEvent
 
 
 def get_mseed_files(dir_path: str):
@@ -255,9 +256,11 @@ class MseedDirManager:
             else:
                 return False
 
-    def __get_files(self):
+    def __get_files(self, progress_event: ProgressEvent = None):
         mseed_files = get_mseed_files(self.dir_path)
         upload_files = []
+        count = 0
+        total = len(mseed_files)
         for mseed_file in mseed_files:
             file_path = os.path.join(self.dir_path, mseed_file)
             st = obspy.read(file_path)
@@ -267,16 +270,20 @@ class MseedDirManager:
             end_time = str(st[0].stats.get(ObspyStatsKeys.END_TIME))
             upload_file = UploadMseedFiles(file_path, mseed_file, ch, sr, start_time, end_time)
             upload_files.append(upload_file)
+            if progress_event:
+                count += 1
+                progress = count * 100. / total
+                progress_event.set_progress(progress)
 
         # sort files using start time!!
         upload_files.sort(key=lambda file:  DateUtils.convert_string_to_datetime(file.start_time))
         self.fix_info_file(len(mseed_files))
         return upload_files
 
-    def get_files(self):
+    def get_files(self, pe: ProgressEvent = None):
         # Lock this process. Only a user per time can perform this. Avoid overhead at the system.
         with LockById(self.dir_path):
-            return self.__get_files()
+            return self.__get_files(pe)
 
     def __make_destination_dir(self, upload_file: UploadMseedFiles):
         relative_path = construct_relative_destination_dir(upload_file)
@@ -341,16 +348,21 @@ class MseedDirManager:
 
         return result
 
-    def transfer_all_to_storage(self, channel_id: str):
+    def transfer_all_to_storage(self, channel_id: str, pe: ProgressEvent = None):
         channel = ChannelModel.find_by_id(channel_id)
         if not channel:
             raise TypeError("An valid channel id must be provide to transfer files")
         results = []
         with LockById(self.dir_path):
             files = self.__get_files()
+            count = 0
+            total = len(files)
             for file in files:
                 result = self.__transfer_file_to_storage(file, channel)
                 results.append(result)
+                count += 1
+                if pe:
+                    pe.set_progress(count * 100. / total)
 
         return results
 

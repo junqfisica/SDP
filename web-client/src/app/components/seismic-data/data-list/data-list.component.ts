@@ -48,7 +48,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   plotUrl: SafeUrl;
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
-    private modalService: BsModalService, private dataService: DataService, private sanitizer: DomSanitizer,) {
+    private modalService: BsModalService, private dataService: DataService, private sanitizer: DomSanitizer) {
     super(notificationService)
     this.route.params.subscribe(
       params => {          
@@ -90,8 +90,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
     );
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   fetchStation(stationId: string){
     this.fdsnService.getStation(stationId).subscribe(
