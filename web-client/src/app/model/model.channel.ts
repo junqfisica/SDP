@@ -8,6 +8,8 @@ export class Channel {
     longitude: number;
     elevation: number;
     depth: number;
+    azimuth: number;
+    dip: number;
     gain: string;
     sample_rate: number;
     dl_no: string;

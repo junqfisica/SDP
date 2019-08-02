@@ -4,6 +4,7 @@ from typing import List
 from flaskapp import db, app_utils
 from flaskapp.http_util.exceptions import CreateEntityError
 from flaskapp.models import BaseModel, TableNames, RelationShip, EquipmentModel
+from flaskapp.utils import file_utils
 from flaskapp.utils.date_utils import DateUtils
 
 
@@ -152,6 +153,8 @@ class ChannelModel(db.Model, BaseModel):
     longitude = db.Column(db.Float, nullable=False)
     elevation = db.Column(db.Float, nullable=False)
     depth = db.Column(db.Float, nullable=False)
+    azimuth = db.Column(db.Float, nullable=False, default=0.0)
+    dip = db.Column(db.Float, nullable=False, default=0.0)
     gain = db.Column(db.String(50), nullable=False)
     sample_rate = db.Column(db.Integer, nullable=False)
     dl_no = db.Column(db.String(16), nullable=False)
@@ -289,6 +292,17 @@ class ChannelModel(db.Model, BaseModel):
             return 0
 
         return len(data)
+
+    def make_tar_file(self):
+        """
+        Create a .tar file contain all mseed files that belong to this channel.
+
+        :return: The .tar file path.
+        """
+        file_paths = []
+        for sd in self.seismic_data:
+            file_paths.append(sd.file_path)
+        return file_utils.tar_files(file_paths)
 
     @classmethod
     def create_channel(cls, channel_dict: dict):

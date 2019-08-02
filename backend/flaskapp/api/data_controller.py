@@ -4,7 +4,7 @@ from flaskapp.api import data
 from flaskapp.http_util import response
 from flaskapp.http_util.decorators import secure, query, post
 from flaskapp.http_util.exceptions import EntityNotFound, ForbiddenFileFormat
-from flaskapp.models import SeismicDataModel, Right
+from flaskapp.models import SeismicDataModel, Right, ChannelModel
 from flaskapp.structures.structures import Search
 from flaskapp.utils.mseed_utils import save_data_plot
 
@@ -22,6 +22,16 @@ def search_data(search: Search):
 @post(class_to_map=SeismicDataModel)
 def download_file(sd: SeismicDataModel):
     return flask.send_file(sd.file_path, mimetype="mseed", attachment_filename=sd.filename)
+
+
+@data.route("/downloadFiles/<string:channel_id>", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+def download_files(channel_id):
+    ch: ChannelModel = ChannelModel.find_by_id(channel_id)
+    if not ch:
+        raise EntityNotFound("The channel with id {} doesn't exist".format(channel_id))
+    tar_filename = ch.make_tar_file()
+    return response.file_to_response(tar_filename, delete_after=True)
 
 
 @data.route("/deleteSeismicData/<string:data_id>", methods=["DELETE"])

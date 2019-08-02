@@ -6,9 +6,9 @@ from pathlib import Path
 
 import obspy
 from obspy import Stream
-# noinspection PyProtectedMember
 from obspy.clients.nrl import NRL
 from obspy.core.inventory import Inventory, Network, Station, Channel, Site
+# noinspection PyProtectedMember
 from obspy.io.mseed.core import _is_mseed
 from werkzeug.datastructures import FileStorage
 
@@ -54,6 +54,7 @@ def save_data_plot(mseed_file_path: str, size=(1000, 400)):
         st: Stream = obspy.read(mseed_file_path)
         file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         st.plot(size=size, outfile=file.name)
+        file.close()
 
         return file.name
 
@@ -433,8 +434,8 @@ class MseedMetadataHandler:
                                                   model=self.sensor.name,
                                                   serial_number=self.ch.sensor_number,
                                                   description=self.sensor.description),
-            azimuth=0.0,  # TODO add azimuth to channel model.
-            dip=0.0,  # TODO add dip to channel model.
+            azimuth=self.ch.azimuth,
+            dip=self.ch.dip,
             sample_rate=self.ch.sample_rate)
 
         response = self.get_response_from_nrl()
@@ -476,4 +477,3 @@ class MseedMetadataHandler:
         file = tempfile.NamedTemporaryFile(suffix=".xml", delete=False)
         self.inv.write(file.name, format="STATIONXML", validate=True)
         return file.name
-

@@ -78,9 +78,10 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   fetchNRLManufactures(instrumentType: string){
+    this.nrlManufactures = [];
     this.fdsnService.getNRLManufacturers(instrumentType).subscribe(
       manufactores => {
-        this.nrlManufactures = manufactores;                
+        this.nrlManufactures = manufactores;                        
       },
       error => {
         console.log(error);
@@ -90,6 +91,7 @@ export class FdsnCreateComponent implements OnInit {
   }
 
   fetchNRLInstruments(instrumentType: string, manufactore: string){
+    this.nrlInstruments = [];
     this.fdsnService.getNRLInstrument(instrumentType, manufactore).subscribe(
       instruments => {
         this.nrlInstruments = instruments;                
@@ -179,7 +181,6 @@ export class FdsnCreateComponent implements OnInit {
     this.fetchNRLManufactures(value);
     this.clearEquipmentNameAndManufacture();
     this.clearEquipDescription();
-    this.nrlInstruments = [];
   }
 
   onChangeEquipmentManufactory(type: string, manufactore: string) {

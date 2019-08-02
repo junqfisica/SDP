@@ -2,16 +2,16 @@ import { Component, OnInit, TemplateRef, Input } from '@angular/core';
 
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal'
 
-import { FdsnService } from '../../../services/fdsn/fdsn.service';
+import { DataService } from '../../../services/data/data.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { Channel } from '../../../model/model.channel';
 
 @Component({
-  selector: 'app-download-metadata',
-  templateUrl: './download-metadata.component.html',
-  styleUrls: ['./download-metadata.component.css']
+  selector: 'app-download-files',
+  templateUrl: './download-files.component.html',
+  styleUrls: ['./download-files.component.css']
 })
-export class DownloadMetadataComponent implements OnInit {
+export class DownloadFilesComponent implements OnInit {
 
   loadingModalRef: BsModalRef | null;
   _channel: Channel;
@@ -30,7 +30,7 @@ export class DownloadMetadataComponent implements OnInit {
     this._channel = value;
   }
 
-  constructor(private fdsnService: FdsnService, private notificationService: NotificationService, 
+  constructor(private dataService: DataService, private notificationService: NotificationService, 
     private modalService: BsModalService) {       
     }
 
@@ -50,10 +50,10 @@ export class DownloadMetadataComponent implements OnInit {
     }, 500)
   }
 
-  getMetadata(template: TemplateRef<any>){
+  downloadFiles(template: TemplateRef<any>){
     this.openLoadingModal(template);
   
-    this.fdsnService.getMetadata(this._channel).subscribe(
+    this.dataService.downloadFiles(this._channel).subscribe(
       file => {
         if (file !== null) {
           const blob = new Blob([file], { type: file.type});
@@ -61,20 +61,18 @@ export class DownloadMetadataComponent implements OnInit {
           const a = document.createElement('a');
           a.setAttribute('style', 'display: none');
           a.href = url;
-          a.download = this._filename + ".xml";
+          a.download = this._filename + ".tar";
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a); // remove the element
           window.URL.revokeObjectURL(url);
         } else {
-          this.notificationService.showWarningMessage("Fail to get metadata, try it later.")
+          this.notificationService.showWarningMessage("Fail to download files, try it later.")
         }
         this.closeLoadingModal();
       },
       error => {
-        this.closeLoadingModal();
         console.log(error);
-        this.notificationService.showErrorMessage(error.message)
       },
       () => {
         // this.closeLoadingModal();

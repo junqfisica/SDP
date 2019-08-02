@@ -218,6 +218,8 @@ create table SDP.T_CHANNELS
     LONGITUDE numeric not null,
     ELEVATION numeric not null,
     DEPTH numeric not null,
+    AZIMUTH numeric, not null,
+    DIP numeric, not null,
     GAIN varchar(50) not null,
     SAMPLE_RATE integer not null,
     DL_NO varchar(16) not null,
@@ -230,7 +232,7 @@ create table SDP.T_CHANNELS
 );
 grant all privileges on table SDP.T_CHANNELS to SDP;
 
-insert into SDP.T_CHANNELS values ('test1234','ghyWoC46','HHZ','-25.48','-64.39','607','0.6','1',100,'ARZ','GP12','2016/159','2017/098');
+insert into SDP.T_CHANNELS values ('test1234','ghyWoC46','HHZ','-25.48','-64.39','607','0.6','0.0','0.0''1',100,'ARZ','GP12','2016/159','2017/098');
 
 create table SDP.T_CHANNELS_EQUIPMENTS
 (

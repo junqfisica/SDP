@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angu
 
 import { ServerUrl } from '../../../statics/server-url';
 import { LocalStorage } from 'src/app/statics/local-storage';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-progress-event',

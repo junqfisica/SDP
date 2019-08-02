@@ -65,6 +65,28 @@
             <div class="invalid-feedback">*required.</div>
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label>Azimuth (Deg)</label>
+          <input type="number" min="0" max="360" class="form-control" formControlName="azimuth" 
+          [ngClass]="{ 'is-invalid': channelControl.azimuth.errors }">
+          <div *ngIf="channelControl.azimuth.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.azimuth.errors.required">*required.</div>
+            <div *ngIf="channelControl.azimuth.errors.min">It must be bigger than 0 degrees.</div>
+            <div *ngIf="channelControl.azimuth.errors.max">It must be smaller than 360 degrees.</div>
+          </div>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Dip (Deg)</label>
+          <input type="number" min="0" max="90" formControlName="dip" class="form-control" 
+              [ngClass]="{ 'is-invalid': channelControl.dip.errors }">
+          <div *ngIf="channelControl.dip.errors" class="invalid-feedback">
+            <div *ngIf="channelControl.dip.errors.required">*required.</div>
+            <div *ngIf="channelControl.dip.errors.min">It must be bigger than 0 degrees.</div>
+            <div *ngIf="channelControl.dip.errors.max">It must be smaller than 90 degrees.</div>
+          </div>
+        </div>
+      </div>
       <div class="form-row ">
         <div class="form-group col-md-3">
           <label>Start time 

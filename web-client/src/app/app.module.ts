@@ -55,6 +55,7 @@ import { FilesListComponent } from './components/pre-production/files-list/files
 import { DataListComponent } from './components/seismic-data/data-list/data-list.component';
 import { DownloadMetadataComponent } from './components/reusable/download-metadata/download-metadata.component';
 import { ProgressEventComponent } from './components/reusable/progress-event/progress-event.component';
+import { DownloadFilesComponent } from './components/reusable/download-files/download-files.component';
 
 @NgModule({
   declarations: [
@@ -79,6 +80,7 @@ import { ProgressEventComponent } from './components/reusable/progress-event/pro
     DataListComponent,
     DownloadMetadataComponent,
     ProgressEventComponent,
+    DownloadFilesComponent,
   ],
   imports: [
     BrowserModule,

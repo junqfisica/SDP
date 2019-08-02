@@ -25,6 +25,8 @@ export class ChannelForm {
                 Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
             elevation: [currentStation.elevation, {validators: [Validators.required], updateOn: 'change'}],
             depth: [currentStation.depth, {validators: [Validators.required], updateOn: 'change'}],
+            azimuth: ['', {validators: [Validators.required, Validators.min(0), Validators.max(360)], updateOn: 'change'}],
+            dip: ['', {validators: [Validators.required, Validators.min(0), Validators.max(90)], updateOn: 'change'}],
             datalogger:['', {validators: [Validators.required], updateOn: 'change'}],
             sensor:['', {validators: [Validators.required], updateOn: 'change'}],
             gain: ['', {validators: [Validators.required], updateOn: 'change'}],
@@ -88,6 +90,8 @@ export class ChannelForm {
             this.controls.longitude.setValue(channel.longitude);
             this.controls.elevation.setValue(channel.elevation);
             this.controls.depth.setValue(channel.depth);
+            this.controls.azimuth.setValue(channel.azimuth);
+            this.controls.dip.setValue(channel.dip);
             this.controls.datalogger.setValue(this.datalogger);
             this.controls.sensor.setValue(this.sensor);
             this.controls.gain.setValue(channel.gain);
@@ -119,6 +123,8 @@ export class ChannelForm {
         channel.longitude = this.controls.longitude.value;
         channel.elevation = this.controls.elevation.value;
         channel.depth = this.controls.depth.value;
+        channel.azimuth = this.controls.azimuth.value;
+        channel.dip = this.controls.dip.value;
         channel.start_time = DateUtil.convertDateToUTCStringWithoutShift(this.controls.startTime.value);
         channel.stop_time = DateUtil.convertDateToUTCStringWithoutShift(this.controls.stopTime.value);
         channel.equipments = []

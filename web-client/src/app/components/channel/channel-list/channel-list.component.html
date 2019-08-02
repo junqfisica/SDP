@@ -87,6 +87,7 @@
         </td>
         <td>
           <div class="pull-right">
+            <app-download-files [channel]=ch filename="{{station.name}}-{{ch.name}}"></app-download-files>
             <app-download-metadata [channel]=ch filename="{{station.name}}-{{ch.name}}"></app-download-metadata>
             <a routerLink="/fdsn/channel/edit/{{ch.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
               <span class="fa fa-pencil icon-medium"></span>

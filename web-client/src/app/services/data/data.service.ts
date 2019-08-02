@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { SearchResult } from '../../model/model.search-result';
 import { ServerUrl } from '../../statics/server-url';
 import { SeismicData } from '../../model/model.seismic-data';
+import { Channel } from '../../model/model.channel';
 
 @Injectable()
 export class DataService {
@@ -26,6 +27,10 @@ export class DataService {
 
   plotData(seismicData: SeismicData): Observable<Blob> {
     return this.http.get(ServerUrl.rootUrl + '/api/data/plotData/' + seismicData.id, {responseType: 'blob'});
+  }
+
+  downloadFiles(ch: Channel): Observable<Blob> {
+    return this.http.get(ServerUrl.rootUrl + '/api/data/downloadFiles/' + ch.id, {responseType: 'blob'});
   }
 
 }

@@ -73,10 +73,10 @@ def delete_file(upload_file: UploadMseedFiles):
 @query_param("dir_path", "progress_id")
 def get_files(dir_path: str, progress_id: str):
     progress_id = progress_id if progress_id != '' else '0'
-    root_dir = AppParamsModel.get_upload_folder_path()
-    relative_path = MseedDirManager.reconstruct_path(dir_path)
-    dir_path = os.path.join(root_dir, relative_path)
     with ProgressEvent(progress_id) as pe:
+        root_dir = AppParamsModel.get_upload_folder_path()
+        relative_path = MseedDirManager.reconstruct_path(dir_path)
+        dir_path = os.path.join(root_dir, relative_path)
         try:
             mdm = MseedDirManager(dir_path)
             return response.model_to_response(mdm.get_files(pe))

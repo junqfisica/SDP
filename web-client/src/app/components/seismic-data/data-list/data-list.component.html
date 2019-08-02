@@ -50,6 +50,7 @@
   </div>
   <div class="center" style="margin-top: 1%">
     <app-download-metadata [channel]=channel filename="{{station?.name}}-{{channel.name}}" [showIcon]="false"></app-download-metadata>
+    <app-download-files style="margin-left: 1%"  [channel]=channel filename="{{station?.name}}-{{channel.name}}" [showIcon]="false"></app-download-files>
   </div>
   <div style="margin-top: 1%">
     <app-wrap-tl-google-chart [dataSet]="seismicData"></app-wrap-tl-google-chart>
