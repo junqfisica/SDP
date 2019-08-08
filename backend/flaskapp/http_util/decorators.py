@@ -60,7 +60,7 @@ def query(class_to_map: AbstractStructure):
     return app_decorator
 
 
-def post(class_to_map = None, *post_parameters: str):
+def post(class_to_map=None, *post_parameters: str):
     """
     Get post data as a dictionary if no post parameter is given. Otherwise
     it will map the parameters from post to the decorate function.

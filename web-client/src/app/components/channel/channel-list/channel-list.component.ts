@@ -36,6 +36,9 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
   searchValue: string;
   typeaheadLoading: boolean;
   isLoaddingPage = true;
+  startTimeFilter: Date;
+  stopTimeFilter: Date;
+  bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
     private modalService: BsModalService) {
@@ -81,18 +84,38 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
   ngOnInit() {
   }
 
+  createDateTextQuery(startDate?: Date, stopDate?: Date) {
+    if (startDate && stopDate){
+      stopDate.setHours(23,59,59)
+      startDate.setHours(0,0,0)
+      return "stop_time <= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(stopDate) + "'" + " and start_time >= " + "'" + 
+      DateUtil.convertDateToUTCStringWithoutShift(startDate) + "'";
+    } else if (startDate) {
+      startDate.setHours(0,0,0)
+      return "start_time >= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(startDate) + "'";
+    } else if (stopDate) {
+      stopDate.setHours(23,59,59)
+      return "stop_time <= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(stopDate) + "'";
+    } else {
+      return null;
+    }
+
+  };
+
   buildQueryParams(value="", orderBy="name, start_time", searchBy = "station_id, name"): HttpParams {
     if (searchBy !== 'id') {
       value = this.stationId + "," + value;
     }
     const searchParms = new Search(searchBy, value).searchParms
-    searchParms.orderBy = orderBy
+    searchParms.orderBy = orderBy;
     searchParms.orderDesc = false;
     searchParms.use_AND_Operator = true;
     searchParms.mapColumnAndValue = true;
-    searchParms.page = this.page
-    searchParms.perPage = this.itemsPerPage
-
+    searchParms.page = this.page;
+    searchParms.perPage = this.itemsPerPage;
+    searchParms.TextualQuery = this.createDateTextQuery(this.startTimeFilter, this.stopTimeFilter);
+    console.log(searchParms.TextualQuery);
+    
     return new HttpParams({ fromObject: searchParms });
   }
 
@@ -164,7 +187,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
     this.fdsnService.searchChannels(this.buildQueryParams(value, orderBy, searchBy)).subscribe(
       data => {        
         this.totalItems = data.total;
-        this.channels = data.result;
+        this.channels = data.result;        
       },
       error => {
         console.log(error);

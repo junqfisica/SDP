@@ -7,7 +7,8 @@ export class Search {
       "page" : null,
       "perPage" : null,
       "mapColumnAndValue" : null,
-      "use_AND_Operator" : null 
+      "use_AND_Operator" : null,
+      "TextualQuery" : null
     };
   
     constructor(searchBy: string, value: string) {
@@ -18,5 +19,6 @@ export class Search {
       this.searchParms.perPage = 10
       this.searchParms.mapColumnAndValue = false
       this.searchParms.use_AND_Operator = false
-    }
+      this.searchParms.TextualQuery = null
+    };
 }

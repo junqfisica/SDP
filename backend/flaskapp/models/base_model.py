@@ -1,9 +1,9 @@
-from sqlalchemy import Column, or_, and_, inspect
+from sqlalchemy import Column, or_, and_, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from flaskapp import db, app_logger
-from flaskapp.structures.structures import Search, SearchResult
 from flaskapp.http_util.exceptions import AppException, EntityNotFound
+from flaskapp.structures.structures import Search, SearchResult
 
 
 class BaseModel:
@@ -184,6 +184,9 @@ class BaseModel:
             query = cls.query.filter(and_(*search_filters)).order_by(*order_by_list)
         else:
             query = cls.query.filter(or_(*search_filters)).order_by(*order_by_list)
+
+        if search.TextualQuery:
+            query = query.filter(text(search.TextualQuery)).order_by(*order_by_list)
 
         return query
 

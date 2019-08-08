@@ -17,6 +17,7 @@
 <div style="margin-top: 2%">
   <app-wrap-tl-google-chart [dataSet]="channels"></app-wrap-tl-google-chart>
 </div>
+
 <div class="d-flex justify-content-start navbar" id="header">
   <div>
     <a routerLink="/fdsn/create/channel/{{stationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Channels">
@@ -40,6 +41,12 @@
       <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
       <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
   </button>
+  <div style="margin-left: 1%" class="form-inline mr-sm-2">
+    <label class="mr-sm-2">Filter Date: </label>
+    <input type="text" [bsConfig]="bsConfig" class="form-control mr-sm-2" placeholder="Start date" bsDatepicker [(ngModel)]="startTimeFilter" />
+    <span>-</span>
+    <input type="text" [bsConfig]="bsConfig" class="form-control ml-sm-2" placeholder="Stop date" bsDatepicker [(ngModel)]="stopTimeFilter" />
+  </div>
 </div>
 
 <div class="table-responsive">
@@ -50,6 +57,8 @@
         <th class="center">Location (lat, long)</th>
         <th class="center">Elevation (m)</th>
         <th class="center">Depth (m)</th>
+        <th class="center">Azimuth</th>
+        <th class="center">Dip</th>
         <th class="center">Gain</th>
         <th class="center">Sample Rate</th>
         <th class="center">Start Date & Time (UTC)</th>
@@ -62,9 +71,11 @@
     <tbody>
       <tr *ngFor="let ch of channels">
         <td>{{ch.name}}</td>
-        <td class="center">{{ch.latitude}}, {{ch.longitude}}</td>
+        <td class="center">{{ch.latitude}} &#730;, {{ch.longitude}} &#730;</td>
         <td class="center">{{ch.elevation}}</td>
         <td class="center">{{ch.depth}}</td>
+        <td class="center">{{ch.azimuth}} &#730;</td>
+        <td class="center">{{ch.dip}} &#730;</td>
         <td class="center">{{ch.gain}}</td>
         <td class="center">{{ch.sample_rate}}</td>
         <td class="center">{{ dateTimeToUTC(ch.start_time) | date:'dd.MM.yyyy - HH:mm:ss'}}</td>
@@ -87,7 +98,7 @@
         </td>
         <td>
           <div class="pull-right">
-            <app-download-files [channel]=ch filename="{{station.name}}-{{ch.name}}"></app-download-files>
+            <app-download-files [data]=ch filename="{{station.name}}-{{ch.name}}"></app-download-files>
             <app-download-metadata [channel]=ch filename="{{station.name}}-{{ch.name}}"></app-download-metadata>
             <a routerLink="/fdsn/channel/edit/{{ch.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
               <span class="fa fa-pencil icon-medium"></span>

@@ -1,3 +1,5 @@
+from typing import List
+
 import flask
 
 from flaskapp.api import data
@@ -6,6 +8,7 @@ from flaskapp.http_util.decorators import secure, query, post
 from flaskapp.http_util.exceptions import EntityNotFound, ForbiddenFileFormat
 from flaskapp.models import SeismicDataModel, Right, ChannelModel
 from flaskapp.structures.structures import Search
+from flaskapp.utils import file_utils
 from flaskapp.utils.mseed_utils import save_data_plot
 
 
@@ -31,6 +34,16 @@ def download_files(channel_id):
     if not ch:
         raise EntityNotFound("The channel with id {} doesn't exist".format(channel_id))
     tar_filename = ch.make_tar_file()
+    return response.file_to_response(tar_filename, delete_after=True)
+
+
+@data.route("/downloadFileList", methods=["POST"])
+@secure(Right.EDIT_FDSN)
+@post()
+def download_file_list(sdl: List[dict]):
+    sd_list: [SeismicDataModel] = [SeismicDataModel.from_dict(d) for d in sdl]
+    file_paths = [sd.file_path for sd in sd_list]
+    tar_filename = file_utils.tar_files(file_paths)
     return response.file_to_response(tar_filename, delete_after=True)
 
 

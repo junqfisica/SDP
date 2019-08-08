@@ -16,6 +16,7 @@ import { FdsnService } from '../../../services/fdsn/fdsn.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { Search } from '../../../model/model.search';
 import { ComponentUtils } from '../../component.utils';
+import { DateUtil } from '../../../statics/date-util';
 
 
 @Component({
@@ -34,6 +35,9 @@ export class StationListComponent extends ComponentUtils implements OnInit {
   dataSource: Observable<Station>;
   searchValue: string;
   typeaheadLoading: boolean;
+  startTimeFilter: Date;
+  stopTimeFilter: Date;
+  bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private fdsnService: FdsnService, private notificationService: NotificationService, private modalService: BsModalService, 
     private router: Router) {
@@ -59,12 +63,30 @@ export class StationListComponent extends ComponentUtils implements OnInit {
   ngOnInit() {
   }
 
+  createDateTextQuery(startDate?: Date, stopDate?: Date) {
+    if (startDate && stopDate){
+      stopDate.setHours(23,59,59)
+      startDate.setHours(0,0,0)
+      return "removal_date <= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(stopDate) + "'" + " and creation_date >= " + "'" + 
+      DateUtil.convertDateToUTCStringWithoutShift(startDate) + "'";
+    } else if (startDate) {
+      startDate.setHours(0,0,0)
+      return "creation_date >= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(startDate) + "'";
+    } else if (stopDate) {
+      stopDate.setHours(23,59,59)
+      return "removal_date <= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(stopDate) + "'";
+    } else {
+      return null;
+    }
+  };
+
   buildQueryParams(searchBy="name", value="", orderBy=""): HttpParams {
     const searchParms = new Search(searchBy, value).searchParms;
     searchParms.orderBy = orderBy;
     searchParms.orderDesc = false;
     searchParms.page = this.page;
     searchParms.perPage = this.itemsPerPage;
+    searchParms.TextualQuery = this.createDateTextQuery(this.startTimeFilter, this.stopTimeFilter);
 
     return new HttpParams({ fromObject: searchParms });
   }

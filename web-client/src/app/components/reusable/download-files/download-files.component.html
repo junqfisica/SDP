@@ -1,10 +1,10 @@
 <button *ngIf="_showIcon" (click)="downloadFiles(loadingModalTemplate)" class="btn btn-xs btn-default" title="download files"
-  [disabled]="_channel.number_of_files === 0">
+  [disabled]="isDisable">
   <span class="fa fa-download icon-medium"></span>
 </button>
 
 <button *ngIf="!_showIcon" (click)="downloadFiles(loadingModalTemplate)" class="btn btn-dark" title="download files" 
-  [disabled]="_channel.number_of_files === 0">
+  [disabled]="isDisable">
   <span class="fa fa-download icon-medium"></span> Download Files 
 </button>
 

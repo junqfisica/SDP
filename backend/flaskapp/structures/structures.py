@@ -68,6 +68,8 @@ class Search(AbstractStructure, NamedTuple):
             If False: This will search for username = like(%admin%, %Sara%) and name = like(%admin%, %Sara%).
 
         Use_AND_Operator (default = False): Makes the search with AND instead of OR.
+
+        TextualQuery: Use a textual query, i.e: "id<1111"
     """
 
     SearchBy: str
@@ -78,6 +80,7 @@ class Search(AbstractStructure, NamedTuple):
     OrderDesc: bool = False
     MapColumnAndValue: bool = False
     Use_AND_Operator: bool = False
+    TextualQuery: str = None
 
     def to_dict(self):
         return self._asdict()

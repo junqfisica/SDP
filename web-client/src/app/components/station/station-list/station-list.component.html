@@ -26,6 +26,12 @@
       <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
       <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
   </button>
+  <div style="margin-left: 1%" class="form-inline mr-sm-2">
+    <label class="mr-sm-2">Filter Date: </label>
+    <input type="text" [bsConfig]="bsConfig" class="form-control mr-sm-2" placeholder="Start date" bsDatepicker [(ngModel)]="startTimeFilter" />
+    <span>-</span>
+    <input type="text" [bsConfig]="bsConfig" class="form-control ml-sm-2" placeholder="Stop date" bsDatepicker [(ngModel)]="stopTimeFilter" />
+  </div>
 </div>
 <div class="table-responsive">
   <table class="table table-striped table-hover table-condensed">

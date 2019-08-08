@@ -46,6 +46,11 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   isLoaddingPage = true;
   isChannelInfoCollapsed = true;
   plotUrl: SafeUrl;
+  startDateFilter: Date;
+  stopDateFilter: Date;
+  startTimeFilter: Date;
+  stopTimeFilter: Date;
+  bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
     private modalService: BsModalService, private dataService: DataService, private sanitizer: DomSanitizer) {
@@ -92,6 +97,44 @@ export class DataListComponent extends ComponentUtils implements OnInit {
 
   ngOnInit() {}
 
+  createDateTextQuery(startDate?: Date, stopDate?: Date) {
+    
+    let startHH = 0;
+    let startMM = 0;
+    let startSS = 0;
+    let stopHH = 23;
+    let stopMM = 59;
+    let stopSS = 59.999;
+
+    if (this.startTimeFilter) {
+      startHH = this.startTimeFilter.getHours();
+      startMM = this.startTimeFilter.getMinutes();
+      startSS = this.startTimeFilter.getSeconds();
+    }
+
+    if (this.stopTimeFilter) {
+      stopHH = this.stopTimeFilter.getHours();
+      stopMM = this.stopTimeFilter.getMinutes();
+      stopSS = this.stopTimeFilter.getSeconds() + 0.999;
+      
+    }  
+    
+    if (startDate && stopDate){
+      stopDate.setHours(stopHH,stopMM,stopSS, 999);
+      startDate.setHours(startHH,startMM,startSS);
+      return "stop_time <= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(stopDate, true) + "'" + " and start_time >= " + "'" + 
+      DateUtil.convertDateToUTCStringWithoutShift(startDate, true) + "'";
+    } else if (startDate) {
+      startDate.setHours(startHH,startMM,startSS);
+      return "start_time >= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(startDate, true) + "'";
+    } else if (stopDate) {
+      stopDate.setHours(stopHH,stopMM,stopSS);
+      return "stop_time <= " + "'" + DateUtil.convertDateToUTCStringWithoutShift(stopDate, true) + "'";
+    } else {
+      return null;
+    }
+  };
+
   fetchStation(stationId: string){
     this.fdsnService.getStation(stationId).subscribe(
       station => {
@@ -116,6 +159,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
     searchParms.mapColumnAndValue = true;
     searchParms.page = this.page;
     searchParms.perPage = this.itemsPerPage;
+    searchParms.TextualQuery = this.createDateTextQuery(this.startDateFilter, this.stopDateFilter);        
 
     return new HttpParams({ fromObject: searchParms });
   }
