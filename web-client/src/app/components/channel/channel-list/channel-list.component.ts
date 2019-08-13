@@ -114,7 +114,6 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
     searchParms.page = this.page;
     searchParms.perPage = this.itemsPerPage;
     searchParms.TextualQuery = this.createDateTextQuery(this.startTimeFilter, this.stopTimeFilter);
-    console.log(searchParms.TextualQuery);
     
     return new HttpParams({ fromObject: searchParms });
   }

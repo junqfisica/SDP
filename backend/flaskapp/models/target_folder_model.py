@@ -1,6 +1,7 @@
-from flaskapp import db
+from flaskapp import db, app_utils
 from flaskapp.http_util.exceptions import ActiveFolderNotFound
 from flaskapp.models import BaseModel, TableNames
+from flaskapp.utils import file_utils
 
 
 class TargetFolderModel(db.Model, BaseModel):
@@ -28,3 +29,45 @@ class TargetFolderModel(db.Model, BaseModel):
             raise ActiveFolderNotFound("There isn't an active target folder. Please, activate before proceed.")
 
         return active_folder
+
+    def to_dict(self):
+        """
+        Convert TargetFolder into a dictionary, this way we can convert it to a JSON response.
+
+        :return: A clean dictionary form of this model.
+        """
+        # convert columns to dict
+        dict_representation = super().to_dict()
+
+        # add extra keys
+        dict_representation['online'] = file_utils.is_dir_online(self.path)
+
+        return dict_representation
+
+    def deactivate(self):
+        self.active = False
+        self.save()
+
+    def activate(self):
+        self.active = True
+        self.save()
+
+    @classmethod
+    def save_target_folder(cls, target_folder):
+        try:
+            active_folder = cls.get_active_folder()
+        except ActiveFolderNotFound:
+            active_folder = None
+
+        if target_folder.id:
+            safe_tf: TargetFolderModel = cls.find_by_id(target_folder.id)
+            safe_tf << target_folder
+            safe_tf.save()
+        else:
+            target_folder.id = app_utils.generate_id(16)
+            target_folder.save()
+
+        if active_folder and active_folder.id != target_folder.id and target_folder.active:
+            active_folder.deactivate()
+
+        return target_folder

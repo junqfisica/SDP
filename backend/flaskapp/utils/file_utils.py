@@ -98,3 +98,17 @@ def archive_dir(dir_path: str, file_format: str, output_path: str = None):
         output_path = output_path.replace("." + file_ext, "")
     shutil.make_archive(output_path, format=file_format, root_dir=dir_path)
     return output_path
+
+
+def is_dir_online(dir_path: str):
+    """
+    Check is is dir and if exists.
+
+    :param dir_path: The directory full path.
+
+    :return: True if is a dir and exists, false otherwise.
+    """
+    if os.path.isdir(dir_path) and os.path.exists(dir_path):
+        return True
+    else:
+        return False

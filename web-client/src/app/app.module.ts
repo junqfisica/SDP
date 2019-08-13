@@ -25,7 +25,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { UserService } from './services/user/user.service';
 import { AuthService } from './services/auth/auth.service';
-import { ApplicationParamService } from './services/setting/application-param.service';
+import { SettingsService } from './services/setting/application-param.service';
 import { NotificationService } from './services/notification/notification.service';
 import { FdsnService } from './services/fdsn/fdsn.service';
 import { PreProductionService } from './services/pre-production/pre-production.service';
@@ -108,7 +108,7 @@ import { DownloadFilesComponent } from './components/reusable/download-files/dow
     AuthService,
     NotificationService,
     UserService,
-    ApplicationParamService,
+    SettingsService,
     FdsnService,
     PreProductionService,
     DataService,

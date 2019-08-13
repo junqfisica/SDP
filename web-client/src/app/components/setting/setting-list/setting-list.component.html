@@ -1,41 +1,106 @@
-<div class="page-header" style="margin: 1%">
+<div class="page-header text-shadow" style="margin: 1%">
   <h3><i class="fa fa-gear"> Settings</i></h3>
 </div>
-<div class="table-responsive">
-  <table class="table table-striped table-hover table-condensed">
-    <thead>
-      <tr>
-        <!-- <th><input type="checkbox" ng-click="toggleAllSearchItems()"></th> -->
-        <th>Description</th>
-        <th>Value</th>
-        <th>Status</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let param of applicationParams">
-        <td>{{param.label}}</td>
-        <td>{{param.param_value}}</td>
-        <td>
-          <div *ngIf="loadingStatus" 
-            class="fa fa-spinner fa-spin" title="loading">
-          </div>
-          <div *ngIf="!loadingStatus && isUploadFolderOnline" 
-            class="fa fa-check-square" title="Ok">
-          </div>
-          <div *ngIf="!loadingStatus && !isUploadFolderOnline" 
-            class="fa fa-exclamation-triangle error" title="Upload-Folder is not online.">
-          </div>
-        </td>
-        <td>
-          <div class="pull-right">
-            <a routerLink="editSetting/{{param.param_id}}" class="btn btn-xs btn-default" 
-              *ngIf="hasRole('ROLE_ADMIN')" title="Change">
-              <span class="fa fa-pencil"></span>
-            </a>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div>
+  <tabset>
+    <!-- Parameters-->
+    <tab heading id="tab1">
+      <ng-template tabHeading>
+        <span class="fa fa-th-list"> Parameters</span>
+      </ng-template>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover table-condensed">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Value</th>
+              <th class="center">Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let param of applicationParams">
+              <td>{{param.label}}</td>
+              <td>{{param.param_value}}</td>
+              <td class="center">
+                <div *ngIf="loadingStatus" 
+                  class="fa fa-spinner fa-spin" title="loading">
+                </div>
+                <div *ngIf="!loadingStatus && isUploadFolderOnline">
+                  <span class="fa fa-hdd-o icon-green icon-big text-shadow" title="Ok"></span>
+                </div>
+                <div *ngIf="!loadingStatus && !isUploadFolderOnline">
+                  <span class="fa fa-hdd-o icon-red icon-big text-shadow" title="Upload folder is offline."></span>
+                </div>
+              </td>
+              <td>
+                <div class="pull-right">
+                  <a routerLink="editSetting/{{param.param_id}}" class="btn btn-xs btn-default" 
+                    *ngIf="hasRole('ROLE_ADMIN')" title="Change">
+                    <span class="fa fa-pencil icon-medium text-shadow"></span>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </tab>
+    <!-- Storage-->
+    <tab heading>
+      <ng-template tabHeading>
+        <span class="fa fa-server"> Storage folder</span>
+      </ng-template>
+      <div id="table" class="table-editable">
+        <span class="table-add mb-3 mt-3 ml-2">
+          <button type="button" class="btn btn-default button-transparent" (click)="addTargetFolder()">
+            <span class="fa fa-plus icon-big icon-link text-shadow"></span>
+          </button>
+        </span>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover table-condensed">
+            <thead>
+              <tr>
+                <th>Full path</th>
+                <th class="center">Status</th>
+                <th class="center">Active</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let targetFolder of targetFolders">
+                <td contenteditable="true" (keyup)="changePathValue(targetFolder, $event)">{{targetFolder.path}}</td>
+                <td class="center">
+                  <div *ngIf="targetFolder.online">
+                    <span class="fa fa-hdd-o icon-green icon-big text-shadow" title="Ok"></span>
+                  </div>
+                  <div *ngIf="!targetFolder.online">
+                    <span class="fa fa-hdd-o icon-red icon-big text-shadow" title="Target folder is offline."></span>
+                  </div>
+                </td>
+                <td class="center">
+                  <button *ngIf="hasRole('ROLE_ADMIN')" type="button" class="btn btn-default button-transparent" (click)="changeActive(targetFolder)">
+                    <span *ngIf="targetFolder.active == true" class="fa fa-check-square icon-big text-shadow" title="Current target folder"></span>
+                    <span *ngIf="targetFolder.active !== true" class="fa fa-square-o icon-big text-shadow" title="Current target folder"></span>
+                  </button>
+                </td>
+                <td>
+                  <div class="pull-right">
+                    <button *ngIf="hasRole('ROLE_ADMIN')" type="button" class="btn btn-dark btn-rounded btn-shadow mr-2" 
+                     [disabled]="!(targetFolder.editPath || targetFolder.path)" (click)="saveTargetFolder(targetFolder)">
+                     <span class="fa fa-floppy-o"></span> Save 
+                    </button>
+                    <button *ngIf="hasRole('ROLE_ADMIN')" type="button" class="btn btn-danger btn-rounded btn-shadow" 
+                      (click)="removeTargetFolder(targetFolder)"> <span class="fa fa-close"></span> Remove 
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </tab>
+  </tabset>
 </div>

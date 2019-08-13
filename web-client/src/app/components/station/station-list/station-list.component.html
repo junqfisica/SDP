@@ -5,7 +5,7 @@
 <div class="d-flex justify-content-start navbar" id="header">
   <div>
     <a routerLink="/fdsn/create" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Stations">
-      <span class="fa fa-plus icon-big icon-link"></span>
+      <span class="fa fa-plus icon-big icon-link text-shadow"></span>
     </a>
   </div>
   <div class="form-inline">
@@ -61,7 +61,7 @@
         <td class="center">
           <a routerLink="/fdsn/channel/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
             title="channels {{station.channels.length}}">
-            <span class="fa fa-sitemap icon-medium"></span>
+            <span class="fa fa-sitemap icon-medium text-shadow"></span>
           </a>
         </td>
         <td class="center">
@@ -71,18 +71,18 @@
             adaptivePosition="true"
             popoverTitle="Location info"
             [popover]="popLocationTemplate">
-            <span *ngIf="station.public_data" class="fa fa-globe icon-medium icon-green" title="Public"></span>
-            <span *ngIf="!station.public_data" class="fa fa-globe icon-medium icon-red" title="Restrict"></span>
+            <span *ngIf="station.public_data" class="fa fa-globe icon-medium icon-green text-shadow" title="Public"></span>
+            <span *ngIf="!station.public_data" class="fa fa-globe icon-medium icon-red text-shadow" title="Restrict"></span>
           </button>
         </td>
         <td>
           <div class="pull-right">
             <a routerLink="edit/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" title="edit">
-              <span class="fa fa-pencil icon-medium"></span>
+              <span class="fa fa-pencil icon-medium text-shadow"></span>
             </a>
             <button (click)="openDeleteModal(deleteModalTemplate, station)" class="btn btn-xs btn-default" 
               *ngIf="hasRight('RIGHT_FDSN_DELETE')" title="delete">
-              <span class="fa fa-trash-o icon-medium"></span>
+              <span class="fa fa-trash-o icon-medium text-shadow"></span>
             </button>
           </div>
         </td>

@@ -5,9 +5,10 @@ import { Observable } from 'rxjs';
 
 import { ServerUrl } from '../../statics/server-url';
 import { AppParams } from '../../model/model.app-param';
+import { TargetFolder } from '../../model/model.target-folder';
 
 @Injectable()
-export class ApplicationParamService {
+export class SettingsService {
 
   constructor(private http: HttpClient) { }
 
@@ -26,5 +27,17 @@ export class ApplicationParamService {
   isUploadFolderOnline(): Observable<boolean> {
     const uploadFolderId = "uploadFolder"
     return this.http.get<boolean>(ServerUrl.rootUrl + '/api/setting/isFolderOnline?param_id=' + uploadFolderId);
+  }
+
+  getTargetFolders(): Observable<TargetFolder[]> {
+    return this.http.get<TargetFolder[]>(ServerUrl.rootUrl + '/api/setting/getTargetFolders');
+  }
+
+  saveTargetFolder(targetFolder: TargetFolder): Observable<TargetFolder> {
+    return this.http.post<TargetFolder>(ServerUrl.rootUrl + '/api/setting/saveTargetFolder', targetFolder);
+  }
+
+  deleteTargetFolder(targetFolder: TargetFolder): Observable<boolean> {
+    return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/setting/deleteTargetFolder/' + targetFolder.id);
   }
 }

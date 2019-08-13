@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { ApplicationParamService } from '../../../services/setting/application-param.service';
+import { SettingsService } from '../../../services/setting/application-param.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { AppParams } from '../../../model/model.app-param';
 
@@ -15,11 +15,11 @@ export class ApplicationParamEditComponent implements OnInit {
   param: AppParams = new AppParams();
 
   constructor(private route: ActivatedRoute, private notificationService: NotificationService, 
-    private applicationParamService: ApplicationParamService) { 
+    private settingsService: SettingsService) { 
       this.route.params.subscribe(
         params => {
           if (params && params.id) {
-            this.applicationParamService.get(params.id).subscribe(
+            this.settingsService.get(params.id).subscribe(
               data => {
                 this.param = data
               },
@@ -47,7 +47,7 @@ export class ApplicationParamEditComponent implements OnInit {
 
   updateApplicationParam(){
     if (this.isValidForm()) {
-      this.applicationParamService.updateAppParam(this.param).subscribe(
+      this.settingsService.updateAppParam(this.param).subscribe(
         wasUpdated => {
           if (wasUpdated) {
             this.notificationService.showSuccessMessage("Update succeed.")

@@ -55,19 +55,25 @@
   <div style="margin-top: 1%">
     <app-wrap-tl-google-chart [dataSet]="seismicData"></app-wrap-tl-google-chart>
   </div>
-  <div class="form-row ml-sm-2">
+  <div class="d-flex justify-content-start navbar" id="filter">
+    <button type="button" class="btn btn-dark fa fa-filter btn-shadow" (click)="isFilterCollapsed = !isFilterCollapsed"
+        [attr.aria-expanded]="!isFilterCollapsed" aria-controls="collapseEvent"> Date Filter 
+    </button>
+    <button type="button" class="btn btn-info fa fa-remove ml-sm-2 btn-shadow" (click)="clearFilter()"> Clear Filter</button>
+  </div>
+  <div id="collapseEvent" [isAnimated]="true" [collapse]="isFilterCollapsed">
+    <div class="form-row ml-sm-2">
       <div class="form-group col-md-2">
-        <label>Filter Date:</label>
         <input type="text" [bsConfig]="bsConfig" class="form-control mr-sm-2" placeholder="Start date" 
           bsDatepicker [(ngModel)]="startDateFilter" />
         <timepicker [(ngModel)]="startTimeFilter" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
       </div>
       <div class="form-group col-md-2">
-        <label>&nbsp;</label>
         <input type="text" [bsConfig]="bsConfig" class="form-control" placeholder="Stop date" bsDatepicker [(ngModel)]="stopDateFilter"/>
         <timepicker [(ngModel)]="stopTimeFilter" [showSeconds]="true" [showMeridian]="false" [minuteStep]="1"></timepicker>
       </div>
     </div>
+  </div>
   <div class="d-flex justify-content-start navbar" id="header">
     <div class="form-inline">
       <input [(ngModel)]="searchValue"
@@ -113,20 +119,20 @@
               containerClass="customClass"
               popoverTitle="Associated transferred files"
               [popover]="popOriginalFileTemplate"> 
-              <span class="fa fa-hdd-o icon-medium"></span>
+              <span class="fa fa-hdd-o icon-medium text-shadow"></span>
             </button>
           </td>
           <td>
             <div class="pull-right">
               <button (click)="openPlotModal(plotModalTemplate,sd)" class="btn btn-xs btn-default" title="plot">
-                <span class="fa fa-line-chart icon-medium"></span>
+                <span class="fa fa-line-chart icon-medium text-shadow"></span>
               </button>
               <button (click)="downloadFile(sd)" class="btn btn-xs btn-default" title="download">
-                <span class="fa fa-download icon-medium"></span>
+                <span class="fa fa-download icon-medium text-shadow"></span>
               </button>
               <button *ngIf="hasRight('RIGHT_FDSN_DELETE')" (click)="openDeleteModal(deleteModalTemplate, sd)" class="btn btn-xs btn-default" 
                 title="delete">
-                <span class="fa fa-trash-o icon-medium"></span>
+                <span class="fa fa-trash-o icon-medium text-shadow"></span>
               </button>
             </div>
           </td>

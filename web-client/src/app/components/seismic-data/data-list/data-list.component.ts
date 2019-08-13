@@ -50,6 +50,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   stopDateFilter: Date;
   startTimeFilter: Date;
   stopTimeFilter: Date;
+  isFilterCollapsed = true;
   bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
@@ -294,5 +295,12 @@ export class DataListComponent extends ComponentUtils implements OnInit {
         console.log(error);
       }
     );
+  }
+
+  clearFilter(): void {
+    this.startTimeFilter = null;
+    this.stopTimeFilter = null;
+    this.startDateFilter = null;
+    this.stopDateFilter = null;
   }
 }
