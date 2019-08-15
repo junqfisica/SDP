@@ -56,6 +56,7 @@ import { DataListComponent } from './components/seismic-data/data-list/data-list
 import { DownloadMetadataComponent } from './components/reusable/download-metadata/download-metadata.component';
 import { ProgressEventComponent } from './components/reusable/progress-event/progress-event.component';
 import { DownloadFilesComponent } from './components/reusable/download-files/download-files.component';
+import { NoCommaNumberPipe } from './pipes/number-pipe';
 
 @NgModule({
   declarations: [
@@ -81,6 +82,7 @@ import { DownloadFilesComponent } from './components/reusable/download-files/dow
     DownloadMetadataComponent,
     ProgressEventComponent,
     DownloadFilesComponent,
+    NoCommaNumberPipe,
   ],
   imports: [
     BrowserModule,

@@ -6,8 +6,9 @@ from sqlalchemy import event
 
 from flaskapp import db, app_utils, app_logger
 from flaskapp.http_util.exceptions import EntityNotFound, FileNotFound
-from flaskapp.models import BaseModel, TableNames, TargetFolderModel, RelationShip, FileTransferredModel, ChannelModel
-from flaskapp.structures.structures import UploadMseedFiles
+from flaskapp.models import BaseModel, TableNames, TargetFolderModel, RelationShip, FileTransferredModel, \
+    ChannelModel, StationModel
+from flaskapp.structures.structures import UploadMseedFiles, SearchResult
 from flaskapp.utils.date_utils import DateUtils
 
 
@@ -159,6 +160,58 @@ class SeismicDataModel(db.Model, BaseModel):
 
         return dict_representation
 
+    @classmethod
+    def join_search(cls, **kwargs):
+        """
+        Make a join search with Station and ChannelModel.
+
+         Possible keys are:
+            * network = (string) network name
+
+            * station = (string) station name
+
+            * channel = (string) channel name
+
+            * start_time = (string) start datetime
+
+            * stop_time = (string) stop datetime
+
+            * page = (int) The current page to return.
+
+            * per_page = (int) Number of items per page.
+
+        :param kwargs: Key words to use in the filter.
+
+        :return:  A SearchResult instance.
+        """
+        search_filters = []
+        for key in kwargs.keys():
+            if key == 'station':
+                search_filters.append(StationModel.name == kwargs[key])
+            elif key == 'network':
+                search_filters.append(StationModel.network_id == kwargs[key])
+            elif key == 'channel':
+                search_filters.append(ChannelModel.name == kwargs[key])
+            elif key == 'start_time':
+                search_filters.append(SeismicDataModel.start_time >= kwargs[key])
+            elif key == 'stop_time':
+                search_filters.append(SeismicDataModel.stop_time <= kwargs[key])
+
+        query = cls.query.join(ChannelModel, cls.channel_id == ChannelModel.id).\
+            join(StationModel, ChannelModel.station_id == StationModel.id)\
+            .filter(*search_filters).order_by(cls.start_time)
+
+        per_page = kwargs.get('per_page') if 'per_page' in kwargs else 1000
+        page = kwargs.get('page') if 'page' in kwargs else 1
+        page = query.paginate(per_page=per_page, page=page)
+
+        entities = page.items
+        total = page.total
+        if entities:
+            return SearchResult(entities, total)
+
+        return SearchResult([], 0)
+
 
 class FileDataModel(db.Model, BaseModel):
 
@@ -202,5 +255,3 @@ def receive_after_delete(mapper, connection, target: SeismicDataModel):
 
     except FileNotFound:
         app_logger.info("File {} was already deleted.".format(target.filename))
-
-

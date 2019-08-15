@@ -53,7 +53,7 @@
       </ng-template>
       <div id="table" class="table-editable">
         <span class="table-add mb-3 mt-3 ml-2">
-          <button type="button" class="btn btn-default button-transparent" (click)="addTargetFolder()">
+          <button type="button" class="btn btn-default button-transparent" (click)="addTargetFolder()" title="Add new storage">
             <span class="fa fa-plus icon-big icon-link text-shadow"></span>
           </button>
         </span>
@@ -63,7 +63,8 @@
               <tr>
                 <th>Full path</th>
                 <th class="center">Status</th>
-                <th class="center">Active</th>
+                <th class="center">Capacity</th>
+                <th class="center" title="The current storage folder">Active</th>
                 <th></th>
               </tr>
             </thead>
@@ -77,6 +78,9 @@
                   <div *ngIf="!targetFolder.online">
                     <span class="fa fa-hdd-o icon-red icon-big text-shadow" title="Target folder is offline."></span>
                   </div>
+                </td>
+                <td class="center" title="used/total">
+                  {{targetFolder.diskInfo[1] | number: '1.0-1' | noCommaNumber}} GB / {{targetFolder.diskInfo[0] | number: '1.0-0' | noCommaNumber}} GB
                 </td>
                 <td class="center">
                   <button *ngIf="hasRole('ROLE_ADMIN')" type="button" class="btn btn-default button-transparent" (click)="changeActive(targetFolder)">

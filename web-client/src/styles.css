@@ -94,6 +94,14 @@ table.table-dark>thead>tr {
     color: white !important;
 }
 
+.modal-body {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+}
+
+.shadow {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
+}
+
 .btn-shadow {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
 }
@@ -114,4 +122,18 @@ table.table-dark>thead>tr {
 
 .text-shadow:hover {
     text-shadow: 3px 4px rgba(0,0,0,.18);
+}
+
+tabset .nav-tabs .nav-link{
+    border: 1px solid #00000014;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+tabset a.nav-link{
+    color: #8c8c8c;
+}
+
+tabset a.nav-link.active{
+    color: #343a40 !important;
 }

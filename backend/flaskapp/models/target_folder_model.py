@@ -41,6 +41,7 @@ class TargetFolderModel(db.Model, BaseModel):
 
         # add extra keys
         dict_representation['online'] = file_utils.is_dir_online(self.path)
+        dict_representation['diskInfo'] = app_utils.get_disk_info(self.path)
 
         return dict_representation
 

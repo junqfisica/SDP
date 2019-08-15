@@ -148,11 +148,11 @@
     <p>Are you sure you want to delete this channel?</p>
     <p><strong>Start date: {{deleteChannel?.start_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}</strong></p>
     <p><strong>Stop date: {{deleteChannel?.stop_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}</strong></p>
-    <p style="color:red"><strong>All files belonging to this channel will also be deleted!!</strong></p>
+    <p style="color:red"><strong>All files from this channel will be also deleted!!</strong></p>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="deleteChannelFromModal()">Delete</button>
-    <button type="button" class="btn btn-outline-dark" (click)="closeDeleteModal()">Cancel</button>
+    <button type="button" class="btn btn-dark btn-shadow" (click)="deleteChannelFromModal()">Delete</button>
+    <button type="button" class="btn btn-danger btn-shadow" (click)="closeDeleteModal()">Cancel</button>
   </div>
 </ng-template>
 

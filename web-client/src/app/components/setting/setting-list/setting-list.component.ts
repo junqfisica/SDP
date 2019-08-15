@@ -45,6 +45,8 @@ export class SettingListComponent extends ComponentUtils implements OnInit {
     this.settingsService.getTargetFolders().subscribe(
       targetFolders => {
         this.targetFolders = targetFolders;
+        // console.log(this.targetFolders);
+        
       },
       error => {
         console.log(error);
@@ -61,6 +63,7 @@ export class SettingListComponent extends ComponentUtils implements OnInit {
       returnTargetFolder => {
         targetFolder.id = returnTargetFolder.id;
         targetFolder.online = returnTargetFolder.online;
+        targetFolder.diskInfo = returnTargetFolder.diskInfo;
         this.notificationService.showSuccessMessage("Saved");
       }, 
       error => {
@@ -87,6 +90,7 @@ export class SettingListComponent extends ComponentUtils implements OnInit {
     newTargetFolder.id = null;
     newTargetFolder.online = false;
     newTargetFolder.active = false;
+    newTargetFolder.diskInfo = [0,0,0]
     this.targetFolders.push(newTargetFolder);
   }
 
