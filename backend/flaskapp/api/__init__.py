@@ -8,8 +8,9 @@ setting = Blueprint('setting', __name__)
 fdsn = Blueprint('fdsn', __name__)
 data = Blueprint('data', __name__)
 sse = Blueprint('sse', __name__)
+public = Blueprint('public', __name__)
 
 
 # import the controllers.
 from flaskapp.api import user_controller, login_controller, pre_production_controller, setting_controler, \
-    fdsn_controller, data_controller, server_send_event
+    fdsn_controller, data_controller, server_send_event, public_controler

@@ -8,7 +8,7 @@ from flaskapp import db, app_utils, app_logger
 from flaskapp.http_util.exceptions import EntityNotFound, FileNotFound
 from flaskapp.models import BaseModel, TableNames, TargetFolderModel, RelationShip, FileTransferredModel, \
     ChannelModel, StationModel
-from flaskapp.structures.structures import UploadMseedFiles, SearchResult
+from flaskapp.structures.structures import UploadMseedFiles, SearchResult, SeismicDataSearch
 from flaskapp.utils.date_utils import DateUtils
 
 
@@ -84,10 +84,9 @@ class SeismicDataModel(db.Model, BaseModel):
         if os.path.isfile(self.file_path):
             os.remove(self.file_path)
 
-    @property
-    def mseed_file(self):
-        file = open(self.file_path, mode="rb")
-        return file
+    def is_public(self):
+        channel: ChannelModel = ChannelModel.find_by_id(self.channel_id)
+        return channel.get_station().public_data
 
     @property
     def folder_path(self):
@@ -158,52 +157,50 @@ class SeismicDataModel(db.Model, BaseModel):
         # add file location
         dict_representation["folder_path"] = self.folder_path
 
+        # add is public
+        dict_representation["is_public"] = self.is_public()
+
         return dict_representation
 
     @classmethod
-    def join_search(cls, **kwargs):
+    def join_search(cls, seismic_search: SeismicDataSearch):
         """
         Make a join search with Station and ChannelModel.
 
-         Possible keys are:
-            * network = (string) network name
-
-            * station = (string) station name
-
-            * channel = (string) channel name
-
-            * start_time = (string) start datetime
-
-            * stop_time = (string) stop datetime
-
-            * page = (int) The current page to return.
-
-            * per_page = (int) Number of items per page.
-
-        :param kwargs: Key words to use in the filter.
+        :param seismic_search: A SeismicDataSearch instance use in the search.
 
         :return:  A SearchResult instance.
         """
         search_filters = []
-        for key in kwargs.keys():
-            if key == 'station':
-                search_filters.append(StationModel.name == kwargs[key])
-            elif key == 'network':
-                search_filters.append(StationModel.network_id == kwargs[key])
-            elif key == 'channel':
-                search_filters.append(ChannelModel.name == kwargs[key])
-            elif key == 'start_time':
-                search_filters.append(SeismicDataModel.start_time >= kwargs[key])
-            elif key == 'stop_time':
-                search_filters.append(SeismicDataModel.stop_time <= kwargs[key])
+        if seismic_search.Station:
+            search_filters.append(StationModel.name == seismic_search.Station.upper().strip())
+
+        if seismic_search.Network:
+            search_filters.append(StationModel.network_id == seismic_search.Network.upper().strip())
+
+        if seismic_search.Channel:
+            search_filters.append(ChannelModel.name == seismic_search.Channel.upper().strip())
+
+        if seismic_search.StartTime:
+            # noinspection PyTypeChecker
+            search_filters.append(SeismicDataModel.start_time >= seismic_search.StartTime)
+
+        if seismic_search.StopTime:
+            # noinspection PyTypeChecker
+            search_filters.append(SeismicDataModel.stop_time <= seismic_search.StopTime)
+
+        if seismic_search.Filename:
+            search_filters.append(cls.filename.like('%{}%'.format(seismic_search.Filename.strip())))
+
+        # Need at least one filter, otherwise return empty result.
+        if not search_filters:
+            return SearchResult([], 0)
 
         query = cls.query.join(ChannelModel, cls.channel_id == ChannelModel.id).\
             join(StationModel, ChannelModel.station_id == StationModel.id)\
             .filter(*search_filters).order_by(cls.start_time)
 
-        per_page = kwargs.get('per_page') if 'per_page' in kwargs else 1000
-        page = kwargs.get('page') if 'page' in kwargs else 1
-        page = query.paginate(per_page=per_page, page=page)
+        page = query.paginate(per_page=seismic_search.PerPage, page=seismic_search.Page)
 
         entities = page.items
         total = page.total

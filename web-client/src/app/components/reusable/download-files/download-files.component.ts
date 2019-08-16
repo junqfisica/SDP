@@ -6,6 +6,7 @@ import { DataService } from '../../../services/data/data.service';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { Channel } from '../../../model/model.channel';
 import { SeismicData } from '../../../model/model.seismic-data';
+import { PublicService } from '../../../services/public/public.service';
 
 @Component({
   selector: 'app-download-files',
@@ -18,6 +19,7 @@ export class DownloadFilesComponent implements OnInit {
   _data: Channel | SeismicData[];
   _filename: string;
   _showIcon: boolean = true;
+  _usePublicApi: boolean = false;
   isDisable = false;
 
   @Input() set showIcon (value: boolean) {   
@@ -26,6 +28,10 @@ export class DownloadFilesComponent implements OnInit {
 
   @Input() set filename (value: string) {
     this._filename = value;
+  }
+
+  @Input() set usePublicApi (value: boolean) {   
+    this._usePublicApi = value;
   }
 
   @Input() set data (value: Channel | SeismicData[]) {
@@ -45,7 +51,7 @@ export class DownloadFilesComponent implements OnInit {
   }
 
   constructor(private dataService: DataService, private notificationService: NotificationService, 
-    private modalService: BsModalService) {       
+    private modalService: BsModalService, private publicService: PublicService) {       
   }
 
   ngOnInit() {
@@ -96,7 +102,8 @@ export class DownloadFilesComponent implements OnInit {
         }
       );
     } else if (this._data instanceof Array){
-      this.dataService.downloadFileList(this._data).subscribe(
+      const service = this._usePublicApi ? this.publicService : this.dataService;
+      service.downloadFileList(this._data).subscribe(
         file => {
           this.openFile(file);
         },

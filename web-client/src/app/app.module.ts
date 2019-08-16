@@ -30,10 +30,13 @@ import { NotificationService } from './services/notification/notification.servic
 import { FdsnService } from './services/fdsn/fdsn.service';
 import { PreProductionService } from './services/pre-production/pre-production.service';
 import { DataService } from './services/data/data.service';
+import { PublicService } from './services/public/public.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
 import { LoginPermission, SameUserPermission, AdminPermission, RightPermission } from './urlPermission/url.permission';
+
+import { NoCommaNumberPipe } from './pipes/number-pipe';
 
 import { LoginComponent } from './components/login/login.component';
 import { CreateUserComponent } from './components/user/create-user/create-user.component';
@@ -56,7 +59,7 @@ import { DataListComponent } from './components/seismic-data/data-list/data-list
 import { DownloadMetadataComponent } from './components/reusable/download-metadata/download-metadata.component';
 import { ProgressEventComponent } from './components/reusable/progress-event/progress-event.component';
 import { DownloadFilesComponent } from './components/reusable/download-files/download-files.component';
-import { NoCommaNumberPipe } from './pipes/number-pipe';
+import { DataSearchComponent } from './components/public/data-search/data-search.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +86,7 @@ import { NoCommaNumberPipe } from './pipes/number-pipe';
     ProgressEventComponent,
     DownloadFilesComponent,
     NoCommaNumberPipe,
+    DataSearchComponent,
   ],
   imports: [
     BrowserModule,
@@ -114,6 +118,7 @@ import { NoCommaNumberPipe } from './pipes/number-pipe';
     FdsnService,
     PreProductionService,
     DataService,
+    PublicService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

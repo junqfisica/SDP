@@ -94,6 +94,10 @@ table.table-dark>thead>tr {
     color: white !important;
 }
 
+.table-danger, .table-danger>td, .table-danger>th {
+    background-color:  #dc35457a;
+}
+
 .modal-body {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
 }

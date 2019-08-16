@@ -10,6 +10,7 @@ export class SeismicData {
     channel_id: string;
     folder_path: string;
     files: FileTransferred[];
+    is_public: boolean;
 
     // setup instanceOf check that. Assumes that anything with these atributtes is a Channel.
     static [Symbol.hasInstance](obj: SeismicData) {

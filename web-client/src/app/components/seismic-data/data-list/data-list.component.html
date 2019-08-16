@@ -142,10 +142,11 @@
   </div>
   <ng-template [ngTemplateOutlet]="pagination"></ng-template>
 </div>
-  
+ 
 <ng-template #typeaheadTemplate let-data="item">
-  <span><i class="fa fa-file-o" title="Channel name">:</i> {{data.filename}} - 
-    <i class="fa fa-calendar-plus-o" title="Start at">:</i> {{ data.start_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}
+  <span><i class="fa fa-file-o btn-shadow" title="Channel name"> </i> {{data.filename}} &rsaquo; 
+    <i class="fa fa-calendar-plus-o icon-green btn-shadow" title="Started at"></i> : {{ data.start_time | date:'dd.MM.yyyy - HH:mm:ss.ss' : 'UTC'}}&nbsp;
+    <i class="fa fa-calendar-minus-o icon-red btn-shadow" title="Ended at"></i> : {{ data.stop_time | date:'dd.MM.yyyy - HH:mm:ss.ss' : 'UTC'}}
   </span>
 </ng-template>
     

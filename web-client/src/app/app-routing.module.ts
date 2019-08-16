@@ -19,9 +19,11 @@ import { ChannelEditComponent } from './components/channel/channel-edit/channel-
 import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
 import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
 import { DataListComponent } from './components/seismic-data/data-list/data-list.component';
+import { DataSearchComponent } from './components/public/data-search/data-search.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'search', component: DataSearchComponent },
   { path: 'user/createUser', component: CreateUserComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_USER_CREATE"]}},
   { path: 'user/users', component: UserListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_USER"]}},
   { path: 'user/edit/:id', component: UserEditComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_USER_EDIT"]}},
@@ -40,7 +42,7 @@ const routes: Routes = [
   { path: 'settings/editSetting/:id', component: ApplicationParamEditComponent, canActivate: [AdminPermission]},
 
   // otherwise redirect to profile
-  { path: '**', redirectTo: '/' }
+  { path: '**', redirectTo: 'search' }
 ];
 
 @NgModule({

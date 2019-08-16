@@ -98,6 +98,53 @@ class Search(AbstractStructure, NamedTuple):
             raise AppException(str(error))
 
 
+class SeismicDataSearch(AbstractStructure, NamedTuple):
+    """
+    Class that holds a structure to perform a join search for SeismicDataModel and paginate it.
+
+    Fields:
+        * Filename = (string) the name of the file.
+
+        * network = (string) network name.
+
+        * station = (string) station name.
+
+        * channel = (string) channel name.
+
+        * start_time = (string) start datetime.
+
+        * stop_time = (string) stop datetime.
+
+        * page = (int) The current page to return.
+
+        * per_page = (int) Number of items per page.
+    """
+
+    Filename: str = None
+    Network: str = None
+    Station: str = None
+    Channel: str = None
+    StartTime: str = None
+    StopTime: str = None
+    Page: int = 1
+    PerPage: int = 1000
+
+    def to_dict(self):
+        return self._asdict()
+
+    # noinspection PyTypeChecker
+    @classmethod
+    def from_dict(cls, dictionary):
+        try:
+            new_d = validate_dictionary(cls, dictionary)
+            return cls(**new_d)
+
+        except Exception as error:
+            # traceback.print_exc(limit=2, file=sys.stdout)
+            app_logger.error(traceback.format_exc())
+            raise AppException(str(error))
+
+
 class SearchResult(AbstractStructure, NamedTuple):
     """
     Class that holds a structure to return a search result.
