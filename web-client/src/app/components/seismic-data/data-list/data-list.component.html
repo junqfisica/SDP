@@ -92,6 +92,9 @@
         <span *ngIf="typeaheadLoading" class="fa fa-spinner fa-spin"></span>
         <span *ngIf="!typeaheadLoading" class="fa fa-search"></span>
     </button>
+    <button class="btn btn-dark btn-rounded btn-shadow my-2 my-sm-0 ml-auto" type="submit"
+      (click)="openRenameModal(renameModalTemplate)" [disabled]="seismicData?.length === 0"> Rename files
+    </button>
   </div>
   <div class="table-responsive">
     <table class="table table-striped table-hover table-condensed" id="dataTable">
@@ -266,6 +269,35 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger btn-shadow" (click)="closePlotModal()">Close</button>
+  </div>
+</ng-template>
+
+<ng-template #renameModalTemplate let-c="close" let-d="dismiss"  class="modal fade">
+  <div class="modal-header">
+    <h4 *ngIf="!isRenamingFiles" class="modal-title">Rename Files?</h4>
+    <h4 *ngIf="isRenamingFiles" class="modal-title">Renaming Files</h4>
+  </div>
+  <div class="modal-body">
+    <div *ngIf="!isRenamingFiles">
+      <div class="center">
+        <h5>All files at the channel {{channel?.name}} will be renamed to: </h5> 
+        <strong>{{station?.network_id}}.{{station?.name}}'Start Time'.{{channel?.name}}</strong> 
+      </div>
+      <div>Start Time = YYYY MM DD HH mm ss </div> 
+    </div>
+    <div *ngIf="isRenamingFiles">
+      <div class="center">
+        <h5>Renaming Files this may take a while...</h5> 
+      </div>
+    </div>
+    <div class="container" [ngClass]="{ 'no-width': !isRenamingFiles }">
+      <label *ngIf="isRenamingFiles">Progress: </label>
+      <app-progress-event #progress></app-progress-event>
+    </div>
+  </div>
+  <div *ngIf="!isRenamingFiles" class="modal-footer">
+    <button type="button" class="btn btn-dark btn-shadow" (click)="renameFiles(progress)"[disabled]="isRenamingFiles">Rename</button>
+    <button type="button" class="btn btn-danger btn-shadow" (click)="closeRenameModal()" [disabled]="isRenamingFiles">Cancel</button>
   </div>
 </ng-template>
   

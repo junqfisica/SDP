@@ -10,6 +10,7 @@ from flaskapp.models import SeismicDataModel, Right, ChannelModel
 from flaskapp.structures.structures import Search
 from flaskapp.utils import file_utils
 from flaskapp.utils.mseed_utils import save_data_plot
+from flaskapp.utils.progress_event import ProgressEvent
 
 
 @data.route("/searchData", methods=["GET"])
@@ -72,3 +73,16 @@ def plot_data(data_id):
         ForbiddenFileFormat("The file {} is not a valid mseed file.".format(sd.filename))
 
     return response.file_to_response(image_path, delete_after=True)
+
+
+@data.route("/renameFiles/<string:channel_id>", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+def rename_files(channel_id):
+    progress_id = 'rename_' + channel_id
+    with ProgressEvent(progress_id) as pe:
+        ch: ChannelModel = ChannelModel.find_by_id(channel_id)
+        if not ch:
+            raise EntityNotFound("The channel with id {} doesn't exist".format(channel_id))
+        ch.rename_data(pe)
+
+    return response.string_to_response('Ok')

@@ -6,6 +6,8 @@ from flaskapp.http_util.exceptions import CreateEntityError
 from flaskapp.models import BaseModel, TableNames, RelationShip, EquipmentModel
 from flaskapp.utils import file_utils
 from flaskapp.utils.date_utils import DateUtils
+from flaskapp.utils.locks_util import LockById
+from flaskapp.utils.progress_event import ProgressEvent
 
 
 class StationModel(db.Model, BaseModel):
@@ -222,6 +224,24 @@ class ChannelModel(db.Model, BaseModel):
         :return: The station from this channel.
         """
         return StationModel.find_by_id(self.station_id)
+
+    def rename_data(self, pe: ProgressEvent = None):
+        """
+        Rename all seismic data belonging to this channel. The renam
+
+        :param pe: (Optional) A progress bar event
+
+        :return:
+        """
+        with LockById(self.id):
+            data_list = self.seismic_data
+            total = len(data_list)
+            processed = 0.
+            for sd in data_list:
+                sd.rename_mseed()
+                processed += 1
+                if pe:
+                    pe.set_progress(processed * 100. / total)
 
     @classmethod
     def from_dict(cls, channel_dict: dict):

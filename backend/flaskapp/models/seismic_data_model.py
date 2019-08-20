@@ -2,12 +2,14 @@ import os
 from datetime import datetime
 from typing import List
 
+import obspy
 from sqlalchemy import event
 
 from flaskapp import db, app_utils, app_logger
 from flaskapp.http_util.exceptions import EntityNotFound, FileNotFound
 from flaskapp.models import BaseModel, TableNames, TargetFolderModel, RelationShip, FileTransferredModel, \
     ChannelModel, StationModel
+from flaskapp.structures.obspy_stats_keys import ObspyStatsKeys
 from flaskapp.structures.structures import UploadMseedFiles, SearchResult, SeismicDataSearch
 from flaskapp.utils.date_utils import DateUtils
 
@@ -87,6 +89,62 @@ class SeismicDataModel(db.Model, BaseModel):
     def is_public(self):
         channel: ChannelModel = ChannelModel.find_by_id(self.channel_id)
         return channel.get_station().public_data
+
+    def get_containers(self):
+        """
+        Gets the channel and station that this data belong.
+
+        :return: A tuple containing channel and station.
+        """
+        ch: ChannelModel = ChannelModel.find_by_id(self.channel_id)
+        station = ch.get_station()
+        return ch, station
+
+    def fix_mseed_metadata(self):
+        """
+        Check if Network, Station and Channel metadata in the mseed file is equal to the
+        Network id, Station name and Channel name that this data was linked with. If not, it will change the metadata
+        of this fields in the mseed file.
+
+        :return:
+        """
+        stream = obspy.read(self.file_path)
+        ch, station = self.get_containers()
+        should_rewrite = False
+        for tr in stream:
+            stats = tr.stats
+            if not stats.get(ObspyStatsKeys.NETWORK) == station.network_id:
+                stats[ObspyStatsKeys.NETWORK] = station.network_id
+                should_rewrite = True
+            if not stats.get(ObspyStatsKeys.STATION) == station.name:
+                stats[ObspyStatsKeys.STATION] = station.name
+                should_rewrite = True
+            if not stats.get(ObspyStatsKeys.CHANNEL) == ch.name:
+                stats[ObspyStatsKeys.CHANNEL] = ch.name
+                should_rewrite = True
+
+        if should_rewrite:
+            stream.write(self.file_path, format="MSEED")
+
+    def _create_name(self):
+        """
+        Create a name for the file based on its channel, station, network and start time.
+
+        :return: The file name that this file should have.
+        """
+        utc_time = DateUtils.convert_datetime_to_utc(self.start_time)
+        time_stamp = DateUtils.create_stamp(utc_time)
+        ch, station = self.get_containers()
+        return station.network_id + '.' + station.name + time_stamp + '.' + ch.name
+
+    def rename_mseed(self):
+        self.fix_mseed_metadata()
+        new_name = self._create_name()
+        if self.filename != new_name:
+            new_file_path = os.path.join(self.folder_path, new_name)
+            os.rename(self.file_path, new_file_path)
+            self.filename = new_name
+            self.save()
 
     @property
     def folder_path(self):

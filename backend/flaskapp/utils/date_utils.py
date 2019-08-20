@@ -52,3 +52,14 @@ class DateUtils:
         dt = DateUtils.convert_string_to_datetime(date_str)
         return_utc = DateUtils.convert_datetime_to_utc(dt)
         return return_utc
+
+    @staticmethod
+    def create_stamp(date_time: datetime):
+        """
+        Creates a stamp from the datetime. The stamp is a string of YYYY + MM + DD + HH + mm + ss
+
+        :param date_time: The datetime
+
+        :return: A string like YYYY + MM + DD + HH + mm + ss
+        """
+        return date_time.strftime('%Y%m%d%H%M%S')

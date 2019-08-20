@@ -1,6 +1,7 @@
 python-dateutil
 opencage
 numpy
+matplotlib
 obspy
 bcrypt==3.1.6
 cffi==1.12.2

@@ -4,6 +4,8 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+
 import obspy
 from obspy import Stream
 from obspy.clients.nrl import NRL
@@ -15,6 +17,7 @@ from werkzeug.datastructures import FileStorage
 from flaskapp.models import FileTransferredModel, TargetFolderModel, ChannelModel, SeismicDataModel, StationModel, \
     NetworkModel, EquipmentModel
 from flaskapp.models.file_transferred_model import FileStatus
+from flaskapp.structures.obspy_stats_keys import ObspyStatsKeys
 from flaskapp.structures.structures import PreUploadFiles, UploadMseedFiles, FileTransferResult
 from flaskapp.utils.date_utils import DateUtils
 from flaskapp.utils.locks_util import LockById
@@ -54,6 +57,7 @@ def save_data_plot(mseed_file_path: str, size=(1000, 400)):
         st: Stream = obspy.read(mseed_file_path)
         file = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
         st.plot(size=size, outfile=file.name)
+        plt.close(file.name)
         file.close()
 
         return file.name
@@ -65,30 +69,13 @@ def construct_relative_destination_dir(upload_file: UploadMseedFiles):
     """
     Construct a relative path to be used to save mseed files to the storage area.
     This path must be join with the active folder.
+
     :param upload_file: The upload file structure.
+
     :return: A relative path to save mseed files.
     """
     relative_path = str(DateUtils.convert_string_to_utc(upload_file.start_time).year)
     return relative_path
-
-
-class ObspyStatsKeys:
-    """
-    Class to map keywords names for obspy stats
-    """
-
-    NETWORK = "network"
-    STATION = "station"
-    LOCATION = "location"
-    CHANNEL = "channel"
-    START_TIME = "starttime"
-    END_TIME = "endtime"
-    SAMPLE_RATE = "sampling_rate"
-    DELTA = "delta"
-    NPTS = "npts"
-    CALIB = "calib"
-    FORMAT = "_format"
-    MSEED = "mseed"
 
 
 class MseedFileManager:

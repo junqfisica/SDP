@@ -2,8 +2,9 @@ from unittest import TestCase
 
 from flaskapp import create_app
 from flaskapp.models import AppParamsModel, NetworkModel, EquipmentModel, EquipmentTypeModel, StationModel, \
-    ChannelModel, ChannelEquipmentsModel, FileTransferredModel
+    ChannelModel, ChannelEquipmentsModel, FileTransferredModel, SeismicDataModel
 from flaskapp.models.file_transferred_model import FileStatus
+from flaskapp.utils import date_utils
 
 
 class TestModels(TestCase):
@@ -69,3 +70,7 @@ class TestModels(TestCase):
             ftm = FileTransferredModel(id="test", status_id=FileStatus.TRANSFERRED)
             ftm.save()
             print(FileTransferredModel.find_by_id("test"))
+
+    def test_sd_model(self):
+        sd: SeismicDataModel = SeismicDataModel.find_by_id("ixlMtzUQhWPEridR")
+        sd.rename_mseed()

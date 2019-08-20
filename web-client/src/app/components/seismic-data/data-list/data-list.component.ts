@@ -21,6 +21,7 @@ import { ComponentUtils } from '../../component.utils';
 import { Channel } from '../../../model/model.channel';
 import { Station } from '../../../model/model.station';
 import { SeismicData } from '../../../model/model.seismic-data';
+import { ProgressEventComponent } from '../../reusable/progress-event/progress-event.component';
 
 @Component({
   selector: 'app-data-list',
@@ -35,6 +36,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   seismicData: SeismicData[] = [];
   deleteModalRef: BsModalRef | null;
   plotModalRef: BsModalRef | null;
+  renameModalRef: BsModalRef | null;
   deleteData: SeismicData;
   plotSeismicData: SeismicData;
   page = 1;
@@ -51,6 +53,7 @@ export class DataListComponent extends ComponentUtils implements OnInit {
   startTimeFilter: Date;
   stopTimeFilter: Date;
   isFilterCollapsed = true;
+  isRenamingFiles = false;
   bsConfig = { dateInputFormat: 'DD.MM.YYYY', containerClass: 'theme-default' };
 
   constructor(private route: ActivatedRoute, private fdsnService: FdsnService, private notificationService: NotificationService, 
@@ -225,6 +228,20 @@ export class DataListComponent extends ComponentUtils implements OnInit {
     this.plotUrl = null;
   }
 
+  openRenameModal(template: TemplateRef<any>) {
+    this.renameModalRef = this.modalService.show(template, {backdrop: 'static', class: 'modal-dialog modal-lg'});
+  }
+
+  closeRenameModal() {
+    setTimeout(() => { 
+      if (this.renameModalRef){
+        this.renameModalRef.hide();
+        this.renameModalRef = null;
+      }
+      this.isRenamingFiles = false;
+    }, 100);
+  }
+
   private removeChannelFromList() {
     if (this.deleteData) {
       const index = this.seismicData.indexOf(this.deleteData);
@@ -302,5 +319,29 @@ export class DataListComponent extends ComponentUtils implements OnInit {
     this.stopTimeFilter = null;
     this.startDateFilter = null;
     this.stopDateFilter = null;
+  }
+
+  renameFiles(progress: ProgressEventComponent){
+    this.isRenamingFiles = true;
+    this.dataService.renameFiles(this.channel).subscribe(
+      renamed => {
+        this.closeRenameModal();
+        progress.close();
+        progress = null;
+        this.searchFiles();
+      },
+      error => {
+        console.log(error);
+        this.notificationService.showErrorMessage(error.error.message);
+        this.closeRenameModal();
+        progress.close();
+        progress = null;
+      }
+    );
+    setTimeout(() => {
+      if (progress) {
+        progress.startListenProgress('rename_' + this.channelId);
+      } 
+    }, 500)
   }
 }

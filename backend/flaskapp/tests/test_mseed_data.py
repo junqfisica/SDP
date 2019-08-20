@@ -85,10 +85,3 @@ class TestMseed(TestCase):
         # root_path = "/media/junqueira/DATA/Test_SDP_DATA/"
         # paths = get_mseed_dirs(root_path)
         # print(paths)
-
-    def test_test(self):
-        path = "/media/junqueira/DATA/test_sdp_data_transfer/XX/A2M/400Hz/p0/exA2M131016154449.pri0"
-        topath = "/media/junqueira/DATA/test_sdp_data_storage/2013/exA2M131016154449.pri0"
-        rp = os.path.relpath(path, "/media/junqueira/DATA")
-        print(rp)
-

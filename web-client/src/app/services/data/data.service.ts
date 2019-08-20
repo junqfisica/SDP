@@ -37,4 +37,8 @@ export class DataService {
     return this.http.post(ServerUrl.rootUrl + '/api/data/downloadFileList', seismicDataList, {responseType: 'blob'});
   }
 
+  renameFiles(ch: Channel):  Observable<string> {
+    return this.http.get<string>(ServerUrl.rootUrl + '/api/data/renameFiles/' + ch.id);
+  }
+
 }
