@@ -23,7 +23,7 @@ export class DataUploadComponent extends ComponentUtils implements OnInit {
   uploader: FileUploader;
   hasBaseDropZoneOver = false;
   serviceUrl = ServerUrl.rootUrl + '/api/preProduction/upload'
-  private supportedFileExt: string[] = ['mseed'];
+  supportedFileExt: string[] = ['mseed'];
 
   constructor(private notificationService: NotificationService,  private modalService: BsModalService) { 
     super(notificationService);

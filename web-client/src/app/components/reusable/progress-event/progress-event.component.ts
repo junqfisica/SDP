@@ -12,7 +12,7 @@ export class ProgressEventComponent implements OnInit, OnDestroy {
   processEventSource: EventSource;
 
   // Used at the html.
-  private progress: number = 0;
+  progress: number = 0;
 
   @Input() url: string = ServerUrl.rootUrl + "/api/sse/progress/";
   
