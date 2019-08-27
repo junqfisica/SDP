@@ -123,7 +123,7 @@ class MseedFileManager:
     def save(self):
         if self.file_path and self.dir_path:
             if not os.path.exists(self.dir_path):
-                os.makedirs(self.dir_path, mode=0o660)
+                os.makedirs(self.dir_path, mode=0o777)
 
             if os.path.exists(self.file_path):
                 return False
@@ -277,7 +277,7 @@ class MseedDirManager:
         relative_path = construct_relative_destination_dir(upload_file)
         dest_dir = os.path.join(self.active_folder.path, relative_path)
         if not os.path.isdir(dest_dir):
-            os.makedirs(dest_dir, mode=0o660)
+            os.makedirs(dest_dir, mode=0o777)
         return dest_dir
 
     def __transfer_file_to_storage(self, upload_file: UploadMseedFiles, channel: ChannelModel):
