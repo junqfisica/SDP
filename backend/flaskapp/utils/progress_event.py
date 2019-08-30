@@ -68,7 +68,7 @@ class ProgressEvent:
     @stream_with_context
     def event_progress(self):
         msg = Message(self.__progress, type="message", id=self.progress_id)
-        for i in range(2):
+        for i in range(20):
             if self.progress_id in PROGRESS_IDS:
                 yield str(msg)
                 break
