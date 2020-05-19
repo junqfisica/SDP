@@ -209,10 +209,28 @@ grant all privileges on table SDP.T_STATIONS to SDP;
 
 insert into SDP.T_STATIONS values ('ghyWoC46','ST','04A','-25.48','-64.39','607','0.6','2016/159','2017/226',False);
 
+create table SDP.T_LOCATIONS
+(
+    ID varchar(16) not null,
+    STATION_ID varchar(16) not null,
+    NAME  varchar(5) not null,
+    LATITUDE numeric not null,
+    LONGITUDE numeric not null,
+    ELEVATION numeric not null,
+    DEPTH numeric not null,
+    primary key (ID),
+    foreign key (STATION_ID) references SDP.T_STATIONS (ID) on delete restrict
+ 
+);
+grant all privileges on table SDP.T_LOCATIONS to SDP;
+
+insert into SDP.T_LOCATIONS values ('thiWoC46','ghyWoC46','LOC','-25.48','-64.39','607','0.6');
+
 create table SDP.T_CHANNELS
 (
     ID varchar(16) not null,
     STATION_ID varchar(16) not null,
+    LOCATION_ID varchar(16) not null,
     NAME  varchar(5) not null,
     LATITUDE numeric not null,
     LONGITUDE numeric not null,
@@ -227,12 +245,13 @@ create table SDP.T_CHANNELS
     START_TIME timestamptz not null,
     STOP_TIME timestamptz not null,
     primary key (ID),
-    foreign key (STATION_ID) references SDP.T_STATIONS (ID) on delete restrict
+    foreign key (STATION_ID) references SDP.T_STATIONS (ID) on delete restrict,
+    foreign key (LOCATION_ID) references SDP.T_LOCATIONS (ID) on delete restrict
     
 );
 grant all privileges on table SDP.T_CHANNELS to SDP;
 
-insert into SDP.T_CHANNELS values ('test1234','ghyWoC46','HHZ','-25.48','-64.39','607','0.6','0.0','0.0','1',100,'ARZ','GP12','2016/159','2017/098');
+insert into SDP.T_CHANNELS values ('test1234','ghyWoC46','thiWoC46', 'HHZ','-25.48','-64.39','607','0.6','0.0','0.0','1',100,'ARZ','GP12','2016/159','2017/098');
 
 create table SDP.T_CHANNELS_EQUIPMENTS
 (

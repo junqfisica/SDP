@@ -32,6 +32,8 @@ class StationModel(db.Model, BaseModel):
     country = db.Column(db.String(100), nullable=True)
     channels = db.relationship(RelationShip.CHANNEL, backref="station",
                                cascade="save-update, merge, delete", lazy=True)
+    locations = db.relationship(RelationShip.LOCATION, backref="station",
+                                cascade="save-update, merge, delete", lazy=True)
 
     def __repr__(self):
         return "StationModel(id={},network_id={},name={}, latitude={}, longitude={})"\
@@ -142,6 +144,26 @@ class StationModel(db.Model, BaseModel):
         return valid_station
 
 
+class LocationModel(db.Model, BaseModel):
+
+    # The name of the table at the data base.
+    __tablename__ = TableNames.T_LOCATIONS
+
+    # The table columns.
+    id = db.Column(db.String(16), primary_key=True)
+    station_id = db.Column(db.String(16), db.ForeignKey(TableNames.T_STATIONS + ".id"), nullable=False)
+    name = db.Column(db.String(5), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    elevation = db.Column(db.Float, nullable=False)
+    depth = db.Column(db.Float, nullable=False)
+    channels = db.relationship(RelationShip.CHANNEL, backref="location",
+                               cascade="save-update, merge, delete", lazy=True)
+
+    def __repr__(self):
+        return "LocationModel(id={},station_id={},name={})".format(self.id, self.station_id, self.name)
+
+
 class ChannelModel(db.Model, BaseModel):
 
     # The name of the table at the data base.
@@ -150,6 +172,7 @@ class ChannelModel(db.Model, BaseModel):
     # The table columns.
     id = db.Column(db.String(16), primary_key=True)
     station_id = db.Column(db.String(16), db.ForeignKey(TableNames.T_STATIONS + ".id"), nullable=False)
+    location_id = db.Column(db.String(16), db.ForeignKey(TableNames.T_LOCATIONS + ".id"), nullable=False)
     name = db.Column(db.String(5), nullable=False)
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
@@ -169,8 +192,8 @@ class ChannelModel(db.Model, BaseModel):
                                    cascade="save-update, merge, delete", lazy=True)
 
     def __repr__(self):
-        return "ChannelModel(id={},station_id={},name={},gain={},dl_no={},dl_no={},sample_rate={}, " \
-               "start_time={}, stop_time={})".format(self.id, self.station_id, self.name, self.gain,
+        return "ChannelModel(id={},station_id={},station_id={}, name={},gain={},dl_no={},dl_no={},sample_rate={}, " \
+               "start_time={}, stop_time={})".format(self.id, self.station_id, self.location_id, self.name, self.gain,
                                                      self.sample_rate, self.dl_no, self.sensor_number,
                                                      self.start_time, self.stop_time)
 
@@ -256,7 +279,7 @@ class ChannelModel(db.Model, BaseModel):
         return channel
 
     def creation_validation(self):
-        channels = self.find_by(station_id=self.station_id, name=self.name, get_first=False)
+        channels = self.find_by(location_id=self.location_id, name=self.name, get_first=False)
         if channels:
             for channel in channels:
                 if self.is_time_overlap(channel):
