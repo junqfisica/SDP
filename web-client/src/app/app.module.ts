@@ -52,6 +52,7 @@ import { ChannelCreateComponent } from './components/channel/channel-create/chan
 import { ChannelListComponent } from './components/channel/channel-list/channel-list.component';
 import { StationEditComponent } from './components/station/station-edit/station-edit.component';
 import { ChannelEditComponent } from './components/channel/channel-edit/channel-edit.component';
+import { LocationListComponent } from './components/location/location-list/location-list.component';
 import { WrapTlGoogleChartComponent } from './components/reusable/wrap-tl-google-chart/wrap-tl-google-chart.component';
 import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
 import { FilesListComponent } from './components/pre-production/files-list/files-list.component';
@@ -60,6 +61,7 @@ import { DownloadMetadataComponent } from './components/reusable/download-metada
 import { ProgressEventComponent } from './components/reusable/progress-event/progress-event.component';
 import { DownloadFilesComponent } from './components/reusable/download-files/download-files.component';
 import { DataSearchComponent } from './components/public/data-search/data-search.component';
+import { LocationEditComponent } from './components/location/location-edit/location-edit.component';
 
 @NgModule({
   declarations: [
@@ -87,6 +89,8 @@ import { DataSearchComponent } from './components/public/data-search/data-search
     DownloadFilesComponent,
     NoCommaNumberPipe,
     DataSearchComponent,
+    LocationListComponent,
+    LocationEditComponent,
   ],
   imports: [
     BrowserModule,

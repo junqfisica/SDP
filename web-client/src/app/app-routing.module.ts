@@ -14,6 +14,7 @@ import { FdsnCreateComponent } from './components/seismic-data/fdsn/fdsn-create/
 import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
 import { StationListComponent } from './components/station/station-list/station-list.component';
 import { ChannelListComponent } from './components/channel/channel-list/channel-list.component';
+import { LocationListComponent } from './components/location/location-list/location-list.component';
 import { StationEditComponent } from './components/station/station-edit/station-edit.component';
 import { ChannelEditComponent } from './components/channel/channel-edit/channel-edit.component';
 import { UploadListComponent } from './components/pre-production/upload-list/upload-list.component';
@@ -34,6 +35,7 @@ const routes: Routes = [
   { path: 'fdsn/create', component: FdsnCreateComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_CREATE"]}},
   { path: 'fdsn/create/channel/:stationId', component: ChannelCreateComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_CREATE"]}},
   { path: 'fdsn/channel/:stationId', component: ChannelListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
+  { path: 'fdsn/locations/:stationId', component: LocationListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/data/:channelId', component: DataListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/channel/edit/:channelId', component: ChannelEditComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/stations', component: StationListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},

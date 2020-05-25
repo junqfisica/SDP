@@ -72,6 +72,9 @@ class StationModel(db.Model, BaseModel):
         # convert columns to dict
         dict_representation = super().to_dict()
 
+        # add locations
+        dict_representation["locations"] = [loc.to_dict() for loc in self.locations]
+
         # add channels
         dict_representation["channels"] = [ch.to_dict() for ch in self.channels]
 
@@ -117,7 +120,12 @@ class StationModel(db.Model, BaseModel):
         # validate creation
         st.creation_validation()
 
-        return st.save()
+        if st.save():
+            # create default location
+            LocationModel.create_location_at_station(st)
+            return True
+
+        return False
 
     @classmethod
     def update(cls, station_dict: dict):
@@ -162,6 +170,62 @@ class LocationModel(db.Model, BaseModel):
 
     def __repr__(self):
         return "LocationModel(id={},station_id={},name={})".format(self.id, self.station_id, self.name)
+
+    def validate_creation(self):
+        unique_loc = LocationModel.find_by(station_id=self.station_id, name=self.name, get_first=False)
+        if unique_loc:
+            raise CreateEntityError("The location {} already exists for this station. Please, give a different name.".
+                                    format(self.name))
+
+    @classmethod
+    def create_location(cls, location_dict: dict):
+        """
+         Create a location from dict.
+
+        :param location_dict: A dictionary with keys equal to LocationModel columns.
+
+        :return: True if succeed, false otherwise.
+        """
+        location: LocationModel = cls.from_dict(location_dict)
+        location.id = app_utils.generate_id(16)
+
+        # validate creation.
+        location.validate_creation()
+
+        return location.save()
+
+    @classmethod
+    def create_location_at_station(cls, station: StationModel, name="LOC"):
+        """
+        Create a location for a given station. See also, create_location(location_dict).
+
+        :param station: A station entity.
+
+        :param name: The location name. It must be unique within station.
+
+        :return: True if succeed, false otherwise.
+        """
+
+        location_dict = {"id": "", "station_id": station.id, "name": name,
+                         "latitude": station.latitude, "longitude": station.longitude, "elevation": station.elevation,
+                         "depth": station.depth}
+
+        # create location and validate it.
+        return cls.create_location(location_dict)
+
+    def to_dict(self):
+        """
+        Convert Channel into a dictionary, this way we can convert it to a JSON response.
+
+        :return: A clean dictionary form of this model.
+        """
+        # convert columns to dict
+        dict_representation = super().to_dict()
+
+        # add channels
+        dict_representation["channels"] = [ch.to_dict() for ch in self.channels]
+
+        return dict_representation
 
 
 class ChannelModel(db.Model, BaseModel):

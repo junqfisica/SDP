@@ -1,4 +1,6 @@
 import { Channel } from './model.channel';
+import { LocationModel } from './model.location-model';
+
 
 export class Station {
     id: string = null;
@@ -15,6 +17,7 @@ export class Station {
     geology: string;
     province: string;
     country: string;
+    locations: LocationModel[];
     channels: Channel[];
 
     // setup instanceOf check that. Assumes that anything with these atributtes is a Station.

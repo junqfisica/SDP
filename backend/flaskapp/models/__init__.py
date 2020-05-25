@@ -73,7 +73,7 @@ from flaskapp.models.app_params_model import AppParamsModel
 from flaskapp.models.target_folder_model import TargetFolderModel
 from flaskapp.models.networks_model import NetworkModel
 from flaskapp.models.equipments_model import EquipmentTypeModel, EquipmentModel
-from flaskapp.models.station_channel_model import StationModel, ChannelModel, ChannelEquipmentsModel
+from flaskapp.models.station_channel_model import StationModel, LocationModel, ChannelModel, ChannelEquipmentsModel
 from flaskapp.models.file_transferred_model import TransferredStatusModel, FileTransferredModel
 from flaskapp.models.seismic_data_model import SeismicDataModel, FileDataModel
 

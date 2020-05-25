@@ -11,6 +11,7 @@ import { Location } from '../../model/model.location';
 import { Station } from '../../model/model.station';
 import { Channel } from '../../model/model.channel';
 import { SearchResult } from '../../model/model.search-result';
+import { LocationModel } from '../../model/model.location-model';
 
 @Injectable()
 export class FdsnService {
@@ -97,6 +98,10 @@ export class FdsnService {
 
   searchStations(params: HttpParams): Observable<SearchResult<Station>> {
     return this.http.get<SearchResult<Station>>(ServerUrl.rootUrl + '/api/fdsn/searchStations', { params });
+  }
+
+  searchLocations(params: HttpParams): Observable<SearchResult<LocationModel>> {
+    return this.http.get<SearchResult<LocationModel>>(ServerUrl.rootUrl + '/api/fdsn/searchLocations', { params });
   }
 
   searchChannels(params: HttpParams): Observable<SearchResult<Channel>> {

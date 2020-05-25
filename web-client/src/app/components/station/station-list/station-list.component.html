@@ -44,6 +44,7 @@
         <th class="center">Depth (m)</th>
         <th class="center">Create Date</th>
         <th class="center">Removal Date</th>
+        <th class="center">Locations</th>
         <th class="center">Channels</th>
         <th class="center">Public Data</th>
         <th></th>
@@ -58,6 +59,12 @@
         <td class="center">{{station.depth}}</td>
         <td class="center">{{station.creation_date | date:'dd.MM.yyyy'}}</td>
         <td class="center">{{station.removal_date | date:'dd.MM.yyyy'}}</td>
+        <td class="center">
+          <a routerLink="/fdsn/locations/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
+            title="locations {{station.locations.length}}">
+            <span class="fa fa-map-o icon-medium text-shadow"></span>
+          </a>
+        </td>
         <td class="center">
           <a routerLink="/fdsn/channel/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
             title="channels {{station.channels.length}}">

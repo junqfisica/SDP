@@ -4,7 +4,8 @@ from flaskapp.extensions.geocoder import GeoCoder
 from flaskapp.http_util import response
 from flaskapp.http_util.decorators import secure, post, query_param, query
 from flaskapp.http_util.exceptions import EntityNotFound
-from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel, ChannelModel
+from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel, ChannelModel, \
+    LocationModel
 from flaskapp.structures.structures import Search, SearchResult
 from flaskapp.utils.date_utils import DateUtils
 from flaskapp.utils.mseed_utils import MseedMetadataHandler
@@ -154,6 +155,15 @@ def get_channel(channel_id: str):
 @query(Search)
 def search_stations(station_search: Search):
     search_result: SearchResult = StationModel.search(station_search)
+    return response.model_to_response(search_result)
+
+
+@fdsn.route("/searchLocations", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+@query(Search)
+def search_locations(location_search: Search):
+    print(location_search)
+    search_result: SearchResult = LocationModel.search(location_search)
     return response.model_to_response(search_result)
 
 
