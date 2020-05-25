@@ -2,7 +2,7 @@ import { Component, OnInit, TemplateRef } from '@angular/core';
 import { HttpParams } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal'
@@ -16,6 +16,7 @@ import { ComponentUtils } from '../../component.utils';
 import { Channel } from '../../../model/model.channel';
 import { DateUtil } from '../../../statics/date-util';
 import { Station } from '../../../model/model.station';
+import { LocationModel } from 'src/app/model/model.location-model';
 
 @Component({
   selector: 'app-channel-list',
@@ -25,7 +26,9 @@ import { Station } from '../../../model/model.station';
 export class ChannelListComponent extends ComponentUtils implements OnInit {
 
   station: Station;
+  location: LocationModel;
   stationId: string;
+  locationId: string;
   deleteModalRef: BsModalRef | null;
   deleteChannel: Channel;
   channels: Channel[] = []
@@ -46,9 +49,12 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
     this.route.params.subscribe(
       params => {          
         if (params && params.stationId) {
-          this.fdsnService.getStation(params.stationId).subscribe(
-            station => {
-              this.station = station;
+          forkJoin([this.fdsnService.getStation(params.stationId), this.fdsnService.getLocationModel(params.locationId)]).subscribe(
+            results => {
+              // results[0] is our character
+              // results[1] is our character homeworld
+              this.station = results[0];
+              this.location = results[1];
               this.isLoaddingPage = false;
               this.searchChannels();
             },
@@ -59,6 +65,7 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
             }
           );
           this.stationId = params.stationId;
+          this.locationId = (params.locationId !== '0') ? params.locationId : "";
         }
       },
       error => {
@@ -102,9 +109,9 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
 
   };
 
-  buildQueryParams(value="", orderBy="name, start_time", searchBy = "station_id, name"): HttpParams {
+  buildQueryParams(value="", searchBy = "station_id, location_id, name", orderBy="name, start_time"): HttpParams {
     if (searchBy !== 'id') {
-      value = this.stationId + "," + value;
+      value = this.stationId + "," + this.locationId + "," + value;
     }
     const searchParms = new Search(searchBy, value).searchParms
     searchParms.orderBy = orderBy;
@@ -178,12 +185,12 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
   }
 
   typeaheadOnSelect(e: TypeaheadMatch): void {
-    this.searchChannels(e.item.id, "start_time", "id");
+    this.searchChannels(e.item.id, "id", "start_time");
   }
 
-  searchChannels(value="", orderBy="name, start_time", searchBy = "station_id, name"){
+  searchChannels(value="", searchBy = "station_id, location_id, name", orderBy="name, start_time"){
     
-    this.fdsnService.searchChannels(this.buildQueryParams(value, orderBy, searchBy)).subscribe(
+    this.fdsnService.searchChannels(this.buildQueryParams(value, searchBy, orderBy)).subscribe(
       data => {        
         this.totalItems = data.total;
         this.channels = data.result;        

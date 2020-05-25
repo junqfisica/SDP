@@ -4,6 +4,7 @@
   </div>
   <div *ngIf="!isLoaddingPage" style="text-align: center">
     <h2> Channels at Station {{station.name}}</h2>
+    <h2 *ngIf="location"> Location {{location?.name}}</h2>
     <div style="margin-bottom: 2%">
       <span class="fa fa-globe" style="font-size: 130%; color: #515692" 
         title="Station location"> {{station.latitude}}, {{station.longitude}} </span>
@@ -54,6 +55,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th *ngIf="!location" class="center">LOC</th>
         <th class="center">Location (lat, long)</th>
         <th class="center">Elevation (m)</th>
         <th class="center">Depth (m)</th>
@@ -71,6 +73,7 @@
     <tbody>
       <tr *ngFor="let ch of channels">
         <td>{{ch.name}}</td>
+        <td *ngIf="!location" class="center">{{ch.location_code}}</td>
         <td class="center">{{ch.latitude}} &#730;, {{ch.longitude}} &#730;</td>
         <td class="center">{{ch.elevation}}</td>
         <td class="center">{{ch.depth}}</td>

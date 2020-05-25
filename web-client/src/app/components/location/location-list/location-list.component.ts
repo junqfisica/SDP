@@ -166,7 +166,6 @@ export class LocationListComponent extends ComponentUtils implements OnInit {
       data => {        
         this.totalItems = data.total;
         this.locations = data.result;
-        console.log(data.result);
       },
       error => {
         console.log(error);

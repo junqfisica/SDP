@@ -269,6 +269,10 @@ class ChannelModel(db.Model, BaseModel):
     def stop_time_utc(self):
         return DateUtils.convert_datetime_to_utc(self.stop_time)
 
+    @property
+    def location(self) -> LocationModel:
+        return LocationModel.find_by_id(self.location_id)
+
     def to_dict(self):
         """
         Convert Channel into a dictionary, this way we can convert it to a JSON response.
@@ -283,6 +287,9 @@ class ChannelModel(db.Model, BaseModel):
 
         # add info of how much data files are attach to it
         dict_representation["number_of_files"] = self.number_of_files()
+
+        # add location code.
+        dict_representation["location_code"] = self.location.name
 
         return dict_representation
 

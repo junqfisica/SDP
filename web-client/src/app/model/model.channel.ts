@@ -3,6 +3,7 @@ import { Equipments } from './model.equipments';
 export class Channel {
     id: string = null;
     station_id: string;
+    location_id: string;
     name: string;
     latitude: number;
     longitude: number;
@@ -18,6 +19,7 @@ export class Channel {
     stop_time: string;
     equipments: Equipments[];
     number_of_files: number;
+    location_code: string;
 
     // setup instanceOf check that. Assumes that anything with these atributtes is a Channel.
     static [Symbol.hasInstance](obj: Channel) {

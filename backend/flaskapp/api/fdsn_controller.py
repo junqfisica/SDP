@@ -139,6 +139,17 @@ def get_station(station_id: str):
     return response.empty_response()
 
 
+@fdsn.route("/getLocationModel", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+@query_param("location_id")
+def get_location_model(location_id: str):
+    location = LocationModel.find_by_id(location_id)
+    if location:
+        return response.model_to_response(location)
+
+    return response.empty_response()
+
+
 @fdsn.route("/getChannel", methods=["GET"])
 @secure(Right.EDIT_FDSN)
 @query_param("channel_id")

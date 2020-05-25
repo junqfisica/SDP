@@ -46,6 +46,10 @@ export class FdsnService {
     return this.http.get<Station>(ServerUrl.rootUrl + '/api/fdsn/getStation?station_id=' + id);
   }
 
+  getLocationModel(id: string): Observable<LocationModel>{
+    return this.http.get<LocationModel>(ServerUrl.rootUrl + '/api/fdsn/getLocationModel?location_id=' + id);
+  }
+
   getChannel(id: string): Observable<Channel>{
     return this.http.get<Channel>(ServerUrl.rootUrl + '/api/fdsn/getChannel?channel_id=' + id);
   }

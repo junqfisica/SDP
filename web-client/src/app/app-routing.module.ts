@@ -34,7 +34,7 @@ const routes: Routes = [
   { path: 'data/upload-list/files/:folderPath', component: FilesListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_DATA_UPLOAD"]}},
   { path: 'fdsn/create', component: FdsnCreateComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_CREATE"]}},
   { path: 'fdsn/create/channel/:stationId', component: ChannelCreateComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_CREATE"]}},
-  { path: 'fdsn/channel/:stationId', component: ChannelListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
+  { path: 'fdsn/channel/:stationId/:locationId', component: ChannelListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/locations/:stationId', component: LocationListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/data/:channelId', component: DataListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/channel/edit/:channelId', component: ChannelEditComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
