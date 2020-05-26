@@ -171,11 +171,14 @@ class LocationModel(db.Model, BaseModel):
     def __repr__(self):
         return "LocationModel(id={},station_id={},name={})".format(self.id, self.station_id, self.name)
 
-    def validate_creation(self):
-        unique_loc = LocationModel.find_by(station_id=self.station_id, name=self.name, get_first=False)
-        if unique_loc:
-            raise CreateEntityError("The location {} already exists for this station. Please, give a different name.".
-                                    format(self.name))
+    def creation_validation(self):
+        locs = LocationModel.find_by(station_id=self.station_id, name=self.name, get_first=False)
+        if locs:
+            for loc in locs:
+                # ignore same id.
+                if self.id != loc.id:
+                    raise CreateEntityError("The location {} already exists for this station. "
+                                            "Please, give a different name.".format(self.name))
 
     @classmethod
     def create_location(cls, location_dict: dict):
@@ -190,7 +193,7 @@ class LocationModel(db.Model, BaseModel):
         location.id = app_utils.generate_id(16)
 
         # validate creation.
-        location.validate_creation()
+        location.creation_validation()
 
         return location.save()
 

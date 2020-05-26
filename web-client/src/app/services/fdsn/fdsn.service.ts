@@ -34,8 +34,16 @@ export class FdsnService {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/updateStation', st);
   }
 
+  updateLocation(loc: LocationModel): Observable<boolean> {
+    return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/updateLocation', loc);
+  }
+
   updateChannel(ch: Channel): Observable<boolean> {
     return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/updateChannel', ch);
+  }
+
+  createLocation(loc: LocationModel): Observable<boolean> {
+    return this.http.post<boolean>(ServerUrl.rootUrl + '/api/fdsn/createLocation', loc);
   }
 
   createChannel(ch: Channel): Observable<boolean> {
@@ -114,6 +122,10 @@ export class FdsnService {
 
   deleteStation(station: Station): Observable<boolean> {
     return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/fdsn/deleteStation/' + station.id);
+  }
+
+  deleteLocation(loc: LocationModel): Observable<boolean> {
+    return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/fdsn/deleteLocation/' + loc.id);
   }
 
   deleteChannel(channel: Channel): Observable<boolean> {

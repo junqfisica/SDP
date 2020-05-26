@@ -118,16 +118,15 @@ export class LocationListComponent extends ComponentUtils implements OnInit {
     }
   }
 
-  deleteStationFromModal() {
+  deleteLocationFromModal() {
     
-    /** 
-    this.fdsnService.deleteStation(this.deleteLocation).subscribe(
+    this.fdsnService.deleteLocation(this.deleteLocation).subscribe(
       wasDeleted => {
         if (wasDeleted) {
-          this.notificationService.showSuccessMessage("Station " + this.deleteLocation.name + " has been deleted.");
+          this.notificationService.showSuccessMessage("Location " + this.deleteLocation.name + " has been deleted.");
           this.removeStationFromList();
         } else {
-          this.notificationService.showWarningMessage("Fail to delete station " + this.deleteLocation.name + ".");
+          this.notificationService.showWarningMessage("Fail to delete location " + this.deleteLocation.name + ".");
         }
         this.deleteLocation = null;
         this.closeDeleteModal();
@@ -137,7 +136,7 @@ export class LocationListComponent extends ComponentUtils implements OnInit {
         this.notificationService.showErrorMessage(error.error.message);
         this.closeDeleteModal();
       }
-    )*/
+    )
   }
 
   pageChanged(event: PageChangedEvent) {

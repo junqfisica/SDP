@@ -29,6 +29,9 @@ class BaseModel:
         else:
             raise AttributeError(type(self).__name__ + " is not instance of " + db.Model.__name__)
 
+    def creation_validation(self):
+        pass
+
     @classmethod
     def from_dict(cls, dto):
         """
@@ -39,8 +42,11 @@ class BaseModel:
         :return: The model represent this class.
         """
         # Map column names back to structures fields. The keys must be equal to the column name.
-        clean_dict = {c.name: dto[c.name] for c in cls.__table__.columns}
-        return cls(**clean_dict)
+        try:
+            clean_dict = {c.name: dto[c.name] for c in cls.__table__.columns}
+            return cls(**clean_dict)
+        except KeyError as e:
+            raise AppException("Missing key {} for {}".format(str(e), cls.__name__))
 
     def validate(self, entity_id):
         """
@@ -71,6 +77,34 @@ class BaseModel:
         except SQLAlchemyError as error_message:
             app_logger.error(error_message)
             return False
+
+    @classmethod
+    def update(cls, dto: dict):
+        """
+        Update the current entity.
+
+        Import: You must use save() to storage it in the database.
+
+        :param dto: A dictionary representation of the entity.
+
+        :return: The updated entity or None if not valid.
+        """
+        entity = cls.from_dict(dto)
+        try:
+            valid_entity = cls.find_by_id(dto["id"])
+        except KeyError as e:
+            raise AppException("Can't find key {}".format(e))
+
+        if not valid_entity:
+            return None
+
+        # validate creation your creation.
+        entity.creation_validation()
+
+        # Copy all attributes from entity to valid_entity.
+        valid_entity << entity
+
+        return valid_entity
 
     def delete(self):
         """

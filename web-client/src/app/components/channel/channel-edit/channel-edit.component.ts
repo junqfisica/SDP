@@ -190,7 +190,11 @@ export class ChannelEditComponent implements OnInit {
       }, 
       error => {
         console.log(error);
-        this.notificationService.showErrorMessage(error.error.message)
+        if (error.error.message){
+          this.notificationService.showErrorMessage(error.error.message)
+        } else {
+          this.notificationService.showErrorMessage(error.message)
+        }
       }
     );
   }

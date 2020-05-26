@@ -62,6 +62,7 @@ import { ProgressEventComponent } from './components/reusable/progress-event/pro
 import { DownloadFilesComponent } from './components/reusable/download-files/download-files.component';
 import { DataSearchComponent } from './components/public/data-search/data-search.component';
 import { LocationEditComponent } from './components/location/location-edit/location-edit.component';
+import { LocationCreateComponent } from './components/location/location-create/location-create.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { LocationEditComponent } from './components/location/location-edit/locat
     DataSearchComponent,
     LocationListComponent,
     LocationEditComponent,
+    LocationCreateComponent,
   ],
   imports: [
     BrowserModule,

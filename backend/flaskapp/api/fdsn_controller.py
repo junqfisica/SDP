@@ -37,6 +37,14 @@ def create_station(station_dict: dict):
     return response.bool_to_response(was_created)
 
 
+@fdsn.route("/createLocation", methods=["POST"])
+@secure(Right.CREATE_FDSN)
+@post()
+def create_location(location_dict: dict):
+    was_created = LocationModel.create_location(location_dict)
+    return response.bool_to_response(was_created)
+
+
 @fdsn.route("/createChannel", methods=["POST"])
 @secure(Right.CREATE_FDSN)
 @post()
@@ -199,6 +207,19 @@ def update_station(station: dict):
     return response.bool_to_response(updated_station.save())
 
 
+@fdsn.route("/updateLocation", methods=["POST"])
+@secure(Right.EDIT_FDSN)
+@post()
+def update_location(location: dict):
+
+    updated_location = LocationModel.update(location)
+
+    if not updated_location:
+        raise EntityNotFound("This location doesn't exist.")
+
+    return response.bool_to_response(updated_location.save())
+
+
 @fdsn.route("/updateChannel", methods=["POST"])
 @secure(Right.EDIT_FDSN)
 @post()
@@ -224,6 +245,22 @@ def delete_station(station_id):
         app_logger.info("Station {} - {} has been deleted".format(station.name, station.creation_date))
     else:
         app_logger.warning("Station {} - {} could't be deleted.".format(station.name, station.creation_date))
+
+    return response.bool_to_response(deleted)
+
+
+@fdsn.route("/deleteLocation/<string:loc_id>", methods=["DELETE"])
+@secure(Right.DELETE_FDSN)
+def delete_location(loc_id):
+    loc: LocationModel = LocationModel.find_by_id(loc_id)
+    if not loc:
+        raise EntityNotFound("The location id {} doesn't exist".format(loc_id))
+
+    deleted = loc.delete()
+    if deleted:
+        app_logger.info("Location {} has been deleted at station {}.".format(loc.name, loc.station_id))
+    else:
+        app_logger.warning("Location {} could't be deleted at station {}.".format(loc.name, loc.station_id))
 
     return response.bool_to_response(deleted)
 
