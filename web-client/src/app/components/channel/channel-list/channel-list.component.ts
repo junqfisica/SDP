@@ -51,8 +51,8 @@ export class ChannelListComponent extends ComponentUtils implements OnInit {
         if (params && params.stationId) {
           forkJoin([this.fdsnService.getStation(params.stationId), this.fdsnService.getLocationModel(params.locationId)]).subscribe(
             results => {
-              // results[0] is our character
-              // results[1] is our character homeworld
+              // results[0] is station.
+              // results[1] is location.
               this.station = results[0];
               this.location = results[1];
               this.isLoaddingPage = false;

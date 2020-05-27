@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 
 import { NotificationService } from '../../../services/notification/notification.service';
 import { FdsnService } from '../../../services/fdsn/fdsn.service';
 import { Station } from '../../../model/model.station';
 import { Equipments } from '../../../model/model.equipments';
+import { LocationModel } from '../../../model/model.location-model';
 import { ChannelForm } from '../../../forms/channel-form';
 
 @Component({
@@ -17,7 +18,8 @@ import { ChannelForm } from '../../../forms/channel-form';
 })
 export class ChannelCreateComponent implements OnInit {
 
-  station: Station
+  station: Station;
+  location: LocationModel;
   channelForm: ChannelForm;
   channelFormGroup: FormGroup;
   isLoaddingPage = true;
@@ -34,12 +36,15 @@ export class ChannelCreateComponent implements OnInit {
     private notificationService: NotificationService, private fdsnService: FdsnService) {
       this.route.params.subscribe(
         params => {          
-          if (params && params.stationId) {
-            this.fdsnService.getStation(params.stationId).subscribe(
-              station => {
-                this.station = station;
-                this.buildForms();
+          if (params && params.stationId && params.locationId) {
+            forkJoin([this.fdsnService.getStation(params.stationId), this.fdsnService.getLocationModel(params.locationId)]).subscribe(
+              results => {
+                // results[0] is station.
+                // results[1] is location.
+                this.station = results[0];
+                this.location = results[1];
                 this.isLoaddingPage = false;
+                this.buildForms();
               },
               error =>{
                 console.log(error);
@@ -61,7 +66,7 @@ export class ChannelCreateComponent implements OnInit {
 
   buildForms(){
 
-    this.channelForm = new ChannelForm(this.formBuilder, this.station);
+    this.channelForm = new ChannelForm(this.formBuilder, this.station, this.location);
     this.channelFormGroup = this.channelForm.form;
     
     // Call everytime the timepicker stoptime is changed.

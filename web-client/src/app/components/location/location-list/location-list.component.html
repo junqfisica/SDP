@@ -55,12 +55,12 @@
     <tbody>
     <tr *ngFor="let loc of locations">
         <td>{{loc.name}}</td>
-        <td class="center">{{loc.latitude}} &#730;, {{loc.longitude}} &#730;</td>
+        <td class="center">{{loc.latitude | number:'1.0-3'}} &#730;, {{loc.longitude | number:'1.0-3'}} &#730;</td>
         <td class="center">{{loc.elevation}}</td>
         <td class="center">{{loc.depth}}</td>
         <td class="center">
             <a routerLink="/fdsn/channels/{{loc.station_id}}/{{loc.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
-              title="channels {{station.channels.length}}">
+              title="channels {{loc.channels.length}}">
               <span class="fa fa-sitemap icon-medium text-shadow"></span>
             </a>
         </td>

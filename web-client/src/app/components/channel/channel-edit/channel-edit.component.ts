@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 
 import { BsModalService } from 'ngx-bootstrap/modal';
 
@@ -11,6 +11,7 @@ import { FdsnService } from '../../../services/fdsn/fdsn.service';
 import { Channel } from '../../../model/model.channel';
 import { Station } from '../../../model/model.station';
 import { Equipments } from '../../../model/model.equipments';
+import { LocationModel } from '../../../model/model.location-model';
 import { ChannelForm } from '../../../forms/channel-form';
 
 @Component({
@@ -24,6 +25,7 @@ export class ChannelEditComponent implements OnInit {
   channelForm: ChannelForm;
   channelFormGroup: FormGroup;
   station: Station
+  location: LocationModel
   stationCreateDate: Date;
   stationRemovalDate: Date;
   dataloggers: Observable<Equipments[]>;
@@ -45,7 +47,7 @@ export class ChannelEditComponent implements OnInit {
               channel => {
                 if (channel){
                   this.channel = channel;
-                  this.fetchStation();
+                  this.fetchStationAndLocation();
                 } else {
                   this.notificationService.showErrorMessage("Can't find the channel id " + params.channelId);
                   this.router.navigate(['/fdsn/stations']);
@@ -67,12 +69,15 @@ export class ChannelEditComponent implements OnInit {
   ngOnInit() {
   }
 
-  fetchStation(){
-    this.fdsnService.getStation(this.channel.station_id).subscribe(
-      station => {
-        this.station = station;
-        this.buildForms();
+  fetchStationAndLocation(){
+    forkJoin([this.fdsnService.getStation(this.channel.station_id), this.fdsnService.getLocationModel(this.channel.location_id)]).subscribe(
+      results => {
+        // results[0] is station.
+        // results[1] is location.
+        this.station = results[0];
+        this.location = results[1];
         this.isLoaddingPage = false;
+        this.buildForms();
       },
       error =>{
         console.log(error);
@@ -84,7 +89,7 @@ export class ChannelEditComponent implements OnInit {
 
   buildForms(){
     
-    this.channelForm = new ChannelForm(this.formBuilder, this.station, this.channel);
+    this.channelForm = new ChannelForm(this.formBuilder, this.station, this.location, this.channel);
     this.channelFormGroup = this.channelForm.form;
     
     // Call everytime the timepicker stoptime is changed.

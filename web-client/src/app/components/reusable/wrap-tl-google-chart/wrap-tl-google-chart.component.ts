@@ -88,7 +88,7 @@ export class WrapTlGoogleChartComponent implements OnInit {
         
         } else if (data instanceof Channel) {
           dataTable.addRow(
-            [data.name, data.name + "-" + count, DateUtil.convertUTCStringToDate(data.start_time),  
+            [data.name, data.name + "-" + data.location_code, DateUtil.convertUTCStringToDate(data.start_time),  
             DateUtil.convertUTCStringToDate(data.stop_time)]);
         
         } else if (data instanceof UploadFile) {

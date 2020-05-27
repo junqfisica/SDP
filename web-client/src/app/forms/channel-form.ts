@@ -5,17 +5,20 @@ import { Station } from '../model/model.station';
 import { DateUtil } from '../statics/date-util';
 import { Channel } from '../model/model.channel';
 import { Equipments } from '../model/model.equipments';
+import { LocationModel } from '../model/model.location-model';
 
 export class ChannelForm {
 
     private _form: FormGroup;
     private _currentChannel: Channel;
     private _currentStation: Station;
+    private _currentLocation: LocationModel;
 
-    constructor (private formBuilder: FormBuilder, currentStation: Station, currentChannel?: Channel) {
+    constructor (private formBuilder: FormBuilder, currentStation: Station, currentLocation: LocationModel, currentChannel?: Channel) {
 
         this._currentStation = currentStation;
         this._currentChannel = currentChannel;
+        this._currentLocation = currentLocation;
 
         this._form = this.formBuilder.group({
             name: ['', {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(3)], updateOn: 'change'}],
@@ -25,7 +28,7 @@ export class ChannelForm {
                 Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
             elevation: [currentStation.elevation, {validators: [Validators.required], updateOn: 'change'}],
             depth: [currentStation.depth, {validators: [Validators.required], updateOn: 'change'}],
-            azimuth: ['', {validators: [Validators.required, Validators.min(0), Validators.max(360)], updateOn: 'change'}],
+            azimuth: ['', {validators: [Validators.required, Validators.min(-360), Validators.max(360)], updateOn: 'change'}],
             dip: ['', {validators: [Validators.required, Validators.min(0), Validators.max(90)], updateOn: 'change'}],
             datalogger:['', {validators: [Validators.required], updateOn: 'change'}],
             sensor:['', {validators: [Validators.required], updateOn: 'change'}],
@@ -118,6 +121,7 @@ export class ChannelForm {
         const channel = new Channel();
         channel.id = this._currentChannel ? this._currentChannel.id : null;
         channel.station_id = this._currentStation.id;
+        channel.location_id = this._currentLocation.id;
         channel.name = this.controls.name.value.trim().toUpperCase();
         channel.latitude = this.controls.latitude.value;
         channel.longitude = this.controls.longitude.value;

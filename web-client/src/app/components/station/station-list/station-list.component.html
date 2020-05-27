@@ -54,7 +54,7 @@
       <tr *ngFor="let station of stations">
         <td>{{station.network_id}}</td>
         <td>{{station.name}}</td>
-        <td class="center">{{station.latitude}} &#730;, {{station.longitude}} &#730;</td>
+        <td class="center">{{station.latitude | number:'1.0-3'}} &#730;, {{station.longitude | number:'1.0-3'}} &#730;</td>
         <td class="center">{{station.elevation}}</td>
         <td class="center">{{station.depth}}</td>
         <td class="center">{{station.creation_date | date:'dd.MM.yyyy'}}</td>

@@ -21,7 +21,8 @@
 
 <div class="d-flex justify-content-start navbar" id="header">
   <div>
-    <a routerLink="/fdsn/create/channel/{{stationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE')" title="Create new Channels">
+    <a routerLink="/fdsn/create/channel/{{stationId}}/{{locationId}}" class="btn btn-default" *ngIf="hasRight('RIGHT_FDSN_CREATE') && location" 
+    title="Create new Channels">
       <span class="fa fa-plus icon-big icon-link text-shadow"></span>
     </a>
   </div>
@@ -74,7 +75,7 @@
       <tr *ngFor="let ch of channels">
         <td>{{ch.name}}</td>
         <td *ngIf="!location" class="center">{{ch.location_code}}</td>
-        <td class="center">{{ch.latitude}} &#730;, {{ch.longitude}} &#730;</td>
+        <td class="center">{{ch.latitude | number:'1.0-3'}} &#730;, {{ch.longitude | number:'1.0-3'}} &#730;</td>
         <td class="center">{{ch.elevation}}</td>
         <td class="center">{{ch.depth}}</td>
         <td class="center">{{ch.azimuth}} &#730;</td>
