@@ -71,7 +71,7 @@
 </ng-template>
 
 <ng-template #channelTypeaheadTemplate let-channel="item">
-  <span><i class="fa fa-cube" title="Channel name">:</i> {{channel.name}} - 
+  <span><i class="fa fa-cube" title="Channel name">:</i> {{channel.name}} - {{channel.location_code}}
     <i class="fa fa-calendar-plus-o" title="Start at">:</i> {{ channel.start_time | date:'dd.MM.yyyy - HH:mm:ss' : 'UTC'}}
   </span>
 </ng-template>

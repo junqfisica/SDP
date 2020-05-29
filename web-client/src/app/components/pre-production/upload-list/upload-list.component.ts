@@ -235,7 +235,11 @@ export class UploadListComponent implements OnInit {
         },
         error => {
           console.log(error);
-          this.notificationService.showErrorMessage(error.error.message);
+          if (error.error.message) {
+            this.notificationService.showErrorMessage(error.error.message);
+          } else {
+            this.notificationService.showErrorMessage(error.message);
+          }
         }
       );
     }
@@ -271,8 +275,12 @@ export class UploadListComponent implements OnInit {
       }, 
       error=>{
         console.log(error);
-        this.notificationService.showErrorMessage(error.error.message);
         dir.isTransfering = false;
+        if (error.error.message) {
+          this.notificationService.showErrorMessage(error.error.message);
+        } else {
+          this.notificationService.showErrorMessage(error.message);
+        }
       }
     );
     // Listen to progress.
