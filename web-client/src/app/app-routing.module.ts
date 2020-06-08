@@ -23,6 +23,7 @@ import { DataListComponent } from './components/seismic-data/data-list/data-list
 import { DataSearchComponent } from './components/public/data-search/data-search.component';
 import { LocationEditComponent } from './components/location/location-edit/location-edit.component';
 import { LocationCreateComponent } from './components/location/location-create/location-create.component';
+import { StationAttachedComponent } from './components/station/station-attached/station-attached.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -44,6 +45,7 @@ const routes: Routes = [
   { path: 'fdsn/location/edit/:locationId', component: LocationEditComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/stations', component: StationListComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'fdsn/stations/edit/:stationId', component: StationEditComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
+  { path: 'fdsn/station/attached/:stationId', component: StationAttachedComponent, canActivate: [RightPermission], data: {rights: ["RIGHT_FDSN_EDIT"]}},
   { path: 'settings', component: SettingListComponent, canActivate: [AdminPermission]},
   { path: 'settings/editSetting/:id', component: ApplicationParamEditComponent, canActivate: [AdminPermission]},
 

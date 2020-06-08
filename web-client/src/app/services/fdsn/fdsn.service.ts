@@ -12,6 +12,8 @@ import { Station } from '../../model/model.station';
 import { Channel } from '../../model/model.channel';
 import { SearchResult } from '../../model/model.search-result';
 import { LocationModel } from '../../model/model.location-model';
+import { StationInfoFile } from '../../model/model.station-info-files';
+
 
 @Injectable()
 export class FdsnService {
@@ -134,6 +136,18 @@ export class FdsnService {
 
   getMetadata(ch: Channel): Observable<Blob> {
     return this.http.get(ServerUrl.rootUrl + '/api/fdsn/getMetadata/' + ch.id, {responseType: 'blob'});
+  }
+
+  getAttachedFile(id: String): Observable<Blob> {
+    return this.http.get(ServerUrl.rootUrl + '/api/fdsn/getAttached/' + id, {responseType: 'blob'});
+  }
+
+  getStationInfoFiles(stationId: String): Observable<StationInfoFile[]> {
+    return this.http.get<StationInfoFile[]>(ServerUrl.rootUrl + '/api/fdsn/getAttachedToStation/' + stationId);
+  }
+
+  deleteAttachedFile(infoFile: StationInfoFile): Observable<boolean> {
+    return this.http.delete<boolean>(ServerUrl.rootUrl + '/api/fdsn/deleteAttachedFile/' + infoFile.id);
   }
 
 }

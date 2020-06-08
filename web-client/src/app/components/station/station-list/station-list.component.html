@@ -46,6 +46,7 @@
         <th class="center">Removal Date</th>
         <th class="center">Locations</th>
         <th class="center">Channels</th>
+        <th class="center">Info</th>
         <th class="center">Public Data</th>
         <th></th>
       </tr>
@@ -69,6 +70,12 @@
           <a routerLink="/fdsn/channels/{{station.id}}/0" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
             title="channels {{station.channels.length}}">
             <span class="fa fa-sitemap icon-medium text-shadow"></span>
+          </a>
+        </td>
+        <td class="center">
+          <a routerLink="/fdsn/station/attached/{{station.id}}" class="btn btn-xs btn-default" *ngIf="hasRight('RIGHT_FDSN_EDIT')" 
+            title="Additional information about this station.">
+            <span class="fa fa-paperclip icon-medium text-shadow"></span>
           </a>
         </td>
         <td class="center">

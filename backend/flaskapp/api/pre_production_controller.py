@@ -24,11 +24,14 @@ def upload_data(file: FileStorage):
         try:
             file_manager = MseedFileManager(root_dir, file)
             if file_manager.save():
+                file.close()
                 return response.bool_to_response(True)
             else:
+                file.close()
                 raise FileAlreadyExists("The file {} was already upload to the server".format(file.filename))
 
         except (FileNotFoundError, TypeError, ValueError) as error:
+            file.close()
             raise AppException(str(error))
 
 

@@ -34,6 +34,8 @@ class StationModel(db.Model, BaseModel):
                                cascade="save-update, merge, delete", lazy=True)
     locations = db.relationship(RelationShip.LOCATION, backref="station",
                                 cascade="save-update, merge, delete", lazy=True)
+    attached = db.relationship(RelationShip.ATTACHED, backref="station",
+                               cascade="save-update, merge, delete", lazy=True)
 
     def __repr__(self):
         return "StationModel(id={},network_id={},name={}, latitude={}, longitude={})"\

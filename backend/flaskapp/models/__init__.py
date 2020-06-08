@@ -11,6 +11,7 @@ class RelationShip:
     EQUIPMENT = "EquipmentModel"
     STATIONS = "StationModel"
     LOCATION = "LocationModel"
+    ATTACHED = "StationAttachedFileModel"
     CHANNEL = "ChannelModel"
     CHANNEL_EQUIPMENTS = "ChannelEquipmentsModel"
     SEISMIC_DATA = "SeismicDataModel"
@@ -44,6 +45,7 @@ class TableNames:
     T_TARGET_FOLDERS = "t_target_folders"
     T_SEISMIC_DATA = "t_seismic_data"
     T_FILE_DATA = "t_files_data"
+    T_STATION_ATTACHED = "t_station_attached"
 
 
 class Role:
@@ -76,4 +78,6 @@ from flaskapp.models.equipments_model import EquipmentTypeModel, EquipmentModel
 from flaskapp.models.station_channel_model import StationModel, LocationModel, ChannelModel, ChannelEquipmentsModel
 from flaskapp.models.file_transferred_model import TransferredStatusModel, FileTransferredModel
 from flaskapp.models.seismic_data_model import SeismicDataModel, FileDataModel
+from flaskapp.models.station_attached_files import StationAttachedFileModel
+
 

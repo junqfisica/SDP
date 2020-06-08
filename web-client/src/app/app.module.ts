@@ -63,6 +63,7 @@ import { DownloadFilesComponent } from './components/reusable/download-files/dow
 import { DataSearchComponent } from './components/public/data-search/data-search.component';
 import { LocationEditComponent } from './components/location/location-edit/location-edit.component';
 import { LocationCreateComponent } from './components/location/location-create/location-create.component';
+import { StationAttachedComponent } from './components/station/station-attached/station-attached.component';
 
 @NgModule({
   declarations: [
@@ -93,6 +94,7 @@ import { LocationCreateComponent } from './components/location/location-create/l
     LocationListComponent,
     LocationEditComponent,
     LocationCreateComponent,
+    StationAttachedComponent,
   ],
   imports: [
     BrowserModule,

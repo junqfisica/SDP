@@ -1,11 +1,13 @@
+from werkzeug.datastructures import FileStorage
+
 from flaskapp import app_logger
 from flaskapp.api import fdsn
 from flaskapp.extensions.geocoder import GeoCoder
 from flaskapp.http_util import response
-from flaskapp.http_util.decorators import secure, post, query_param, query
-from flaskapp.http_util.exceptions import EntityNotFound
+from flaskapp.http_util.decorators import secure, post, query_param, query, post_file
+from flaskapp.http_util.exceptions import EntityNotFound, AppException
 from flaskapp.models import Right, NetworkModel, EquipmentTypeModel, EquipmentModel, StationModel, ChannelModel, \
-    LocationModel
+    LocationModel, StationAttachedFileModel
 from flaskapp.structures.structures import Search, SearchResult
 from flaskapp.utils.date_utils import DateUtils
 from flaskapp.utils.mseed_utils import MseedMetadataHandler
@@ -296,3 +298,60 @@ def get_metadata(channel_id):
     file_path = mdh.save_metadata()
 
     return response.file_to_response(file_path, delete_after=True)
+
+
+@fdsn.route("/attacheFile/<string:station_id>", methods=["POST"])
+@secure(Right.EDIT_FDSN)
+@post_file()
+def attach_file(file: FileStorage, station_id):
+    print(file)
+    if file.content_type != 'application/pdf':
+        raise AppException("File is not a valid pdf.")
+    station_attached = StationAttachedFileModel.find_by(station_id=station_id, filename=file.filename,
+                                                        get_first=True)
+    if not station_attached:
+        station_attached = StationAttachedFileModel.create(file.filename, station_id)
+
+    if station_attached.save():
+        try:
+            station_attached.write_file(file)
+        except IOError as e:
+            app_logger.error(str(e))
+
+    file.close()
+    return response.empty_response()
+
+
+@fdsn.route("/getAttached/<string:attached_id>", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+def get_attached_file(attached_id):
+    attached: StationAttachedFileModel = StationAttachedFileModel.find_by_id(attached_id)
+    if not attached:
+        raise EntityNotFound("The attached file id {} doesn't exist".format(attached_id))
+
+    return response.file_to_response(attached.file_path, delete_after=False)
+
+
+@fdsn.route("/getAttachedToStation/<string:station_id>", methods=["GET"])
+@secure(Right.EDIT_FDSN)
+def get_attached_to_station(station_id: str):
+    attached_list = StationAttachedFileModel.find_by(station_id=station_id, get_first=False)
+    if attached_list:
+        return response.model_to_response(attached_list)
+    return response.empty_response()
+
+
+@fdsn.route("/deleteAttachedFile/<string:attached_id>", methods=["DELETE"])
+@secure(Right.DELETE_FDSN)
+def delete_attached_file(attached_id):
+    attached: StationAttachedFileModel = StationAttachedFileModel.find_by_id(attached_id)
+    if not attached:
+        raise EntityNotFound("The file id {} doesn't exist".format(attached_id))
+
+    deleted = attached.delete()
+    if deleted:
+        app_logger.info("Attached file {} has been deleted".format(attached.filename))
+    else:
+        app_logger.warning("Channel {} could't be deleted.".format(attached.filename))
+
+    return response.bool_to_response(deleted)

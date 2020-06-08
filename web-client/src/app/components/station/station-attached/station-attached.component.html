@@ -1,0 +1,158 @@
+
+<div class="container">
+    <div>
+        <tabset>
+            <tab id="attachedTab">
+                <ng-template tabHeading>
+                    <div>Files
+                        <span class="fa fa-file-pdf-o"></span>
+                    </div>
+                </ng-template>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-condensed">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let infoFile of infoFiles">
+                          <td>{{infoFile.filename}}</td>
+                          <td>
+                            <div class="pull-right">
+                              <button (click)="downloadFile(infoFile)" class="btn btn-xs btn-default" title="download">
+                                <span class="fa fa-download icon-medium text-shadow"></span>
+                              </button>
+                              <button (click)="openDeleteModal(deleteModalTemplate, infoFile)" class="btn btn-xs btn-default" 
+                                *ngIf="hasRight('RIGHT_FDSN_DELETE')" title="delete">
+                                <span class="fa fa-trash-o icon-medium text-shadow"></span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
+            </tab>
+            <tab>
+                <ng-template tabHeading>
+                    <div>Attach files
+                        <span class="fa fa-paperclip"></span>
+                    </div>
+                </ng-template>
+                <div class="page-header">
+                    <h3>Attach files: </h3>
+                </div>
+                
+                <form class="form-horizontal">
+                    <div class="row">
+                        <div class="col-sm-3">
+                        <label for="uploader-input" ng2FileDrop
+                            [ngClass]="{'nv-file-over-class': hasBaseDropZoneOver}" (fileOver)="fileOverBase($event)" 
+                            [uploader]="uploader" class="card card-body bg-light my-drop-zone"
+                            (drop)="drop($event)"
+                            webkitdirectory
+                            style="height: 100%; text-align: center;">
+                            <h5>Choose files</h5>
+                            <span>Click or Drag here to add files.</span>
+                        </label>
+                        <input type="file" [uploader]="uploader" ng2FileSelect multiple id="uploader-input" style="display:none" />
+                        </div>
+                        <div class="col-sm-9">
+                        <h5>Upload Progress</h5>
+                        <p>Items in the queue: {{ uploader?.queue?.length }}</p>
+                
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th width="50%">Name</th>
+                                <th *ngIf="uploader.options.isHTML5">Size</th>
+                                <th *ngIf="uploader.options.isHTML5">progress</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let item of uploader.queue">
+                                <td>
+                                <strong>{{ item?.file?.name }}</strong>
+                                </td>
+                                <td *ngIf="uploader.options.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
+                                <td *ngIf="uploader.options.isHTML5">
+                                <div class="progress" style="margin-bottom: 0;">
+                                    <div class="progress-bar" role="progressbar"
+                                    [ngStyle]="{ 'width': item.progress + '%' }"></div>
+                                </div>
+                                </td>
+                                <td class="text-center">
+                                <span *ngIf="item.isSuccess">
+                                    <i class="fa fa-check" title="uploaded"></i>
+                                </span>
+                                <span *ngIf="item.isCancel">
+                                    <i class="fa fa-close" title="canceled"></i>
+                                </span>
+                                <span *ngIf="item.isError">
+                                    <i class="fa fa-exclamation-triangle" [title]="item?.errormessage"></i>
+                                </span>
+                                </td>
+                                <td rowrap>
+                                <button (click)="item.upload()" class="btn btn-sm btn-success" *ngIf="hasRight('RIGHT_DATA_UPLOAD')" 
+                                    title="Upload" [disabled]="item.isReady || item.isUploading || item.isSuccess">
+                                    <span class="fa fa-upload"></span>
+                                </button>
+                                <button (click)="item.cancel()" class="btn btn-sm btn-info" *ngIf="hasRight('RIGHT_DATA_UPLOAD')" 
+                                    title="Cancel" [disabled]="!item.isUploading">
+                                    <span class="fa fa-close"></span>
+                                </button>
+                                <button (click)="item.remove()" class="btn btn-sm btn-danger" *ngIf="hasRight('RIGHT_DATA_UPLOAD')" title="Remove">
+                                    <span class="fa fa-trash-o"></span>
+                                </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <div>
+                            Progress:
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }"></div>
+                            </div>
+                            </div>
+                            <div style="padding-top:10pt">
+                            <button type="button" class="btn btn-success btn-s" (click)="uploader.uploadAll()" [disabled]="!uploader.getNotUploadedItems().length">
+                                <span class="fa fa-upload"></span> Upload all
+                            </button>
+                            <button type="button" class="btn btn-info btn-s" (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
+                                <span class="fa fa-close"></span> Cancel uploads
+                            </button>
+                            <button type="button" class="btn btn-danger btn-s" (click)="uploader.clearQueue()" [disabled]="!uploader.queue.length">
+                                <span class="fa fa-trash-o"></span> Clear all
+                            </button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </form>
+                <div style="color: red"> Valid formats:
+                    <span *ngFor="let ext of supportedFileExt"> *.{{ext}}</span> 
+                </div>
+            </tab>
+        </tabset>
+    </div>
+</div>
+
+<!-- Modal temples -->
+<ng-template #deleteModalTemplate let-c="close" let-d="dismiss"  class="modal fade">
+    <div class="modal-header">
+      <h4 class="modal-title">Delete file {{deleteData?.filename}}</h4>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this?</p>
+      <p style="color: red">*The file will be removed from storage!!</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-dark btn-shadow" (click)="deleteDataFromModal()">Delete</button>
+      <button type="button" class="btn btn-danger btn-shadow" (click)="closeDeleteModal()">Cancel</button>
+    </div>
+</ng-template>

@@ -313,3 +313,16 @@ create table SDP.T_FILES_DATA
 );
 grant all privileges on table SDP.T_FILES_DATA to SDP;
 
+
+create table SDP.T_STATION_ATTACHED (
+    ID varchar(16) not null,
+    FILENAME varchar(50) not null,
+    RELATIVE_PATH varchar(400) not null,
+    TARGET_FOLDER_ID varchar(16) not null,
+    STATION_ID varchar(16) not null,
+    primary key (ID),
+    foreign key (TARGET_FOLDER_ID) references SDP.T_TARGET_FOLDERS (ID) on delete restrict,
+    foreign key (STATION_ID) references SDP.T_STATIONS (ID) on delete restrict
+);
+grant all privileges on table SDP.T_STATION_ATTACHED to SDP;
+
