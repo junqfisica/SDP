@@ -15,7 +15,7 @@ export class LocationForm {
         this._currentStation = currentStation;
 
         this._form = this.formBuilder.group({
-            name: ['', {validators: [Validators.required, Validators.minLength(3), Validators.maxLength(5)], updateOn: 'change'}],
+            name: ['', {validators: [Validators.required, Validators.minLength(2), Validators.maxLength(2)], updateOn: 'change'}],
             latitude: [currentStation.latitude, {validators: [Validators.required, Validators.min(-90), Validators.max(90), 
               Validators.pattern(new RegExp(/^-?\d+(\.\d{5,6})/))], updateOn: 'change'}],
             longitude: [currentStation.longitude, {validators: [Validators.required, Validators.min(-180), Validators.max(180), 

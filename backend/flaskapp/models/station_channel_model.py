@@ -200,7 +200,7 @@ class LocationModel(db.Model, BaseModel):
         return location.save()
 
     @classmethod
-    def create_location_at_station(cls, station: StationModel, name="LOC"):
+    def create_location_at_station(cls, station: StationModel, name="00"):
         """
         Create a location for a given station. See also, create_location(location_dict).
 
