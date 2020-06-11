@@ -108,3 +108,6 @@ venv.bak/
 
 # GeoCode key
 GeoKey.txt
+
+#remove config_test.py with sensitive information.
+/flaskapp/config_test.py

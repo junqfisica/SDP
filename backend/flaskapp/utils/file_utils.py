@@ -1,6 +1,8 @@
 # Util methods to handle files.
 import os
+import shlex
 import shutil
+import subprocess as sp
 import tarfile
 import tempfile
 from typing import List
@@ -112,3 +114,53 @@ def is_dir_online(dir_path: str):
         return True
     else:
         return False
+
+
+def ssh_scp(source: str, destine: str, psw: str):
+    """
+
+    :param source:
+    :param destine:
+    :param psw:
+    :return:
+    """
+
+    if os.path.isdir(source):
+        cmd = shlex.split("sshpass -p '{pws}' scp -r {source} {destine}".format(pws=psw,
+                                                                                source=source, destine=destine))
+    else:
+        cmd = shlex.split("sshpass -p '{pws}' scp {source} {destine}".format(pws=psw,
+                                                                             source=source, destine=destine))
+    with sp.Popen(cmd,
+                  stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE, encoding="utf-8") as p:
+        try:
+            std_out, std_err = p.communicate(timeout=3600*4)
+            print("done", str(std_out))
+        except sp.TimeoutExpired as e:
+            print("Timeout error", e, p.returncode)
+            p.kill()
+            std_out, std_err = p.communicate()
+        if p.returncode != 0:  # Bad error.
+            raise sp.CalledProcessError(p.returncode, std_err)
+        elif len(std_err) != 0:  # Some possible errors trowed by the running subprocess, but not critical.
+            raise sp.SubprocessError(std_err)
+        return std_out
+
+
+def create_rsync_bash(user: str, host_ip: str, psw, files_to_download: List[str], destine: str, file_path=None):
+    print(file_path)
+    file_tag = ""
+    with open(file_path, "w") as f:
+        f.write("#!/bin/bash\n\n")
+        f.write("psw='{}'\n".format(psw))
+        f.write("user='{}'\n".format(user))
+        f.write("host_ip='{}'\n".format(host_ip))
+        f.write("dest='{}'\n\n".format(destine))
+        for index, path in enumerate(files_to_download):
+            f.write("file{}='{}'\n".format(index, path))
+            file_tag += ":$file{} ".format(index)
+        f.write("\n")
+        f.write('rsync -ro -P --rsh="sshpass -p $psw ssh -l $user" $host_ip{}$dest'.format(file_tag))
+
+
+
