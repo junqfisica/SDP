@@ -38,6 +38,16 @@ def download_files(channel_id):
     return response.file_to_response(tar_filename, delete_after=True)
 
 
+@data.route("/rsyncFiles/<string:channel_id>", methods=["GET"])
+@secure(Right.RSYNC_DOWNLOAD)
+def rsync_files(channel_id):
+    ch: ChannelModel = ChannelModel.find_by_id(channel_id)
+    if not ch:
+        raise EntityNotFound("The channel with id {} doesn't exist".format(channel_id))
+    bash_filename = ch.bash_rsync_files()
+    return response.file_to_response(bash_filename, delete_after=True)
+
+
 @data.route("/downloadFileList", methods=["POST"])
 @secure(Right.EDIT_FDSN)
 @post()

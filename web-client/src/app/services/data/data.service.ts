@@ -33,6 +33,10 @@ export class DataService {
     return this.http.get(ServerUrl.rootUrl + '/api/data/downloadFiles/' + ch.id, {responseType: 'blob'});
   }
 
+  rsyncFiles(ch: Channel): Observable<Blob> {
+    return this.http.get(ServerUrl.rootUrl + '/api/data/rsyncFiles/' + ch.id, {responseType: 'blob'});
+  }
+
   downloadFileList(seismicDataList: SeismicData[]):  Observable<Blob> {
     return this.http.post(ServerUrl.rootUrl + '/api/data/downloadFileList', seismicDataList, {responseType: 'blob'});
   }

@@ -1,6 +1,6 @@
 import unittest
 
-from flaskapp.config_test import ConfigSSHTest
+from flaskapp.config_ssh import ConfigSSHTest
 from flaskapp.utils.file_utils import ssh_scp, create_rsync_bash
 
 

@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import List
 
 from flaskapp import db, app_utils
+from flaskapp.config_ssh import ConfigSSHWhiteDwarf
 from flaskapp.http_util.exceptions import CreateEntityError
 from flaskapp.models import BaseModel, TableNames, RelationShip, EquipmentModel
 from flaskapp.utils import file_utils
@@ -422,6 +423,19 @@ class ChannelModel(db.Model, BaseModel):
         for sd in self.seismic_data:
             file_paths.append(sd.file_path)
         return file_utils.tar_files(file_paths)
+
+    def bash_rsync_files(self, client_destine=None):
+        """
+        Create a .sh file to rsync all mseed files that belong to this channel.
+
+        :param client_destine: The client destination to rsync the files.
+
+        :return: The .sh file path.
+        """
+        files_path = [sd.file_path for sd in self.seismic_data]
+        return file_utils.create_rsync_bash(ConfigSSHWhiteDwarf.USER,
+                                            ConfigSSHWhiteDwarf.REMOTE_IP,
+                                            ConfigSSHWhiteDwarf.PSW, files_path, client_destine)
 
     @classmethod
     def create_channel(cls, channel_dict: dict):

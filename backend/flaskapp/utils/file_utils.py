@@ -147,20 +147,43 @@ def ssh_scp(source: str, destine: str, psw: str):
         return std_out
 
 
-def create_rsync_bash(user: str, host_ip: str, psw, files_to_download: List[str], destine: str, file_path=None):
-    print(file_path)
+def create_rsync_bash(user: str, host_ip: str, psw: str, files_to_download: List[str], destine=None, output_path=None):
+    """
+    Create a bash file that uses rsync to download files from server.
+
+    :param user: The server user name.
+    :param host_ip: The server ip.
+    :param psw: The password for the user.
+    :param files_to_download: The list of files paths to download.
+    :param destine: The client destination to rsync the files.
+    :param output_path: The bash output file path. If none it will create a temp file.
+    :return: The bash file path.
+    """
+    print(output_path)
     file_tag = ""
-    with open(file_path, "w") as f:
+    if not output_path:
+        tmp_file = tempfile.NamedTemporaryFile(suffix=".sh")
+        output_path = tmp_file.name
+        tmp_file.close()
+
+    if not destine:
+        destine = "dest=$(pwd)\n\n"  # get current dir where this bash will run.
+    else:
+        destine = "dest='{}'\n\n".format(destine)
+
+    with open(output_path, "w") as f:
         f.write("#!/bin/bash\n\n")
         f.write("psw='{}'\n".format(psw))
         f.write("user='{}'\n".format(user))
         f.write("host_ip='{}'\n".format(host_ip))
-        f.write("dest='{}'\n\n".format(destine))
+        f.write(destine)
         for index, path in enumerate(files_to_download):
             f.write("file{}='{}'\n".format(index, path))
             file_tag += ":$file{} ".format(index)
         f.write("\n")
         f.write('rsync -ro -P --rsh="sshpass -p $psw ssh -l $user" $host_ip{}$dest'.format(file_tag))
+
+    return output_path
 
 
 

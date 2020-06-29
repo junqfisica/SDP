@@ -64,6 +64,7 @@ class Right:
     CREATE_FDSN = "RIGHT_FDSN_CREATE"
     DELETE_FDSN = "RIGHT_FDSN_DELETE"
     EDIT_FDSN = "RIGHT_FDSN_EDIT"
+    RSYNC_DOWNLOAD = "RIGHT_RSYNC_DOWNLOAD"
 
 
 # Import models. Watch for circular dependencies.

@@ -110,4 +110,4 @@ venv.bak/
 GeoKey.txt
 
 #remove config_test.py with sensitive information.
-/flaskapp/config_test.py
+/flaskapp/config_ssh.py

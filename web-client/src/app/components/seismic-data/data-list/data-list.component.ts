@@ -314,6 +314,31 @@ export class DataListComponent extends ComponentUtils implements OnInit {
     );
   }
 
+
+  rsyncFiles(ch: Channel){
+    this.dataService.rsyncFiles(ch).subscribe(
+      file => {
+        if (file !== null) {
+          const blob = new Blob([file], { type: file.type});
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.setAttribute('style', 'display: none');
+          a.href = url;
+          a.download = "rsync_" + this.station.name + "-" + ch.name + ".sh";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a); // remove the element
+          window.URL.revokeObjectURL(url);
+        } else {
+          this.notificationService.showWarningMessage("Couldn't create the bash file, please try again later.")
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
   clearFilter(): void {
     this.startTimeFilter = null;
     this.stopTimeFilter = null;

@@ -25,7 +25,7 @@
     <div class="row-justify">
       <button type="button" class="btn btn-lg btn-default button-transparent" (click)="isChannelInfoCollapsed = !isChannelInfoCollapsed"
         [attr.aria-expanded]="!isChannelInfoCollapsed" aria-controls="collapseChannelInfo" 
-        style="font-size: 150%;" title="Click to expand info about channel.">Files at Channel {{channel.name}}
+        style="font-size: 150%;" title="Click to expand info about channel.">Files at Channel {{channel.name}}-{{channel.location_code}}
         <span *ngIf="isChannelInfoCollapsed" class="fa fa-chevron-up icon-medium"></span>
         <span *ngIf="!isChannelInfoCollapsed" class="fa fa-chevron-down icon-medium"></span> 
       </button>
@@ -51,6 +51,10 @@
   <div class="center" style="margin-top: 1%">
     <app-download-metadata [channel]=channel filename="{{station?.name}}-{{channel.name}}" [showIcon]="false"></app-download-metadata>
     <app-download-files style="margin-left: 1%"  [data]=seismicData filename="{{station?.name}}-{{channel.name}}" [showIcon]="false"></app-download-files>
+    <button [disabled]="!hasRight('RIGHT_RSYNC_DOWNLOAD')" (click)="rsyncFiles(channel)" style="margin-left: 1%" class="btn btn-dark btn btn-shadow"
+    [popover]="popBashFileTemplate" triggers="mouseenter:mouseleave">
+      <span class="fa fa-file-code-o icon-medium"></span> Rsync bash
+    </button>
   </div>
   <div style="margin-top: 1%">
     <app-wrap-tl-google-chart [dataSet]="seismicData"></app-wrap-tl-google-chart>
@@ -298,6 +302,20 @@
   <div *ngIf="!isRenamingFiles" class="modal-footer">
     <button type="button" class="btn btn-dark btn-shadow" (click)="renameFiles(progress)"[disabled]="isRenamingFiles">Rename</button>
     <button type="button" class="btn btn-danger btn-shadow" (click)="closeRenameModal()" [disabled]="isRenamingFiles">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #popBashFileTemplate>
+  <div style="text-align: center">
+    <div>
+      <strong>Download a bash file to rsync data from this channel. You must have Rsync_Download rights to use this.</strong>
+    </div>
+    <div>
+      <strong style="color: red; font-size: 120%">The files will be transferred to the dir you run this bash!!</strong>
+    </div>
+    <div>Run with:
+      <i>sudo sh filename</i>
+    </div>
   </div>
 </ng-template>
   

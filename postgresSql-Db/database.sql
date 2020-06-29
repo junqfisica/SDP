@@ -33,6 +33,7 @@ insert into SDP.S_RIGHTS values ('RIGHT_DATA_UPLOAD','Upload data');
 insert into SDP.S_RIGHTS values ('RIGHT_FDSN_CREATE','Create FDSN metadata');
 insert into SDP.S_RIGHTS values ('RIGHT_FDSN_DELETE','Delete FDSN metadata');
 insert into SDP.S_RIGHTS values ('RIGHT_FDSN_EDIT','Edit FDSN metadata');
+insert into SDP.S_RIGHTS values ('RIGHT_RSYNC_DOWNLOAD','Can download a rsync bash');
 
 create table SDP.S_ROLES
 (
@@ -63,6 +64,7 @@ insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_DATA_UPLOAD');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_FDSN_CREATE');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_FDSN_DELETE');
 insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_FDSN_EDIT');
+insert into SDP.T_ROLES_RIGHTS values ('ROLE_ADMIN','RIGHT_RSYNC_DOWNLOAD');
 
 create table SDP.T_USER (
 	ID varchar(16) not null, 
@@ -123,6 +125,7 @@ insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_DATA_UPLOAD');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_FDSN_DELETE');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_FDSN_CREATE');
 insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_FDSN_EDIT');
+insert into SDP.T_USER_RIGHTS values ('A7BU1ZBUgL','RIGHT_RSYNC_DOWNLOAD');
 
 create table SDP.T_APPLICATION_PARAMS
 (
