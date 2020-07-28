@@ -38,12 +38,12 @@ class TestFileUtils(TestCase):
         print(file_utils.zip_files(files_path))
 
     def test_archive_dir(self):
-        base_dir = "/media/junqueira/DATA/Test_SDP_DATA/ROBO/200Hz"
-        output_path = "/media/junqueira/DATA/Test_SDP_DATA/test.zip"
+        base_dir = "/media/junqueira/DATA/Test_SDP_DATA/G1_HHE/"
+        output_path = "/media/junqueira/DATA/Test_SDP_DATA/test"
         if os.path.exists(output_path):
             os.remove(output_path)
-        # file_utils.archive_dir(base_dir, output_path)
-        print(file_utils.archive_dir(base_dir, "tar"))
+        file_utils.archive_dir(base_dir, file_format="tar", output_path=output_path)
+        # print(file_utils.archive_dir(base_dir, "tar"))
 
     def test_tar_files(self):
         base_dir = "/media/junqueira/DATA/Test_SDP_DATA/ROBO/200Hz"
